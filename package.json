@@ -1,8 +1,8 @@
 {
-  "name": "rpi_mqtt_broker",
+  "name": "iot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,8 +12,6 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "mqtt": "^3.0.0",
-    "save": "^2.4.0",
-    "socket.io": "^2.3.0",
-    "socket.io-mqtt": "^0.1.0"
+    "socket.io": "^2.3.0"
   }
 }
