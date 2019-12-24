@@ -18,7 +18,8 @@ client.on('connect', function () {
       console.log('ready to shake hands');
       client.publish('penumats/handshake/reinitiate',"hi")
     }
-  })
+  });
+  client.subscribe("penumats/update");
 });
  
 client.on('message', function (topic, message,packet) {
@@ -28,6 +29,14 @@ client.on('message', function (topic, message,packet) {
     if(id){
       state.boards[id]=JSON.parse(message.toString());
       console.log("board registered",JSON.stringify(state.boards));
+    }
+  }
+  if(topic=="penumats/update"&&!packet.retain){
+    console.log("new switch state");
+    let id = JSON.parse(message.toString()).id;
+    if(id){
+      state.boards[id]=JSON.parse(message.toString());
+      console.log("boards updated",JSON.stringify(state.boards));
     }
   }
 });
@@ -77,7 +86,7 @@ app.get('/boards',function(req,res){
           let ob={};
           ob.label=null;
           ob.on="/on?b="+m+"&s="+index;
-          ob.off="/on?b="+m+"&s="+index;
+          ob.off="/off?b="+m+"&s="+index;
           ob.state = n;
           boards[m].switches.push(ob);
           return n;

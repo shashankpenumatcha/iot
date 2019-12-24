@@ -13,7 +13,7 @@ long lastMsg = 0;
 char msg[50];
 int value = 0;
 String id = "nodemcu1";
-int switches[] = {BUILTIN_LED};
+int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
 
 void setup_wifi() {
@@ -49,7 +49,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
   if(String(topic) == "penumats/handshake/reinitiate"){
     Serial.print("reinitiating");
-     //client.publish("penumats/handshake/connect",("{\"id\":\""+id+"\"}").c_str());
      char buffer[512];
     size_t n = serializeJson(doc, buffer);
     client.publish("penumats/handshake/connect", buffer, n);
@@ -60,10 +59,15 @@ void callback(char* topic, byte* payload, unsigned int length) {
     deserializeJson(docx, payload, length);
     Serial.println();
     int s = docx.getMember(String("switch"));
-    int pin = switches[s];
+    int pin = pins[s];
     if(NULL!=pin){
        Serial.println("turning on switch");
        digitalWrite(pin, LOW);
+       doc.getMember(String("switches"))[s]=true;
+       char buffer[512];
+       size_t n = serializeJson(doc, buffer);
+       client.publish("penumats/update",buffer,n);
+       
      }
   }
   
@@ -72,10 +76,15 @@ void callback(char* topic, byte* payload, unsigned int length) {
     deserializeJson(docx, payload, length);
     Serial.println();
     int s = docx.getMember(String("switch"));
-    int pin = switches[s];
+    int pin = pins[s];
+        
     if(NULL!=pin){
        Serial.println("turning off switch");
        digitalWrite(pin, HIGH);
+       doc.getMember(String("switches"))[s]=false;
+       char buffer[512];
+        size_t n = serializeJson(doc, buffer);
+        client.publish("penumats/update",buffer,n);
     }
   }
 
@@ -90,7 +99,6 @@ void reconnect() {
       client.subscribe("penumats/handshake/reinitiate");
       client.subscribe(("penumats/"+id+"/switch/on").c_str());
       client.subscribe(("penumats/"+id+"/switch/off").c_str());
-     // client.publish("penumats/handshake/connect", ("{\"id\":\""+id+"\"}").c_str());
       char buffer[512];
     size_t n = serializeJson(doc, buffer);
     client.publish("penumats/handshake/connect", buffer, n);
