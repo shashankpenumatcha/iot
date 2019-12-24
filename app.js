@@ -13,7 +13,7 @@ let state={};
 state.boards={};
  
 client.on('connect', function () {
-  client.subscribe('penumats/handshake/connect', function (err) {
+  client.subscribe('penumats/handshake/connect',{qos:2,rh:false,rap:false}, function (err) {
     if (!err) {
       console.log('ready to shake hands');
       client.publish('penumats/handshake/reinitiate',"hi")
@@ -21,8 +21,8 @@ client.on('connect', function () {
   })
 });
  
-client.on('message', function (topic, message) {
-  if(topic=="penumats/handshake/connect"){
+client.on('message', function (topic, message,packet) {
+  if(topic=="penumats/handshake/connect"&&!packet.retain){
     console.log("new nmcu handshake initiated");
     let id = JSON.parse(message.toString()).id;
     if(id){
