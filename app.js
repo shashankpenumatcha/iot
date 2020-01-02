@@ -50,7 +50,7 @@ socket.on('connect', function(){
 
 
 function initDevice(){
-  var client  = mqtt.connect('mqtt://test.mosquitto.org')
+  var client  = mqtt.connect('mqtt://raspberrypi.local:1883')
   
   client.on('connect', function () {
     client.subscribe('penumats/handshake/connect',{qos:2,rh:false,rap:false}, function (err) {
