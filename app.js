@@ -35,6 +35,7 @@ function write_template_to_file(template_path, file_name, context, callback) {
 
       function update_file(file_txt, next_step) {
         console.log(file_txt)
+        console.log(context)
           var template = _.template(file_txt);
           fs.writeFile(file_name, template(context), next_step);
       }
@@ -128,8 +129,8 @@ _reboot_wireless_network = function(wlan_iface, callback) {
 
 
   var conn_info = {
-    wifi_ssid:      'Shashanks',
-    wifi_passcode:  'meenakshi1234',
+    wifi_ssid:'Shashanks',
+    wifi_passcode:'meenakshi1234'
 };
 
 // TODO: If wifi did not come up correctly, it should fail
