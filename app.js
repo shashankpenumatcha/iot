@@ -8,7 +8,6 @@ var path = require('path');
 var io = require('socket.io-client');
 var socket = io.connect('http://shashank.local:3001', {reconnection: false,forceNew:true});
 
-
   
 var _       = require("underscore")._,
     async   = require("async"),
@@ -35,6 +34,7 @@ function write_template_to_file(template_path, file_name, context, callback) {
       },
 
       function update_file(file_txt, next_step) {
+        console.log(context)
           var template = _.template(file_txt);
           fs.writeFile(file_name, template(context), next_step);
       }
@@ -44,18 +44,13 @@ function write_template_to_file(template_path, file_name, context, callback) {
 
 _reboot_wireless_network = function(wlan_iface, callback) {
   async.series([
-      function down(next_step) {
-          exec("sudo ifconfig " + wlan_iface + " down", function(error, stdout, stderr) {
-              if (!error) console.log("ifconfig " + wlan_iface + " down successful...");
+      function restart(next_step) {
+          exec("sudo wpa_cli -i wlan0 reconfigure", function(error, stdout, stderr) {
+              if (!error) console.log("wifi reset done");
               next_step();
           });
-      },
-      function up(next_step) {
-          exec("sudo ifconfig " + wlan_iface + " up", function(error, stdout, stderr) {
-              if (!error) console.log("ifconfig " + wlan_iface + " up successful...");
-              next_step();
-          });
-      },
+      }
+     
   ], callback);
 }
 
