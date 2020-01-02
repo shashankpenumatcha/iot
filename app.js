@@ -130,7 +130,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
 
 // TODO: If wifi did not come up correctly, it should fail
 // currently we ignore ifup failures.
-enable_wifi_mode(conn_info, function(error) {
+_enable_wifi_mode(conn_info, function(error) {
     if (error) {
         console.log("Enable Wifi ERROR: " + error);
       
