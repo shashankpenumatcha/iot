@@ -2,8 +2,8 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "";
-const char* password = "";
+const char* ssid = "Shashank";
+const char* password = "meenakshi1234";
 const char* mqtt_server = "test.mosquitto.org";
 
 WiFiClient espClient;
@@ -12,7 +12,7 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
-String id = "nodemcu1";
+String id = "nodemcu2";
 int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
 
@@ -115,7 +115,7 @@ void reconnect() {
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(115200);
-  doc["id"] = "nodemcu1";
+  doc["id"] = "nodemcu2";
   JsonArray switches = doc.createNestedArray("switches");
   switches.add(true);
   Serial.println();
