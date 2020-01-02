@@ -7,9 +7,14 @@ var mqtt = require('mqtt')
 var path = require('path');
 var io = require('socket.io-client');
 var socket = io.connect('http://shashank.local:3001', {reconnection: false,forceNew:true});
-require ('./wifi.js');
 
-console.log(wifi)
+  
+var _       = require("underscore")._,
+    async   = require("async"),
+    fs      = require("fs"),
+    exec    = require("child_process").exec
+
+
 const deviceId='rpi1';
 var device = null; //registered device from server
 var boards = []; //registered boards from server
@@ -18,16 +23,77 @@ let state={};
 state.boards={};
 
 
-
-var conn_info = {
-  wifi_ssid:'Shashanks',
-  wifi_passcode:'meenakshi1234'
+// Better template format
+_.templateSettings = {
+  interpolate: /\{\{(.+?)\}\}/g,
+  evaluate :   /\{\[([\s\S]+?)\]\}/g
 };
+// Helper function to write a given template to a file based on a given
+// context
+function write_template_to_file(template_path, file_name, context, callback) {
+  async.series([
+
+      function read_template_file(next_step) {
+          fs.readFile(template_path, {encoding: "utf8"}, next_step);
+      },
+
+      function update_file(file_txt, next_step) {
+        console.log(file_txt)
+        console.log(context)
+          var template = _.template(file_txt)
+          console.log(template)
+          console.log(template(context))
+          fs.writeFile(file_name, template(context), next_step);
+      }
+
+  ], callback);
+}
+
+_reboot_wireless_network = function(wlan_iface, callback) {
+  async.series([
+      function restart(next_step) {
+          exec("sudo wpa_cli -i wlan0 reconfigure", function(error, stdout, stderr) {
+              if (!error) console.log("wifi reset done");
+              next_step();
+          });
+      }
+     
+  ], callback);
+}
+
+    // Disables AP mode and reverts to wifi connection
+    _enable_wifi_mode = function(connection_info, callback) {
+
+          
+
+      async.series([
+        //Add new network
+        function update_wpa_supplicant(next_step) {
+          write_template_to_file(
+              "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
+              "/etc/wpa_supplicant/wpa_supplicant.conf",
+              connection_info, next_step);
+          },
+          function reboot_network_interfaces(next_step) {
+              _reboot_wireless_network('wlan0', next_step);
+          },
+      ], callback);
+      
+
+  };
+
+
+  var conn_info = {
+    wifi_ssid:'Shashanks',
+    wifi_passcode:'meenakshi1234'
+};
+wlr;
 // TODO: If wifi did not come up correctly, it should fail
 // currently we ignore ifup failures.
 _enable_wifi_mode(conn_info, function(error) {
     if (error) {
         console.log("Enable Wifi ERROR: " + error);
+      
     }
     // Success! - exit
     console.log("Wifi Enabled! - Exiting");
