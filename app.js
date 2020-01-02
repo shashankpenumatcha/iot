@@ -36,7 +36,9 @@ function write_template_to_file(template_path, file_name, context, callback) {
       function update_file(file_txt, next_step) {
         console.log(file_txt)
         console.log(context)
-          var template = _.template(file_txt);
+          var template = _.template(file_txt)
+          console.log(template)
+          console.log(template(context))
           fs.writeFile(file_name, template(context), next_step);
       }
 
