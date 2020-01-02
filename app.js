@@ -24,6 +24,17 @@ state.boards={};
 
 
 
+var Wifi = require('rpi-wifi-connection');
+var wifi = new Wifi();
+ 
+wifi.connect({ssid:'my-network', psk:'raspberry'}).then(() => {
+    console.log('Connected to network.');
+})
+.catch((error) => {
+    console.log(error);
+});
+
+
 // Helper function to write a given template to a file based on a given
 // context
 function write_template_to_file(template_path, file_name, context, callback) {
@@ -134,7 +145,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
 
 // TODO: If wifi did not come up correctly, it should fail
 // currently we ignore ifup failures.
-_enable_wifi_mode(conn_info, function(error) {
+/* _enable_wifi_mode(conn_info, function(error) {
     if (error) {
         console.log("Enable Wifi ERROR: " + error);
       
@@ -143,7 +154,7 @@ _enable_wifi_mode(conn_info, function(error) {
     console.log("Wifi Enabled! - Exiting");
     process.exit(0);
 });
-
+ */
 
 
 
