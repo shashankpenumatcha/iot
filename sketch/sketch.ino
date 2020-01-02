@@ -2,9 +2,9 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "Shashank";
-const char* password = "meenakshi1234";
-const char* mqtt_server = "test.mosquitto.org";
+const char* ssid = "_AP_SSID_";
+const char* password = "_AP_PASSWORD_";
+const char* mqtt_server = "raspberrypi.local";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
