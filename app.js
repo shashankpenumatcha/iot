@@ -123,7 +123,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
               }, */
 
               function reboot_network_interfaces(next_step) {
-                  _reboot_wireless_network(config.wifi_interface, next_step);
+                  _reboot_wireless_network('wlan0', next_step);
               },
 
           ], callback);
