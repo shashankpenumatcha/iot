@@ -7,6 +7,15 @@ var mqtt = require('mqtt')
 var path = require('path');
 var io = require('socket.io-client');
 var socket = io.connect('http://shashank.local:3001', {reconnection: false,forceNew:true});
+
+
+  
+var _       = require("underscore")._,
+    async   = require("async"),
+    fs      = require("fs"),
+    exec    = require("child_process").exec
+
+
 const deviceId='rpi1';
 var device = null; //registered device from server
 var boards = []; //registered boards from server
