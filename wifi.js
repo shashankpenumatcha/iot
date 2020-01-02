@@ -64,6 +64,3 @@ _reboot_wireless_network = function(wlan_iface, callback) {
 };
 
 
-module.exports = {
-    joinWifi: _enable_wifi_mode
- };

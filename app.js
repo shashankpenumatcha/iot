@@ -7,7 +7,7 @@ var mqtt = require('mqtt')
 var path = require('path');
 var io = require('socket.io-client');
 var socket = io.connect('http://shashank.local:3001', {reconnection: false,forceNew:true});
-var wifi = require('./wifi.js');
+require ('./wifi.js');
 
 console.log(wifi)
 const deviceId='rpi1';
@@ -25,7 +25,7 @@ var conn_info = {
 };
 // TODO: If wifi did not come up correctly, it should fail
 // currently we ignore ifup failures.
-wifi.joinWifi(conn_info, function(error) {
+_enable_wifi_mode(conn_info, function(error) {
     if (error) {
         console.log("Enable Wifi ERROR: " + error);
     }
