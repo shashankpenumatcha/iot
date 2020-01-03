@@ -205,30 +205,38 @@ function initDevice(){
 
   app.get('/wifi/scan',function(req,res){
     
-    wifi.getNetworks((networks) => {
+    wifi.getNetworks().then((networks) => {
       if(networks&&networks.length){
         return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
 
       }
       return res.status(200).send({"networks":[]});
+    },err=>{
+      res.status(500).send({'error':[]})
     });
   
   })
 
   app.get('/wifi/status',function(req,res){
     
-    wifi.getState((connected) => {
+    wifi.getState().then((connected) => {
         if(connected){
-          wifi.getNetworks((networks) => {
+          wifi.getNetworks().then((networks) => {
             if(networks&&networks.length){
               return res.status(200).send({"network":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
       
             }
             return res.status(500).send('error while getting wifi network info');
+          },err=>{
+            return res.status(500).send({"error":err});
+
           });
         }else{
           return res.status(200).send({"network":[]});
         }
+    },err=>{
+      return res.status(500).send({"error":err});
+
     });
   
   })
