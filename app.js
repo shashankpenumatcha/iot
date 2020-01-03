@@ -44,7 +44,7 @@ function login(username,password){
   if(username&&password&&localusers.length){
     let user = localusers.filter(f=>f.username==username);
     if(user&&user.password){
-      return user.password
+      return {"token":user.password}
     }
   }
   return null
@@ -203,21 +203,32 @@ function initDevice(){
   })
 
 
-  app.get('/scan',function(req,res){
+  app.get('/wifi/scan',function(req,res){
     
-    wifi.scan((err, networks) => {
-      if (err) {
-        console.error(err);
-          return res.status(500).send(err);
-      }
+    wifi.getNetworks((networks) => {
       if(networks&&networks.length){
-        return res.status(200).send(networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid))
+        return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
 
-      }else{
-      
       }
-      console.log(networks);
-      return res.status(200).send([]);
+      return res.status(200).send({"networks":[]});
+    });
+  
+  })
+
+  app.get('/wifi/status',function(req,res){
+    
+    wifi.getState((connected) => {
+        if(connected){
+          wifi.getNetworks((networks) => {
+            if(networks&&networks.length){
+              return res.status(200).send({"network":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
+      
+            }
+            return res.status(500).send('error while getting wifi network info');
+          });
+        }else{
+          return res.status(200).send({"network":[]});
+        }
     });
   
   })
