@@ -205,14 +205,16 @@ function initDevice(){
     wifi.scan((err, networks) => {
       if (err) {
         console.error(err);
-          res.status(500).send(err);
+          return res.status(500).send(err);
       }
       if(networks&&networks.length){
-        res.status(200).send(networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid))
+        return res.status(200).send(networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid))
 
+      }else{
+      
       }
-      res.status(200).send([]);
       console.log(networks);
+      return res.status(200).send([]);
     });
   
   })
