@@ -7,8 +7,19 @@ var mqtt = require('mqtt')
 var path = require('path');
 var io = require('socket.io-client');
 var socket = io.connect('http://shashank.local:3001', {reconnection: false,forceNew:true});
-
+var fs = require("fs");
+const bcrypt = require('bcrypt');
+//const scanner = require('node-wifi-scanner');
+var wifi = require("node-wifi");
+ 
+// Initialize wifi module
+// Absolutely necessary even to set interface to null
+wifi.init({
+  iface: null // network interface, choose a random wifi interface if set to null
+});
+ 
 require("./wifi.js");
+
 
 const deviceId='rpi1';
 var device = null; //registered device from server
@@ -16,31 +27,54 @@ var boards = []; //registered boards from server
 let connections=[];
 let state={};
 state.boards={};
+let localusers = [];
 
 
 
-  var conn_info = {
-    wifi_ssid:'Shashanks',
-    wifi_passcode:'meenakshi1234'
-};
+    
 
-// TODO: If wifi did not come up correctly, it should fail
-// currently we ignore ifup failures.
-_enable_wifi_mode(conn_info, function(error) {
-    if (error) {
-        console.log("Enable Wifi ERROR: " + error);
-      
+getLocalUsers();
+initDevice();
+
+
+function login(username,password){
+  if(username&&password&&localusers.length){
+    let user = localusers.filter(f=>f.username==username);
+    if(user&&user.password){
+      return user.password
     }
-    // Success! - exit
-    console.log("Wifi Enabled! - Exiting");
-    process.exit(0);
-});
+  }
+  return null
+}
+
+function getLocalUsers(){
+  try{
+    let rawdata = fs.readFileSync('./assets/auth.json');
+     localusers = JSON.parse(rawdata);
+     console.log(localusers)
+  }catch(e){
+    console.log("error while fetching local user");
+    console.log(e);
+  }
+}
+
+function validateLocalUser(token){  
+  user = null;
+  if(token&&localusers&&localusers.length){
+    user = localusers.fileter(f=>f.password&&f.password==token);
+    delete user.password;
+  }
+  return user;
+}
+
 
 
 
 
 socket.on('connect', function(){
+
   console.log("connected to web sockets");
+
   socket.on('deviceInfo',function(deviceEntitiy){
     device = deviceEntitiy;
     if(device&&device.boards&&device.boards.length){
@@ -48,11 +82,8 @@ socket.on('connect', function(){
         return b.boardId;
       });
     }
-    
-    initDevice();
   });
   
-
   socket.on('joined',function(device){
     if(device){
       socket.on('boardDetails',function(msg){
@@ -64,11 +95,9 @@ socket.on('connect', function(){
         }   
       });
       socket.emit('getDeviceInfo',deviceId);
-
     }
   });
 
-  
   socket.emit('join',deviceId);
 
 });
@@ -76,6 +105,7 @@ socket.on('connect', function(){
 
 
 function initDevice(){
+
   var client  = mqtt.connect('mqtt://raspberrypi.local:1883')
   
   client.on('connect', function () {
@@ -111,10 +141,10 @@ function initDevice(){
         console.log("boards updated",JSON.stringify(state.boards));
         let msg = {deviceId:deviceId,boards:state.boards}
         socket.emit('boards',msg);
-
       }
     }
   });
+
   socket.on('toggle',function(msg){
     if(msg.v==false){
       if(!msg||!msg.b||msg.s==undefined||msg.s==null){
@@ -145,36 +175,6 @@ function initDevice(){
   })
   
   
-  app.get('/on',function(req,res){
-    if(!req.query||!req.query.b||req.query.s==undefined||req.query.s==null){
-      return res.status(400).send({error:"please check the query params"});
-    }
-    let board = req.query.b;
-    let $switch = req.query.s;
-    if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
-      client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
-      res.status(200).send('on');
-    }else{
-      res.status(404).send({error:'board or switch not found'});
-    }
-  
-  })
-  
-  app.get('/off',function(req,res){
-    if(!req.query||!req.query.b||req.query.s==undefined||req.query.s==null){
-      return res.status(400).send({error:"please check the query params"});
-    }
-    let board = req.query.b;
-    let $switch = req.query.s;
-    if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
-      client.publish("penumats/"+board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
-      res.status(200).send('off');
-    }else{
-      res.status(404).send({error:'board or switch not found'});
-    }
-  
-  })
-  
   app.get('/boards',function(req,res){
    if(!state||!state.boards){
      return res.status(404).send({error:"boards not found"});
@@ -194,23 +194,53 @@ function initDevice(){
             return n;
         });
       }
-      
       return m;
    });
    return res.status(200).send(boards);
   })
+
+
+  app.get('/scan',function(req,res){
+    
+    wifi.scan((err, networks) => {
+      if (err) {
+        console.error(err);
+          res.status(500).send(err);
+      }
+      res.status(200).send(networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid))
+      console.log(networks);
+    });
+  
+  })
+
+  
+  app.post('/wifi/join',function(req,res){
+    //check for without passowrd
+    if(!req.body||!req.body.ssid){
+      res.sendStatus(400);
+    }
+    var conn_info ={
+      wifi_ssid:req.body.ssid,
+      wifi_passcode:req.body.password?req.body.password:''
+    }
+    
+    // TODO: If wifi did not come up correctly, it should fail
+    // currently we ignore ifup failures.
+    _enable_wifi_mode(conn_info, function(error) {
+      if (error) {
+        res.status(500).send('error connecting to wifi')
+      }
+      res.status(200).send("Wifi Enabled");
+      //process.exit(0);
+    });
+  
+  });
   
 }
 
 app.use('/mqtt',express.static(path.join(__dirname,'node_modules/mqtt/dist')))
 app.use(express.static('public'))
 console.log(path.join(__dirname,'node_modeules/mqtt/dist'))
-
-
-
-
-
-
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
