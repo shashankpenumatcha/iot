@@ -41,18 +41,35 @@ _reboot_wireless_network = function(wlan_iface, callback) {
 
     // Disables AP mode and reverts to wifi connection
     _enable_wifi_mode = function(connection_info, callback) {
-      async.series([
-        //Add new network
-        function update_wpa_supplicant(next_step) {
-          write_template_to_file(
-              "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
-              "/etc/wpa_supplicant/wpa_supplicant.conf",
-              connection_info, next_step);
-          },
-          function reboot_network_interfaces(next_step) {
-              _reboot_wireless_network('wlan0', next_step);
-          },
-      ], callback);
+        if(!connection_info.passcode){
+            async.series([
+                //Add new network
+                function update_wpa_supplicant(next_step) {
+                  write_template_to_file(
+                      "./assets/etc/wpa_supplicant/wpa_supplicant_NONE.conf.template",
+                      "/etc/wpa_supplicant/wpa_supplicant.conf",
+                      connection_info, next_step);
+                  },
+                  function reboot_network_interfaces(next_step) {
+                      _reboot_wireless_network('wlan0', next_step);
+                  },
+              ], callback);
+        }else{
+            async.series([
+                //Add new network
+                function update_wpa_supplicant(next_step) {
+                  write_template_to_file(
+                      "./assets/etc/wpa_supplicant/wpa_supplicant.conf.template",
+                      "/etc/wpa_supplicant/wpa_supplicant.conf",
+                      connection_info, next_step);
+                  },
+                  function reboot_network_interfaces(next_step) {
+                      _reboot_wireless_network('wlan0', next_step);
+                  },
+              ], callback);
+        }
+
+    
   };
 
 

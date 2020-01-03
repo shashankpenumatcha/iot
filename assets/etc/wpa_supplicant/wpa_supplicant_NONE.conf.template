@@ -4,5 +4,5 @@ country=DE
 
 network={
 	ssid="{{ wifi_ssid }}"
-	psk="{{ wifi_passcode }}"
+	key_mgmt=NONE
 }

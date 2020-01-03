@@ -10,14 +10,17 @@ var socket = io.connect('http://shashank.local:3001', {reconnection: false,force
 var fs = require("fs");
 const bcrypt = require('bcrypt');
 //const scanner = require('node-wifi-scanner');
-var wifi = require("node-wifi");
+//var wifi = require("node-wifi");
  
 // Initialize wifi module
 // Absolutely necessary even to set interface to null
-wifi.init({
+/* wifi.init({
   iface: wlan0 // network interface, choose a random wifi interface if set to null
 });
- 
+  */
+
+ var Wifi = require('rpi-wifi-connection');
+ var wifi = new Wifi();
 require("./wifi.js");
 
 
@@ -227,7 +230,7 @@ function initDevice(){
     }
     var conn_info ={
       wifi_ssid:req.body.ssid,
-      wifi_passcode:req.body.password?req.body.password:''
+      wifi_passcode:req.body.password?req.body.password:null
     }
     
     // TODO: If wifi did not come up correctly, it should fail
