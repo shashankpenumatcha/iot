@@ -20,7 +20,6 @@ const bcrypt = require('bcrypt');
   */
 
 
-function wifiInit(){
   var _       = require("underscore")._,
     async   = require("async"),
     fs      = require("fs"),
@@ -95,9 +94,8 @@ _reboot_wireless_network = function(wlan_iface, callback) {
     
   };
 
-}
 
-wifiInit();
+
 
  var Wifi = require('rpi-wifi-connection');
  var wifi = new Wifi();
@@ -106,6 +104,24 @@ var shell = require('shelljs');
 let deviceId;
 let hostnameJSON
 let hostnameFile = fs.readFileSync('./assets/hostname.json');
+
+
+function write_template_to_file(template_path, file_name, context, callback) {
+  async.waterfall([
+
+      function read_template_file(next_step) {
+          fs.readFile(template_path, {encoding: "utf8"}, next_step);
+      },
+
+      function update_file(file_txt, next_step) {
+       
+          var template = _.template(file_txt)
+          
+          fs.writeFile(file_name, template(context), next_step);
+      }
+
+  ], callback);
+}
 
 if(hostnameFile){
    hostnameJSON = JSON.parse(hostnameFile);
