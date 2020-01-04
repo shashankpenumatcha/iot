@@ -27,6 +27,7 @@ let mac = fs.readFileSync('/sys/class/net/wlan0/address', 'utf8');
 if(mac&&mac.length){
   const deviceId=mac.replace(':','');
 }
+console.log(mac);
 var device = null; //registered device from server
 var boards = []; //registered boards from server
 let connections=[];
