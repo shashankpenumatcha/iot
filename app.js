@@ -26,6 +26,7 @@ require("./wifi.js");
 let deviceId;
 let hostnameJSON
 let hostnameFile = fs.readFileSync('./assets/hostname.json');
+
 if(hostnameFile){
    hostnameJSON = JSON.parse(hostnameFile);
 }
@@ -33,10 +34,11 @@ if(hostnameFile){
 if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
   let mac = fs.readFileSync('/sys/class/net/wlan0/address', 'utf8');
   if(mac&&mac.length){
-    deviceId=mac.split(':').join('');
+    deviceId=mac.split(':').join('').trim();
     hostnameJSON.id = deviceId;
  }
  fs.writeFileSync('./assets/hostname.json',JSON.stringify(hostnameJSON));
+ fs.writeFileSync('/etc/hostname',deviceId);
 }
 console.log(deviceId);
 var device = null; //registered device from server
