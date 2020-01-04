@@ -40,7 +40,11 @@ if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
  }
  fs.writeFileSync('./assets/hostname.json',JSON.stringify(hostnameJSON));
  fs.writeFileSync('/etc/hostname',deviceId);
- shell('reboot')
+ write_template_to_file('./assets/etc/hosts.template','/etc/hosts',hostnameJSON,function(){
+  shell('reboot');
+
+ })
+ 
 }else{
   deviceId = hostnameJSON.id;
 }
