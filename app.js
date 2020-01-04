@@ -24,10 +24,11 @@ const bcrypt = require('bcrypt');
 require("./wifi.js");
 
 let mac = fs.readFileSync('/sys/class/net/wlan0/address', 'utf8');
+let deviceId;
 if(mac&&mac.length){
-  const deviceId=mac.replace(':','');
+   deviceId=mac.split(':').join('');
 }
-console.log(mac);
+console.log(deviceId);
 var device = null; //registered device from server
 var boards = []; //registered boards from server
 let connections=[];
