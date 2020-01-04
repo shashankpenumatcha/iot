@@ -41,6 +41,8 @@ if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
  fs.writeFileSync('./assets/hostname.json',JSON.stringify(hostnameJSON));
  fs.writeFileSync('/etc/hostname',deviceId);
  shell('reboot')
+}else{
+  deviceId = hostnameJSON.id;
 }
 console.log(deviceId);
 var device = null; //registered device from server
