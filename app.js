@@ -24,16 +24,19 @@ const bcrypt = require('bcrypt');
 require("./wifi.js");
 
 let deviceId;
+let hostnameJSON
 let hostnameFile = fs.readFileSync('./assets/hostname.json');
-let hostnameJSON = JSON.parse(hostnameFile);
+if(hostnameFile){
+   hostnameJSON = JSON.parse(hostnameFile);
+}
 
-if(hostnameJSON&&!hostnameJSON.id){
+if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
   let mac = fs.readFileSync('/sys/class/net/wlan0/address', 'utf8');
   if(mac&&mac.length){
     deviceId=mac.split(':').join('');
     hostnameJSON.id = deviceId;
  }
- fs.writeFileSync('./assets/hostname.json');
+ fs.writeFileSync('./assets/hostname.json',JSON.stringify(hostnameJSON));
 }
 console.log(deviceId);
 var device = null; //registered device from server
