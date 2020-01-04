@@ -9,21 +9,17 @@ var io = require('socket.io-client');
 var socket = io.connect('http://shashank.local:3001', {reconnection: false,forceNew:true});
 var fs = require("fs");
 const bcrypt = require('bcrypt');
-//const scanner = require('node-wifi-scanner');
-//var wifi = require("node-wifi");
- 
-// Initialize wifi module
-// Absolutely necessary even to set interface to null
-/* wifi.init({
-  iface: wlan0 // network interface, choose a random wifi interface if set to null
-});
-  */
+var Wifi = require('rpi-wifi-connection');
+var wifi = new Wifi();
 
 
-  var _       = require("underscore")._,
-    async   = require("async"),
-    fs      = require("fs"),
-    exec    = require("child_process").exec
+//
+// wifi network selection code
+//
+var _       = require("underscore")._,
+  async   = require("async"),
+  fs      = require("fs"),
+  exec    = require("child_process").exec
 
 // Better template format
 _.templateSettings = {
@@ -94,11 +90,16 @@ _reboot_wireless_network = function(wlan_iface, callback) {
     
   };
 
+//
+// end wifi network selection code
+//
 
 
 
- var Wifi = require('rpi-wifi-connection');
- var wifi = new Wifi();
+
+//
+// hostname setting
+//
 
 var shell = require('shelljs');
 let deviceId;
@@ -136,7 +137,7 @@ if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
  fs.writeFileSync('./assets/hostname.json',JSON.stringify(hostnameJSON));
  fs.writeFileSync('/etc/hostname',deviceId);
  write_template_to_file('./assets/etc/hosts.template','/etc/hosts',hostnameJSON,function(){
-  shell('reboot');
+  shell.exec('reboot');
 
  })
  
@@ -144,16 +145,19 @@ if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
   deviceId = hostnameJSON.id;
 }
 console.log(deviceId);
+//
+// end hostname setting
+//
+
+
+
+
 var device = null; //registered device from server
 var boards = []; //registered boards from server
 let connections=[];
 let state={};
 state.boards={};
 let localusers  = [];
-
-
-
-    
 
 getLocalUsers();
 initDevice();
