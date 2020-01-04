@@ -17,6 +17,7 @@
     "node-wifi": "^2.0.12",
     "node-wifi-scanner": "^1.1.2-np",
     "rpi-wifi-connection": "^1.0.14",
+    "shelljs": "^0.8.3",
     "socket.io": "^2.3.0",
     "underscore": "^1.9.1"
   }

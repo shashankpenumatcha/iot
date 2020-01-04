@@ -23,6 +23,7 @@ const bcrypt = require('bcrypt');
  var wifi = new Wifi();
 require("./wifi.js");
 
+var shell = require('shelljs');
 let deviceId;
 let hostnameJSON
 let hostnameFile = fs.readFileSync('./assets/hostname.json');
@@ -39,6 +40,7 @@ if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
  }
  fs.writeFileSync('./assets/hostname.json',JSON.stringify(hostnameJSON));
  fs.writeFileSync('/etc/hostname',deviceId);
+ shell('reboot')
 }
 console.log(deviceId);
 var device = null; //registered device from server
