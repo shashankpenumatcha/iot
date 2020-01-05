@@ -24,7 +24,6 @@ function error(error){
 
 //auth middleware
 function auth(req,res,next){  
-  console.log(req.header('Authorization'))
   if(!req.header('Authorization')){
     return res.status(401).send(error("no auth header"))
   }
@@ -381,11 +380,9 @@ function initDevice(){
   })
   
   app.post('/api/password/reset',auth,function(req,res){
-    console.log(req.body)
     if(!req.body||!req.body.username||!req.body.password||!req.body.oldPassword){
       return res.status(400).send(error("Bad Request"))
     }
-   
     resetPassword(req.body.username,req.body.password,req.body.oldPassword).then(function(reset){
       if(reset.message){
         return res.status(200).send(reset)
