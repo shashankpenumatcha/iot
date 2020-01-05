@@ -11,6 +11,33 @@ var fs = require("fs");
 const bcrypt = require('bcrypt');
 var Wifi = require('rpi-wifi-connection');
 var wifi = new Wifi();
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json())
+
+
+
+function error(error){
+  return {"error":error};
+}
+
+
+//auth middleware
+function auth(req,res,next){  
+  console.log(req.header('Authorization'))
+  if(!req.header('Authorization')){
+    return res.status(401).send(error("no auth header"))
+  }
+  let token = req.header('Authorization');
+  user = null;
+  if(localusers&&localusers.length&&token){
+      user = localusers.filter(f=>f.password&&f.password==token);    
+  }
+  if(user&&user.length){
+    return next()
+  }
+  return res.sendStatus(401)
+}
 
 
 //
@@ -48,8 +75,8 @@ function write_template_to_file(template_path, file_name, context, callback) {
 _reboot_wireless_network = function(wlan_iface, callback) {
   async.series([
       function restart(next_step) {
-          exec("sudo wpa_cli -i wlan0 reconfigure", function(error, stdout, stderr) {
-              if (!error) console.log("wifi reset done");
+          exec("sudo wpa_cli -i wlan0 reconfigure", function(err, stdout, stderr) {
+              if (!err) console.log("wifi reset done");
               next_step();
           });
       }
@@ -157,44 +184,97 @@ var boards = []; //registered boards from server
 let connections=[];
 let state={};
 state.boards={};
-let localusers  = [];
+let localusers  = getLocalUsers();
 
-getLocalUsers();
+
 initDevice();
 
 
 function login(username,password){
-  if(username&&password&&localusers.length){
-    let user = localusers.filter(f=>f.username==username);
-    if(user&&user.password){
-      return {"token":user.password}
+  var promise = new Promise(function(resolve, reject) { 
+    if(username&&password&&localusers.length){
+      let user = localusers.filter(f=>f.username==username);
+      if(user&&user.length&&user[0].password){
+          bcrypt.compare(password,user[0].password).then(function(res){
+          if(res){
+            resolve({"token":user[0].password})
+
+          }else{
+            reject(error("Bad Credentials two"))
+
+          }
+        })
+      }
+    }else{
+      reject(error("Bad Credentials"))
     }
-  }
-  return null
+  }); 
+  return promise
+}
+function resetPassword(username,password,oldPassword){
+  var promise = new Promise(function(resolve,reject){
+    if(!username||!password||!oldPassword){
+      reject(error("Bad Request, all parameters are required"));
+    }
+    if(!localusers||!localusers.length){
+      reject(error("no local users"));
+    }
+    let user = localusers.filter(f=>f.username==username);
+    if(!user&&!user.length&&!user[0].password){
+      reject(error("no user found with username "+username));
+    }
+    bcrypt.compare(oldPassword, user[0].password, function(err, res) {
+        if(err){
+          reject(error(err));
+        }
+        if(!res){
+          reject(("invalid password"))
+        }
+        bcrypt.hash(password, 10, function(err, hash) {
+          if(err){
+            reject(error(err));
+          }
+          let users = getLocalUsers();
+          if(!users.length){
+            reject(error("no local users"));
+          }
+          let userNotFound = true;
+          users = users.map(m=>{
+            if(m.username==username){
+              userNotFound=false;
+              m.password=hash;
+            }
+            return m
+          })
+          if(userNotFound){
+            reject(("user not found"))
+          }
+          localusers = users;
+          fs.writeFileSync("./assets/auth.json",JSON.stringify(users));
+          resolve({"message":"password reset succesfully"})
+        });
+        
+    });
+  })
+
+  return promise
 }
 
 function getLocalUsers(){
   try{
     let rawdata = fs.readFileSync('./assets/auth.json');
-     localusers = JSON.parse(rawdata);
-     console.log(localusers)
+    try{
+      let jsondata= JSON.parse(rawdata);
+      return jsondata
+    }catch(e){
+      return []
+    } 
   }catch(e){
     console.log("error while fetching local user");
     console.log(e);
+    return [];
   }
 }
-
-function validateLocalUser(token){  
-  user = null;
-  if(token&&localusers&&localusers.length){
-    user = localusers.fileter(f=>f.password&&f.password==token);
-    delete user.password;
-  }
-  return user;
-}
-
-
-
 
 
 socket.on('connect', function(){
@@ -300,8 +380,39 @@ function initDevice(){
     }
   })
   
+  app.post('/api/password/reset',auth,function(req,res){
+    console.log(req.body)
+    if(!req.body||!req.body.username||!req.body.password||!req.body.oldPassword){
+      return res.status(400).send(error("Bad Request"))
+    }
+   
+    resetPassword(req.body.username,req.body.password,req.body.oldPassword).then(function(reset){
+      if(reset.message){
+        return res.status(200).send(reset)
+      }
+    },function(err){
+      return res.status(500).send(reset)
+
+    })
   
-  app.get('/boards',function(req,res){
+  })
+
+  app.post('/api/login',function(req,res){
+    console.log(req.body)
+    if(!req.body||!req.body.username||!req.body.password){
+      return res.status(400).send({'error':'username and password are required'});
+    }
+      login(req.body.username,req.body.password).then(function(user){
+        if(user.error){
+          return res.status(400).send({"error":"Bad Credentials"})
+        }
+        return res.status(200).send(user);
+      },function(err){
+        return res.sendStatus(401)
+      })
+  })
+  
+  app.get('/api/boards',auth,function(req,res){
    if(!state||!state.boards){
      return res.status(404).send({error:"boards not found"});
    }
@@ -326,8 +437,7 @@ function initDevice(){
   })
 
 
-  app.get('/wifi/scan',function(req,res){
-    
+  app.get('/api/wifi/scan',auth,function(req,res){    
     wifi.getNetworks().then((networks) => {
       if(networks&&networks.length){
         return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
@@ -340,20 +450,11 @@ function initDevice(){
   
   })
 
-  app.get('/wifi/status',function(req,res){
+  app.get('/api/wifi/status',auth,function(req,res){
     
-    wifi.getState().then((connected) => {
-        if(connected){
-          wifi.getNetworks().then((networks) => {
-            if(networks&&networks.length){
-              return res.status(200).send({"network":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
-      
-            }
-            return res.status(500).send('error while getting wifi network info');
-          },err=>{
-            return res.status(500).send({"error":err});
-
-          });
+    wifi.getStatus().then((connection) => {
+        if(connection){
+          return res.status(200).send({"network":connection});
         }else{
           return res.status(200).send({"network":[]});
         }
@@ -365,7 +466,7 @@ function initDevice(){
   })
 
   
-  app.post('/wifi/join',function(req,res){
+  app.post('/api/wifi/join',auth,function(req,res){
     //check for without passowrd
     if(!req.body||!req.body.ssid){
       res.sendStatus(400);
@@ -377,8 +478,8 @@ function initDevice(){
     
     // TODO: If wifi did not come up correctly, it should fail
     // currently we ignore ifup failures.
-    _enable_wifi_mode(conn_info, function(error) {
-      if (error) {
+    _enable_wifi_mode(conn_info, function(err) {
+      if (err) {
         res.status(500).send('error connecting to wifi')
       }
       res.status(200).send("Wifi Enabled");
