@@ -395,7 +395,6 @@ function initDevice(){
   })
 
   app.post('/api/login',function(req,res){
-    console.log(req.body)
     if(!req.body||!req.body.username||!req.body.password){
       return res.status(400).send({'error':'username and password are required'});
     }
@@ -489,8 +488,6 @@ function initDevice(){
 
 app.use('/mqtt',express.static(path.join(__dirname,'node_modules/mqtt/dist')))
 app.use(express.static('public'))
-console.log(path.join(__dirname,'node_modeules/mqtt/dist'))
-
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
