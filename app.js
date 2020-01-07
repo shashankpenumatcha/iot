@@ -29,7 +29,6 @@ app.use(bodyParser.json());
 
 checkHostname();
 let localusers  = getLocalUsers();
-initDevice();
 
 socket.on('connect', function(){
   console.log("connected to web sockets");
@@ -41,6 +40,8 @@ socket.on('connect', function(){
         return b.id;
       });
     }
+    initDevice();
+
   });
   
   socket.on('joined',function(device){
