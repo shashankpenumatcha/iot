@@ -35,6 +35,7 @@ socket.on('connect', function(){
   console.log("connected to web sockets");
   socket.on('deviceInfo',function(deviceEntitiy){
     device = deviceEntitiy;
+    console.log(device)
     if(device&&device.boards&&device.boards.length){
       boards =  device.boards.map(b=>{
         return b.id;
