@@ -37,7 +37,7 @@ socket.on('connect', function(){
     device = deviceEntitiy;
     if(device&&device.boards&&device.boards.length){
       boards =  device.boards.map(b=>{
-        return b.boardId;
+        return b.id;
       });
     }
   });
