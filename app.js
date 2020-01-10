@@ -1,66 +1,34 @@
 
+var path = require('path');
+
+var bodyParser = require('body-parser');
+var Wifi = require('rpi-wifi-connection');
+var shell = require('shelljs');
 
 var express = require('express');
 var app = express();
+
 var http = require('http').createServer(app);
 var mqtt = require('mqtt')
-var path = require('path');
+
 var io = require('socket.io-client');
 var socket = io.connect('http://shashank.local:3001', {reconnection: false,forceNew:true});
-var fs = require("fs");
-const bcrypt = require('bcrypt');
-var Wifi = require('rpi-wifi-connection');
-var wifi = new Wifi();
+
 var wifiUtil = require('./wifi.js');
-var bodyParser = require('body-parser');
-var fs = require("fs");
-var shell = require('shelljs');
-
-let deviceId;
-var device = null; //registered device from server
-var boards = []; //registered boards from server
-let connections=[];
-let state={};
-state.boards={};
-
+var repo = require("./repo.js");
+var registrationService = require('./services/registration.service');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-checkHostname();
-let localusers  = getLocalUsers();
+let deviceId = require('./hostname-setup.js')();
+var device = null; //registered device from server
+var boards = []; //registered boards from server
+let state={};
+state.boards={};
+let localusers  = require('./local-users.js')();
+var wifi = new Wifi();
 
-socket.on('connect', function(){
-  console.log("connected to web sockets");
-  socket.on('deviceInfo',function(deviceEntitiy){
-    device = deviceEntitiy;
-    console.log(device)
-    if(device&&device.boards&&device.boards.length){
-      boards =  device.boards.map(b=>{
-        return b.id;
-      });
-    }
-    initDevice();
-
-  });
-  
-  socket.on('joined',function(device){
-    if(device){
-      socket.on('boardDetails',function(msg){
-        console.log('getting boards', msg)
-        if(Object.keys(state.boards).length){
-          console.log('got boards')
-          let msg = {deviceId:deviceId,boards:state.boards}
-          socket.emit('boards',msg);
-        }   
-      });
-      socket.emit('getDeviceInfo',deviceId);
-    }
-  });
-
-  socket.emit('join',deviceId);
-
-});
 
 function error(error){
   return {"error":error};
@@ -82,116 +50,46 @@ function auth(req,res,next){
   return res.sendStatus(401)
 }
 
-function checkHostname(){
-  let hostnameJSON
-  let hostnameFile = fs.readFileSync('./assets/hostname.json');
-  if(hostnameFile){
-     hostnameJSON = JSON.parse(hostnameFile);
-  }
-  
-  if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
-    let mac = fs.readFileSync('/sys/class/net/wlan0/address', 'utf8');
-    if(mac&&mac.length){
-      deviceId=mac.split(':').join('').trim();
-      hostnameJSON.id = deviceId;
+
+socket.on('connect', function(){
+  console.log("connected to web sockets");
+  socket.on('deviceInfo',function(deviceEntitiy){
+    device = deviceEntitiy;
+    console.log(device)
+    if(device&&device.boards&&device.boards.length){
+      boards =  device.boards.map(b=>{
+        return b.id;
+      });
     }
-    fs.writeFileSync('./assets/hostname.json',JSON.stringify(hostnameJSON));
-    fs.writeFileSync('/etc/hostname',deviceId);
-    wifiUtil.write_template_to_file('./assets/etc/hosts.template','/etc/hosts',hostnameJSON,function(){
-      shell.exec('reboot');
-    });
-  }else{
-    deviceId = hostnameJSON.id;
-  }
-  console.log(deviceId);
-}
+    initDevice();
 
-function login(username,password){
-  var promise = new Promise(function(resolve, reject) { 
-    if(username&&password&&localusers.length){
-      let user = localusers.filter(f=>f.username==username);
-      if(user&&user.length&&user[0].password){
-          bcrypt.compare(password,user[0].password).then(function(res){
-          if(res){
-            resolve({"token":user[0].password})
-
-          }else{
-            reject(error("Bad Credentials two"))
-
-          }
-        })
-      }
-    }else{
-      reject(error("Bad Credentials"))
+  });
+  //initDevice();
+  socket.on('joined',function(device){
+    if(device){
+      socket.on('boardDetails',function(msg){
+        console.log('getting boards', msg)
+        if(Object.keys(state.boards).length){
+          console.log('got boards')
+          let msg = {deviceId:deviceId,boards:state.boards}
+          socket.emit('boards',msg);
+        }   
+      });
+      socket.emit('getDeviceInfo',deviceId);
     }
-  }); 
-  return promise
-}
+  });
 
-function resetPassword(username,password,oldPassword){
-  var promise = new Promise(function(resolve,reject){
-    if(!username||!password||!oldPassword){
-      reject(error("Bad Request, all parameters are required"));
-    }
-    if(!localusers||!localusers.length){
-      reject(error("no local users"));
-    }
-    let user = localusers.filter(f=>f.username==username);
-    if(!user&&!user.length&&!user[0].password){
-      reject(error("no user found with username "+username));
-    }
-    bcrypt.compare(oldPassword, user[0].password, function(err, res) {
-        if(err){
-          reject(error(err));
-        }
-        if(!res){
-          reject(("invalid password"))
-        }
-        bcrypt.hash(password, 10, function(err, hash) {
-          if(err){
-            reject(error(err));
-          }
-          let users = getLocalUsers();
-          if(!users.length){
-            reject(error("no local users"));
-          }
-          let userNotFound = true;
-          users = users.map(m=>{
-            if(m.username==username){
-              userNotFound=false;
-              m.password=hash;
-            }
-            return m
-          })
-          if(userNotFound){
-            reject(("user not found"))
-          }
-          localusers = users;
-          fs.writeFileSync("./assets/auth.json",JSON.stringify(users));
-          resolve({"message":"password reset succesfully"})
-        });
-        
-    });
-  })
+  socket.emit('join',deviceId);
 
-  return promise
-}
-
-function getLocalUsers(){
-  try{
-    let rawdata = fs.readFileSync('./assets/auth.json');
-    try{
-      let jsondata= JSON.parse(rawdata);
-      return jsondata
-    }catch(e){
-      return []
-    } 
-  }catch(e){
-    console.log("error while fetching local user");
-    console.log(e);
-    return [];
-  }
-}
+  socket.on('addLocation',function(location){
+    if(!location.name){
+      socket.emit('locationAdded',{error:"location name is required"});
+    }
+    repo.locationRepo.create(location.name).then(res=>{
+      console.log(`Room  created with id #${res.id}`);
+    })
+  });
+});
 
 
 function initDevice(){
@@ -268,7 +166,7 @@ function initDevice(){
     if(!req.body||!req.body.username||!req.body.password||!req.body.oldPassword){
       return res.status(400).send(error("Bad Request"))
     }
-    resetPassword(req.body.username,req.body.password,req.body.oldPassword).then(function(reset){
+    registrationService.resetPassword(req.body.username,req.body.password,req.body.oldPassword).then(function(reset){
       if(reset.message){
         return res.status(200).send(reset)
       }
@@ -283,7 +181,7 @@ function initDevice(){
     if(!req.body||!req.body.username||!req.body.password){
       return res.status(400).send({'error':'username and password are required'});
     }
-      login(req.body.username,req.body.password).then(function(user){
+    registrationService.login(req.body.username,req.body.password).then(function(user){
         if(user.error){
           return res.status(400).send({"error":"Bad Credentials"})
         }
