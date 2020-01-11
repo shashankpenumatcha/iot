@@ -12,7 +12,7 @@ var http = require('http').createServer(app);
 var mqtt = require('mqtt')
 
 var io = require('socket.io-client');
-var socket = io.connect('http://shashank.local:3001', {reconnection: false,forceNew:true});
+var socket = io.connect('http://shashank.local:3001?device=true', {reconnection: false,forceNew:true});
 
 var wifiUtil = require('./wifi.js');
 var repo = require("./repo.js");
