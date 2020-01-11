@@ -10,9 +10,9 @@ var app = express();
 
 var http = require('http').createServer(app);
 var mqtt = require('mqtt')
-
+let deviceId = require('./hostname-setup.js')();
 var io = require('socket.io-client');
-var socket = io.connect('http://shashank.local:3001?device=true', {reconnection: false,forceNew:true});
+var socket = io.connect(`http://shashank.local:3001?device=${deviceId}`, {reconnection: false,forceNew:true});
 
 var wifiUtil = require('./wifi.js');
 var repo = require("./repo.js");
@@ -21,7 +21,6 @@ var registrationService = require('./services/registration.service');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-let deviceId = require('./hostname-setup.js')();
 var device = null; //registered device from server
 var boards = []; //registered boards from server
 let state={};
