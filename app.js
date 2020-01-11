@@ -81,12 +81,13 @@ socket.on('connect', function(){
 
   socket.emit('join',deviceId);
 
-  socket.on('addLocation',function(location){
+  socket.on('addLocation',function(location, callback){
     if(!location.name){
-      socket.emit('locationAdded',{error:"location name is required"});
+      callback({error : "location name is required"});
     }
     repo.locationRepo.create(location.name).then(res=>{
       console.log(`Room  created with id #${res.id}`);
+      callback({name: location.name})
     })
   });
 });
