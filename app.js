@@ -115,7 +115,7 @@ function initDevice(){
         state.boards[id]=JSON.parse(message.toString());
         console.log("board registered",JSON.stringify(state.boards));
         let msg = {deviceId:deviceId,boards:state.boards}
-       //socket.emit("boards",msg);
+       socket.emit("boards",msg);
       }else if(id){
         console.log('rouge board detected ' + id);
       }else{
