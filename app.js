@@ -85,9 +85,10 @@ socket.on('connect', function(){
     if(!location.name){
       console.log('error')
     }
+    let switchesArray = [];
+
     if(location.boards){
       let boards = Object.keys(location.boards);
-      let switchesArray = [];
       if(boards && boards.length){
            boards.map(m => {
             if(location.boards[m]) {
