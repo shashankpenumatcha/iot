@@ -90,7 +90,7 @@ socket.on('connect', function(){
       if(boards && boards.length){
            boards.map(m => {
             if(location.boards[m]) {
-              switches = Object.keys(location.board[m]);
+              switches = Object.keys(location.boards[m]);
             } 
             if(switches && switches.length){
               console.log('switches loop to create promise')
