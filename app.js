@@ -123,8 +123,10 @@ socket.on('connect', function(){
   });
 
   socket.on('getAssignedSwitches', function() {
-    let assignedSwitches = repo.switchRepo.getAll();
-    console.log(`assigned switchs - ${assignedSwitches}`);
+    repo.switchRepo.getAll().then(assignedSwitches => {
+      console.log(`assigned switchs - ${assignedSwitches}`);
+
+    });
   });
 });
 
