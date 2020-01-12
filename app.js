@@ -85,6 +85,26 @@ socket.on('connect', function(){
     if(!location.name){
       console.log('error')
     }
+    if(location.boards){
+      let boards = Object.keys(location.boards);
+      if(boards && boards.length){
+           boards.map(m => {
+            if(location.boards[m]) {
+              switches = Object.keys(location.board[m]);
+            } 
+            if(switches && switches.length){
+              console.log('switches loop to create promise')
+              switches.map(s => {
+                console.log(s)
+                let swtch = {i:s , b: m, label: location.boards[m][s].label}
+                console.log(swtch);
+                return swtch
+              })
+            }
+            return m           
+          });
+      }
+    }
     repo.locationRepo.create(location.name).then(res=>{
       console.log(`Room  created with id #${res.id}`);
       socket.emit('locationAdded', {deviceId: deviceId, name: location.name})
