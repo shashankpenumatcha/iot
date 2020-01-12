@@ -125,6 +125,9 @@ socket.on('connect', function(){
   socket.on('getAssignedSwitches', function() {
     repo.switchRepo.getAll().then(assignedSwitches => {
       console.log(`assigned switchs - ${assignedSwitches}`);
+      socket.emit('assignedSwitches', {deviceId: deviceId, switches: assignedSwitches})
+    }, err => {
+      socket.emit('assignedSwitches', {deviceId:deviceId ,error : `error whlile getting switches for ${deviceId}`});
 
     });
   });
