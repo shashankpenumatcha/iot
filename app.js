@@ -80,6 +80,8 @@ socket.on('connect', function(){
 
   socket.emit('join',deviceId);
 
+  // TODO multiple devices for room
+  //TODO addlocation socket id for concurrent location creation
   socket.on('addLocation',function(location){
     console.log('add location request')
     if(!location.name){
