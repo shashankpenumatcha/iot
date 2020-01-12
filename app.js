@@ -110,6 +110,9 @@ socket.on('connect', function(){
       if(switches.length){
         Promise.all(switches.map((swtch) => {
           const { label, b, i } = swtch
+          console.log(label)
+          console.log(b)
+          console.log(i)
           return repo.switchRepo.create(label, b, i, res.id)
         })).then( r=> {
           socket.emit('locationAdded', {deviceId: deviceId, name: location.name})
