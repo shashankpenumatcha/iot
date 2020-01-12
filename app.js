@@ -87,6 +87,7 @@ socket.on('connect', function(){
     }
     if(location.boards){
       let boards = Object.keys(location.boards);
+      let swithces = [];
       if(boards && boards.length){
            boards.map(m => {
             if(location.boards[m]) {
@@ -95,9 +96,8 @@ socket.on('connect', function(){
             if(switches && switches.length){
               console.log('switches loop to create promise')
               switches.map(s => {
-                console.log(s)
                 let swtch = {i:s , b: m, label: location.boards[m][s].label}
-                console.log(swtch);
+                switches.push(swtch);
                 return swtch
               })
             }
@@ -107,7 +107,16 @@ socket.on('connect', function(){
     }
     repo.locationRepo.create(location.name).then(res=>{
       console.log(`Room  created with id #${res.id}`);
-      socket.emit('locationAdded', {deviceId: deviceId, name: location.name})
+      if(switches.length){
+        Promise.all(switches.map((swtch) => {
+          const { label, b, i } = swtch
+          return taskRepo.create(label, b, i, res.id)
+        })).then( r=> {
+          socket.emit('locationAdded', {deviceId: deviceId, name: location.name})
+        }, e => {
+          console.log('error delete room manually')
+        })
+      }
     })
   });
 });
