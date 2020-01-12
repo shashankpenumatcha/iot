@@ -108,6 +108,7 @@ socket.on('connect', function(){
     repo.locationRepo.create(location.name).then(res=>{
       console.log(`Room  created with id #${res.id}`);
       if(switches.length){
+        console.log(switches)
         Promise.all(switches.map((swtch) => {
           const { label, b, i } = swtch
           console.log(label)
