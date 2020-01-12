@@ -18,7 +18,7 @@ class SwitchRepository {
     }
     create(name, board, swtch, locationId) {
         return this.dao.run(
-          `INSERT INTO tasks (name, board, switch, locationId)
+          `INSERT INTO switches (name, board, switch, locationId)
             VALUES (?, ?, ?, ?)`,
           [name, board, swtch, locationId])
     }
