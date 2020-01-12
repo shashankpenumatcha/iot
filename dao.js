@@ -8,6 +8,7 @@ class AppDAO {
         console.log('Could not connect to database', err)
       } else {
         console.log('Connected to database')
+        this.db.run(`PRAGMA foreign_keys=ON`);
       }
     })
   }
