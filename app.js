@@ -112,7 +112,7 @@ socket.on('connect', function(){
         Promise.all(switchesArray.map((s) => {
           console.log(s)
           
-          return repo.switchRepo.create(s.label, s.b, s.i, s.res.id)
+          return repo.switchRepo.create(s.label, s.b, s.i, res.id)
         })).then( r=> {
           socket.emit('locationAdded', {deviceId: deviceId, name: location.name})
         }, e => {
