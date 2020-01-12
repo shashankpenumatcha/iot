@@ -87,7 +87,7 @@ socket.on('connect', function(){
     }
     if(location.boards){
       let boards = Object.keys(location.boards);
-      let swithces = [];
+      let switchesArray = [];
       if(boards && boards.length){
            boards.map(m => {
             if(location.boards[m]) {
@@ -97,7 +97,7 @@ socket.on('connect', function(){
               console.log('switches loop to create promise')
               switches.map(s => {
                 let swtch = {i:s , b: m, label: location.boards[m][s].label}
-                switches.push(swtch);
+                switchesArray.push(swtch);
                 return swtch
               })
             }
@@ -107,14 +107,11 @@ socket.on('connect', function(){
     }
     repo.locationRepo.create(location.name).then(res=>{
       console.log(`Room  created with id #${res.id}`);
-      if(switches.length){
-        console.log(switches)
-        Promise.all(switches.map((swtch) => {
-          const { label, b, i } = swtch
-          console.log(label)
-          console.log(b)
-          console.log(i)
-          return repo.switchRepo.create(label, b, i, res.id)
+      if(switchesArray.length){
+        Promise.all(switchesArray.map((s) => {
+          console.log(s)
+          
+          return repo.switchRepo.create(s.label, s.b, s.i, s.res.id)
         })).then( r=> {
           socket.emit('locationAdded', {deviceId: deviceId, name: location.name})
         }, e => {
