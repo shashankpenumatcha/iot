@@ -135,6 +135,21 @@ socket.on('connect', function(){
 
     });
   });
+
+  socket.on('getLocations', msg => {
+    if(msg.socketId){
+      let payload = {};
+      payload.socketId = msg.socketId;
+      payload.deviceId = deviceId;
+      switchRepo.getLocations().then(res => {
+        payload.switches = res;
+        socket.emit('locations',payload);
+      }, error => {
+        payload.error = 'error getting locations'
+        socket.emit('locations', payload)
+      })
+    }
+  })
 });
 
 

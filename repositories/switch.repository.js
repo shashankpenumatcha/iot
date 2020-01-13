@@ -59,6 +59,9 @@ class SwitchRepository {
         [id, swtch])
     }
     
+    getLocations() {
+      return this.dao.all(`select switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationid`)
+    }
   }
   
   module.exports = SwitchRepository;
