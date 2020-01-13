@@ -116,7 +116,7 @@ socket.on('connect', function(){
           
           return repo.switchRepo.create(s.label, s.b, s.i, res.id)
         })).then( r=> {
-          socket.emit('locationAdded', {deviceId: deviceId, name: location.name})
+          socket.emit('locationAdded', {deviceId: deviceId, name: location.name, socketId: location.socketId})
         }, e => {
           console.log('error delete room manually')
         })
