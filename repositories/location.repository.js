@@ -15,7 +15,7 @@ class LocationRepository {
     create(name) {
         return this.dao.run(
           'INSERT INTO locations (name, locationId) VALUES (?, ?)',
-          [name])
+          [name, locationId])
     }
     update(location) {
         const { id, name , locationId } = location
