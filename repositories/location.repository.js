@@ -8,31 +8,32 @@ class LocationRepository {
       const sql = `
       CREATE TABLE IF NOT EXISTS locations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL)`
+        name TEXT NOT NULL,
+        locationId TEXT NOT NULL)`
       return this.dao.run(sql)
     }
     create(name) {
         return this.dao.run(
-          'INSERT INTO locations (name) VALUES (?)',
+          'INSERT INTO locations (name, locationId) VALUES (?, ?)',
           [name])
     }
     update(location) {
-        const { id, name } = location
+        const { id, name , locationId } = location
         return this.dao.run(
-          `UPDATE locations SET name = ? WHERE id = ?`,
-          [name, id]
+          `UPDATE locations SET name = ? , locationId= ? WHERE id = ?`,
+          [name, locationId, id]
         )
     }
-    delete(id) {
+    delete(locationId) {
         return this.dao.run(
-            `DELETE FROM locations WHERE id = ?`,
-            [id]
+            `DELETE FROM locations WHERE locationId = ?`,
+            [locationId]
         )
     }
-    getById(id) {
+    getById(locationId) {
         return this.dao.get(
-          `SELECT * FROM locations WHERE id = ?`,
-          [id])
+          `SELECT * FROM locations WHERE locationId = ?`,
+          [locationId])
     }
     getAll() {
         return this.dao.all(`SELECT * FROM locations`)
