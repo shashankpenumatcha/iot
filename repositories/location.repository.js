@@ -12,7 +12,7 @@ class LocationRepository {
         locationId TEXT NOT NULL)`
       return this.dao.run(sql)
     }
-    create(name) {
+    create(name, locationId) {
         return this.dao.run(
           'INSERT INTO locations (name, locationId) VALUES (?, ?)',
           [name, locationId])
