@@ -141,7 +141,7 @@ socket.on('connect', function(){
       let payload = {};
       payload.socketId = msg.socketId;
       payload.deviceId = deviceId;
-      switchRepo.getLocations().then(res => {
+      repo.switchRepo.getLocations().then(res => {
         payload.switches = res;
         socket.emit('locations',payload);
       }, error => {
