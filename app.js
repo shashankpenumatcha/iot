@@ -108,7 +108,7 @@ socket.on('connect', function(){
           });
       }
     }
-    repo.locationRepo.create(location.name).then(res=>{
+    repo.locationRepo.create(location.name, location.locationId).then(res=>{
       console.log(`Room  created with id #${res.id}`);
       if(switchesArray.length){
         Promise.all(switchesArray.map((s) => {
@@ -118,7 +118,9 @@ socket.on('connect', function(){
         })).then( r=> {
           socket.emit('locationAdded', {deviceId: deviceId, name: location.name, socketId: location.socketId})
         }, e => {
-          console.log('error delete room manually')
+          console.log(`error - location not created on ${deviceId}`)
+          socket.emit('locationAdded', {error: `error while creating room in ${deviceId}`,deviceId: deviceId, name: location.name, socketId: location.socketId, devices: location.devices})
+
         })
       }
     })
