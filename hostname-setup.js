@@ -18,7 +18,7 @@ function checkHostname(){
       fs.writeFileSync('./assets/hostname.json',JSON.stringify(hostnameJSON));
       fs.writeFileSync('/etc/hostname',deviceId);
       wifiUtil.write_template_to_file('./assets/etc/hosts.template','/etc/hosts',hostnameJSON,function(){
-      //  shell.exec('reboot');
+      shell.exec('reboot');
       });
     }else{
       deviceId = hostnameJSON.id;
