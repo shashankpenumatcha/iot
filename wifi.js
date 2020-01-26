@@ -108,7 +108,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     path: '/register',
                     method: 'POST',
                     headers: {
-                      'Content-Type': 'text/plain'
+                      'Content-Type': 'text/json'
                     }
                   }
                   
