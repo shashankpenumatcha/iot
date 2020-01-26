@@ -116,6 +116,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     console.log(`statusCode: ${res.statusCode}`)
                   
                     res.on('data', d => {
+                        console.log(d);
                         console.log('register board returned success')
                       next_step();  
                     })

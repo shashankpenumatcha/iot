@@ -6,7 +6,7 @@
 */
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-//#include <ESP8266mDNS.h>
+#include <ESP8266mDNS.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include "FS.h"
@@ -20,7 +20,7 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
-String id = "nodemcu2";
+String id = "5e29d00a61f8612408c0cc51";
 int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
 ESP8266WebServer server(80);
