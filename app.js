@@ -12,7 +12,7 @@ var http = require('http').createServer(app);
 var mqtt = require('mqtt')
 let deviceId = require('./hostname-setup.js')();
 var io = require('socket.io-client');
-var socket = io.connect(`http://shashank.local:3001?device=${deviceId}`, {reconnection: false,forceNew:true});
+var socket = io.connect(`ws://shashank.local:3001?device=${deviceId}`, {reconnection: true,forceNew:true});
 
 var wifiUtil = require('./wifi.js');
 var repo = require("./repo.js");
@@ -27,7 +27,7 @@ let state={};
 state.boards={};
 let localusers  = require('./local-users.js')();
 var wifi = new Wifi();
-
+var init = false;
 
 function error(error){
   return {"error":error};
@@ -50,8 +50,11 @@ function auth(req,res,next){
 }
 
 
-socket.on('connect', function(){
-  console.log("connected to web sockets");
+  socket.on('connect', function(){
+    console.log("connected to web sockets");
+    socket.removeAllListeners();
+    socket.emit('join',deviceId);
+    
   socket.on('deviceInfo',function(deviceEntitiy){
     device = deviceEntitiy;
     console.log(device)
@@ -65,7 +68,8 @@ socket.on('connect', function(){
   });
   //initDevice();
   socket.on('joined',function(device){
-    if(device){
+    if(device && !init){
+      init = true;
       socket.on('boardDetails',function(msg){
         console.log('getting boards', msg)
         if(Object.keys(state.boards).length){
@@ -78,7 +82,6 @@ socket.on('connect', function(){
     }
   });
 
-  socket.emit('join',deviceId);
 
   // TODO multiple devices for room
   //TODO addlocation socket id for concurrent location creation
@@ -150,8 +153,11 @@ socket.on('connect', function(){
       })
     }
   })
-});
 
+
+
+
+  });
 
 function initDevice(){
 

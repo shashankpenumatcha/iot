@@ -42,7 +42,7 @@ class SwitchRepository {
     }
     getById(id) {
         return this.dao.get(
-          `SELECT * FROM projects WHERE id = ?`,
+          `SELECT * FROM switches WHERE id = ?`,
           [id])
     }
     getAll() {
@@ -55,7 +55,7 @@ class SwitchRepository {
     }
     getSwitchByAddress(board,swtch) {
       return this.dao.get(
-        `SELECT * FROM projects WHERE board = ? AND switch = ?`,
+        `SELECT * FROM switches WHERE board = ? AND switch = ?`,
         [id, swtch])
     }
     
