@@ -1,4 +1,5 @@
 
+var http = require('http');
 
 //
 // wifi network selection code
