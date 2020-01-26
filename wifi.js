@@ -97,7 +97,11 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                   "/etc/wpa_supplicant/wpa_supplicant.conf",
                   connection_info, next_step);
               },
+              
               function add_board_http(next_step) {
+                exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
+                    if (!err) console.log("restart dhcpcd to connect to board ap");
+                
                 const options = {
                     hostname: '192.168.4.1',
                     port: 80,
@@ -112,7 +116,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     console.log(`statusCode: ${res.statusCode}`)
                   
                     res.on('data', d => {
-                    
+                        console.log('register board returned success')
                       next_step();  
                     })
                   })
@@ -124,15 +128,17 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                   })
                   req.write(deviceId)  
                   req.end()  
+                  
+                })
                            
                 },
                 function delet(next_step){
                     exec("sudo rm /etc/wpa_supplicant/wpa_supplicant.conf", function(err, stdout, stderr) {
-                        if (!err) console.log("error deleting wpa_supplicant");
+                        if (!err) console.log(" deleting wpa_supplicant");
                         exec("sudo mv /etc/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf", function(err, stdout, stderr) {
-                            if (!err) console.log("error replacing wpa_supplicant");
+                            if (!err) console.log(" replacing wpa_supplicant");
                             exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
-                                if (!err) console.log("error resetting dhcpcd");
+                                if (!err) console.log(" resetting dhcpcd");
                                 next_step();
                             }); 
                         }); 
