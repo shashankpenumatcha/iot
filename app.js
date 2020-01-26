@@ -78,8 +78,8 @@ function auth(req,res,next){
         console.log('getting boards', msg)
         //if(Object.keys(state.boards).length){
           console.log('got boards')
-          let msg = {deviceId:deviceId,boards:state.boards}
-          socket.emit('boards',msg);
+          let board_message = {deviceId:deviceId,boards:state.boards}
+          socket.emit('boards',board_message);
        // }   
       });
       socket.emit('getDeviceInfo',deviceId);
