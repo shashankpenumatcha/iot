@@ -118,8 +118,21 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                         })
                         .catch(function (err) {
                             // POST failed...
-                            console.error(err)
-                            next_step();
+                            console.error('err')
+                            setTimeout(function(){
+                                rp(options)
+                                .then(function (parsedBody) {
+                                    console.log(parsedBody);
+                                console.log('register board returned success')
+                              next_step();  
+                                    // POST succeeded...
+                                })
+                                .catch(function (err) {
+                                    // POST failed...
+                                    console.error('err')
+                                    next_step();
+                                });
+                            },20000);
                         });
                 /* const options = {
                     hostname: '192.168.4.1',
