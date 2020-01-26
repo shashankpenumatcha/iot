@@ -104,11 +104,9 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     if (!err) console.log("restart dhcpcd to connect to board ap");
                     var options = {
                         method: 'POST',
-                        uri: 'http://api.posttestserver.com/post',
-                        body: {
-                            some: 'payload'
-                        },
-                        json: true // Automatically stringifies the body to JSON
+                        uri: 'http://192.168.4.1/register',
+                        body: deviceId,
+                        json: false // Automatically stringifies the body to JSON
                     };
                      
                     rp(options)
