@@ -76,11 +76,11 @@ function auth(req,res,next){
       init = true;
       socket.on('boardDetails',function(msg){
         console.log('getting boards', msg)
-        if(Object.keys(state.boards).length){
+        //if(Object.keys(state.boards).length){
           console.log('got boards')
           let msg = {deviceId:deviceId,boards:state.boards}
           socket.emit('boards',msg);
-        }   
+       // }   
       });
       socket.emit('getDeviceInfo',deviceId);
     }
