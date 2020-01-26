@@ -70,6 +70,8 @@ function auth(req,res,next){
   });
   //initDevice();
   socket.on('joined',function(device){
+    let message_boards = {deviceId:deviceId,boards:state.boards}
+    socket.emit("boards",message_boards);
     if(device && !init){
       init = true;
       socket.on('boardDetails',function(msg){
