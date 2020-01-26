@@ -53,8 +53,9 @@ function auth(req,res,next){
 
   socket.on('connect', function(){
     console.log("connected to web sockets");
-    socket.removeAllListeners();
+   // socket.removeAllListeners();
     socket.emit('join',deviceId);
+  });
     
   socket.on('deviceInfo',function(deviceEntitiy){
     device = deviceEntitiy;
@@ -158,7 +159,7 @@ function auth(req,res,next){
 
 
 
-  });
+
 
 function initDevice(){
 
