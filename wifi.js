@@ -78,6 +78,69 @@ _reboot_wireless_network = function(wlan_iface, callback) {
     
   };
 
+   // Disables AP mode and reverts to wifi connection
+   _add_board = function(connection_info,deviceId, callback) {
+    if(!connection_info.passcode){
+        async.series([
+            function backup_file(next_step){
+                exec("sudo mv /etc/wpa_supplicant/wpa_supplicant.conf /etc/wpa_supplicant.conf", function(err, stdout, stderr) {
+                    if (!err) console.log("backup wpa supplicant");
+                    next_step();
+                });
+            },
+    
+            //Add new network
+            function update_wpa_supplicant(next_step) {
+              write_template_to_file(
+                  "./assets/etc/wpa_supplicant/wpa_supplicant_NONE.conf.template",
+                  "/etc/wpa_supplicant/wpa_supplicant.conf",
+                  connection_info, next_step);
+              },
+              function add_board_http(next_step) {
+                const options = {
+                    hostname: '192.168.4.1',
+                    port: 80,
+                    path: '/register',
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'text/plain'
+                    }
+                  }
+                  
+                  const req = http.request(options, res => {
+                    console.log(`statusCode: ${res.statusCode}`)
+                  
+                    res.on('data', d => {
+                    
+                      next_step();  
+                    })
+                  })
+                  
+                  req.on('error', error => {
+
+                    console.error(error)
+                    next_step();  
+                  })
+                  req.write(deviceId)  
+                  req.end()  
+                           
+                },
+                function delet(next_step){
+                    exec("sudo rm /etc/wpa_supplicant/wpa_supplicant.conf", function(err, stdout, stderr) {
+                        if (!err) console.log("error deleting wpa_supplicant");
+                        exec("sudo mv /etc/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf", function(err, stdout, stderr) {
+                            if (!err) console.log("error replacing wpa_supplicant");
+                            exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
+                                if (!err) console.log("error resetting dhcpcd");
+                                next_step();
+                            }); 
+                        }); 
+                    }); 
+                }
+          ], callback);
+    }
+};
+
 //
 // end wifi network selection code
 //
@@ -86,4 +149,5 @@ module.exports={
   write_template_to_file:write_template_to_file,
   _reboot_wireless_network:_reboot_wireless_network,
   _enable_wifi_mode:_enable_wifi_mode,
+  _add_board:_add_board
 }

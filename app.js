@@ -1,9 +1,9 @@
 
 var path = require('path');
+var shell = require('shelljs');
 
 var bodyParser = require('body-parser');
 var Wifi = require('rpi-wifi-connection');
-var shell = require('shelljs');
 
 var express = require('express');
 var app = express();
@@ -59,7 +59,7 @@ function auth(req,res,next){
     
   socket.on('deviceInfo',function(deviceEntitiy){
     device = deviceEntitiy;
-    console.log(device)
+  
     if(device&&device.boards&&device.boards.length){
       boards =  device.boards.map(b=>{
         return b.id;
@@ -158,6 +158,28 @@ function auth(req,res,next){
     }
   })
 
+  socket.on('addBoard',function(payload){
+    console.log('add board request')
+    if(!payload.boardId || !payload.socketId){
+      console.log('no board id to connect to ap')
+    }
+    var conn_info ={
+      wifi_ssid:payload.boardId
+    }
+    
+    // TODO: If wifi did not come up correctly, it should fail
+    // currently we ignore ifup failures.
+    wifiUtil._add_board(conn_info,payload.deviceId, function(err) {
+      if (err) {
+      console.log(err)
+      console.log("error setup")
+      }      
+        console.log('board registered new path')      //process.exit(0);
+    });
+  
+
+   
+  });
 
 
 
