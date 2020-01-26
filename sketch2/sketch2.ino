@@ -141,7 +141,7 @@ void handleBody() { //Handler for the body path
 
   if (server.hasArg("plain")== false){ //Check if body received
 
-        server.send(200, "text/plain", "Body not received");
+        server.send(201, "text/plain", "Body not received");
         return;
 
   }

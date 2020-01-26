@@ -1,3 +1,4 @@
+var rp = require('request-promise');
 
 var http = require('http');
 
@@ -101,8 +102,28 @@ _reboot_wireless_network = function(wlan_iface, callback) {
               function add_board_http(next_step) {
                 exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
                     if (!err) console.log("restart dhcpcd to connect to board ap");
-                
-                const options = {
+                    var options = {
+                        method: 'POST',
+                        uri: 'http://api.posttestserver.com/post',
+                        body: {
+                            some: 'payload'
+                        },
+                        json: true // Automatically stringifies the body to JSON
+                    };
+                     
+                    rp(options)
+                        .then(function (parsedBody) {
+                            console.log(parsedBody);
+                        console.log('register board returned success')
+                      next_step();  
+                            // POST succeeded...
+                        })
+                        .catch(function (err) {
+                            // POST failed...
+                            console.error(err)
+                            next_step();
+                        });
+                /* const options = {
                     hostname: '192.168.4.1',
                     port: 80,
                     path: '/register',
@@ -126,7 +147,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     next_step();  
                   })
                   req.write(deviceId)  
-                  req.end()  
+                  req.end()   */
                   
                 })
                            
