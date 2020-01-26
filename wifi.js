@@ -106,10 +106,8 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     hostname: '192.168.4.1',
                     port: 80,
                     path: '/register',
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'text'
-                    }
+                    method: 'POST'
+                    
                   }
                   
                   const req = http.request(options, res => {
