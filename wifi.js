@@ -120,38 +120,38 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                                     console.log(status);
                                    // return next_step();
                                    if( status && status.wpa_state && (status.wpa_state== 'ASSOCIATING'||status.wpa_state== 'SCANNING')){
-                                       checkStatus();
+                                        setTimeout(function(){
+                                            checkStatus();
+                                        },5000)
+                                   }else if(status && status.wpa_state && (status.wpa_state== 'COMPLETED')&& (status.ssid== connection_info.wifi_ssid)){
+                                    var options = {
+                                        method: 'POST',
+                                        uri: 'http://192.168.4.1/register',
+                                        body: deviceId,
+                                        json: false // Automatically stringifies the body to JSON
+                                    };
+                                     rp(options)
+                                        .then(function (parsedBody) {
+                                            console.log(parsedBody);
+                                        console.log('register board returned success')
+                                            // POST succeeded...
+                                            next_step();  
+                
+                                        })
+                                        .catch(function (err) {
+                                            // POST failed...
+                                            console.error('err')
+                                            next_step();  
+                
+                                          
+                                        }); 
                                    }else{
                                        next_step()
                                    }
                                   });
                               
                  
-                 /*  setTimeout(function(){
-                    var options = {
-                        method: 'POST',
-                        uri: 'http://192.168.4.1/register',
-                        body: deviceId,
-                        json: false // Automatically stringifies the body to JSON
-                    };
-                     rp(options)
-                        .then(function (parsedBody) {
-                            console.log(parsedBody);
-                        console.log('register board returned success')
-                            // POST succeeded...
-                        })
-                        .catch(function (err) {
-                            // POST failed...
-                            console.error('err')
-                          
-                        }); 
-                        setTimeout(function(){
-                            next_step();  
-
-                        },5000)
-
-                   
-                },10000) */
+                
                  
                             }
                         }).catch((error) => {
