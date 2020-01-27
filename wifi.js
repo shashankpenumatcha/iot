@@ -17,7 +17,7 @@ _.templateSettings = {
 };
 // Helper function to write a given template to a file based on a given
 // context
-
+var wifi = new Wifi();
 function write_template_to_file(template_path, file_name, context, callback) {
   async.waterfall([
 
@@ -100,7 +100,48 @@ _reboot_wireless_network = function(wlan_iface, callback) {
               },
               
               function add_board_http(next_step) {
-                exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
+                   
+                    wifi.connect({ssid:connection_info.wifi_ssid}).then(() => {
+                        console.log('Connected to network.');
+                        var options = {
+                            method: 'POST',
+                            uri: 'http://192.168.4.1/register',
+                            body: deviceId,
+                            json: false // Automatically stringifies the body to JSON
+                        };
+                         
+                        rp(options)
+                            .then(function (parsedBody) {
+                                console.log(parsedBody);
+                            console.log('register board returned success')
+                          next_step();  
+                                // POST succeeded...
+                            })
+                            .catch(function (err) {
+                                // POST failed...
+                                console.error('err')
+                                setTimeout(function(){
+                                    rp(options)
+                                    .then(function (parsedBody) {
+                                        console.log(parsedBody);
+                                    console.log('register board returned success')
+                                  next_step();  
+                                        // POST succeeded...
+                                    })
+                                    .catch(function (err) {
+                                        // POST failed...
+                                        console.error('err')
+                                        next_step();
+                                    });
+                                },20000);
+                            });
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        next_step()
+
+                    });
+               /*  exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
                     if (!err) console.log("restart dhcpcd to connect to board ap");
                    
                  const options = {
@@ -162,7 +203,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                   req.write(deviceId)  
                   req.end()  
                   
-                })
+                }) */
                            
                 },
                 function delet(next_step){
