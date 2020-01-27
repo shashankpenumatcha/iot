@@ -153,7 +153,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     }
                  
                 
-                    
+                    checkStatus();
                   
                     
                   
