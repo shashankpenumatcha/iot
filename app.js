@@ -179,7 +179,7 @@ function auth(req,res,next){
       });
     }
 
-    piWifi.scan(function(err, networks) {
+  /*   piWifi.scan(function(err, networks) {
       if (err) {
         return console.error(err.message);
       }
@@ -195,7 +195,15 @@ function auth(req,res,next){
             console.log('board registered new path')      //process.exit(0);
         });
       }
-    });
+    }); */
+    var piWifi = require('pi-wifi');
+ 
+piWifi.status('wlan0', function(err, status) {
+  if (err) {
+    return console.error(err.message);
+  }
+  console.log(status);
+});
     
    
   });
