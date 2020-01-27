@@ -118,7 +118,12 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                                        return next_step();
                                     }
                                     console.log(status);
-                                    return next_step();
+                                   // return next_step();
+                                   if( status && status.wpa_state && status.wpa_state== 'ASSOCIATING'){
+                                       checkStatus();
+                                   }else{
+                                       next_step()
+                                   }
                                   });
                               
                  
