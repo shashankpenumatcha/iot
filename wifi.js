@@ -1,6 +1,7 @@
 var rp = require('request-promise');
 
 var http = require('http');
+var Wifi = require('rpi-wifi-connection');
 
 //
 // wifi network selection code
