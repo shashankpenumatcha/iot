@@ -109,32 +109,54 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                         wifi.getState().then((connected) => {
                             if (connected){
                                 console.log('Connected to network.');
-                                var options = {
-                                    method: 'POST',
-                                    uri: 'http://192.168.4.1/register',
-                                    body: deviceId,
-                                    json: false // Automatically stringifies the body to JSON
-                                };
-                                 
-                                rp(options)
-                                    .then(function (parsedBody) {
-                                        console.log(parsedBody);
-                                    console.log('register board returned success')
-                                  next_step();  
-                                        // POST succeeded...
-                                    })
-                                    .catch(function (err) {
-                                        // POST failed...
-                                        console.error('err')
-                                        next_step();
-                                       
-                                    });
-                             } else{
-                                next_step();
-                                console.log('Not connected to network.');
-                            }
+                                            
+                 const options = {
+                    hostname: '192.168.4.1',
+                    port: 80,
+                    path: '/register',
+                    method: 'POST'
+                    
+                  }
+                  
+                  const req = http.request(options, res => {
+                    console.log(`statusCode: ${res.statusCode}`)
+                  if(res.statusCode == 201){
+                    var options = {
+                        method: 'POST',
+                        uri: 'http://192.168.4.1/register',
+                        body: deviceId,
+                        json: false // Automatically stringifies the body to JSON
+                    };
+                     next_step();
+                 /*    rp(options)
+                        .then(function (parsedBody) {
+                            console.log(parsedBody);
+                        console.log('register board returned success')
+                      next_step();  
+                            // POST succeeded...
                         })
-                        .catch((error) => {
+                        .catch(function (err) {
+                            // POST failed...
+                            console.error('err')
+                          
+                        }); */
+                  }
+                    res.on('data', d => {
+                        console.log(d);
+                        console.log('miracle register board returned success')
+                      next_step();  
+                    })
+                  })
+                  
+                  req.on('error', error => {
+
+                    console.error(error)
+                    next_step();  
+                  })
+                  req.write(deviceId)  
+                  req.end()  
+                            }
+                        }).catch((error) => {
                             setTimeout(function(){
                                 checkStatus();
                                 console.log(error);
