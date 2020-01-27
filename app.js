@@ -183,6 +183,7 @@ function auth(req,res,next){
       if (err) {
         return console.error(err.message);
       }
+      console.log(networks);
       network = networks.filter(f=>(f.ssid == payload.boardId));
       if(!network.length){
         console.log("error - no board network found")
