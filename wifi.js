@@ -119,7 +119,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                                     }
                                     console.log(status);
                                    // return next_step();
-                                   if( status && status.wpa_state && s(tatus.wpa_state== 'ASSOCIATING'||status.wpa_state== 'SCANNING')){
+                                   if( status && status.wpa_state && (tatus.wpa_state== 'ASSOCIATING'||status.wpa_state== 'SCANNING')){
                                        checkStatus();
                                    }else{
                                        next_step()
