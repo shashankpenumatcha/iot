@@ -102,6 +102,18 @@ _reboot_wireless_network = function(wlan_iface, callback) {
               function add_board_http(next_step) {
                 exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
                     if (!err) console.log("restart dhcpcd to connect to board ap");
+                   
+                 const options = {
+                    hostname: '192.168.4.1',
+                    port: 80,
+                    path: '/register',
+                    method: 'POST'
+                    
+                  }
+                  
+                  const req = http.request(options, res => {
+                    console.log(`statusCode: ${res.statusCode}`)
+                  if(res.statusCode == 201){
                     var options = {
                         method: 'POST',
                         uri: 'http://192.168.4.1/register',
@@ -134,20 +146,10 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                                 });
                             },20000);
                         });
-                /* const options = {
-                    hostname: '192.168.4.1',
-                    port: 80,
-                    path: '/register',
-                    method: 'POST'
-                    
                   }
-                  
-                  const req = http.request(options, res => {
-                    console.log(`statusCode: ${res.statusCode}`)
-                  
                     res.on('data', d => {
                         console.log(d);
-                        console.log('register board returned success')
+                        console.log('miracle register board returned success')
                       next_step();  
                     })
                   })
@@ -158,7 +160,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     next_step();  
                   })
                   req.write(deviceId)  
-                  req.end()   */
+                  req.end()  
                   
                 })
                            
