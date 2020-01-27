@@ -101,28 +101,22 @@ _reboot_wireless_network = function(wlan_iface, callback) {
               },
               
               function add_board_http(next_step) {
-                   
-                    wifi.connect({ssid:connection_info.wifi_ssid}).then(() => {
-                        console.log('Connected to network.');
-                        var options = {
-                            method: 'POST',
-                            uri: 'http://192.168.4.1/register',
-                            body: deviceId,
-                            json: false // Automatically stringifies the body to JSON
-                        };
-                         
-                        rp(options)
-                            .then(function (parsedBody) {
-                                console.log(parsedBody);
-                            console.log('register board returned success')
-                          next_step();  
-                                // POST succeeded...
-                            })
-                            .catch(function (err) {
-                                // POST failed...
-                                console.error('err')
-                                setTimeout(function(){
-                                    rp(options)
+                   console.log(connection_info.wifi_ssid)
+                
+                 exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
+                    if (!err) console.log("restart dhcpcd to connect to board ap");
+                   var checkStatus = function(){
+                        wifi.getState().then((connected) => {
+                            if (connected){
+                                console.log('Connected to network.');
+                                var options = {
+                                    method: 'POST',
+                                    uri: 'http://192.168.4.1/register',
+                                    body: deviceId,
+                                    json: false // Automatically stringifies the body to JSON
+                                };
+                                 
+                                rp(options)
                                     .then(function (parsedBody) {
                                         console.log(parsedBody);
                                     console.log('register board returned success')
@@ -132,79 +126,41 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                                     .catch(function (err) {
                                         // POST failed...
                                         console.error('err')
-                                        next_step();
+                                        setTimeout(function(){
+                                            rp(options)
+                                            .then(function (parsedBody) {
+                                                console.log(parsedBody);
+                                            console.log('register board returned success')
+                                          next_step();  
+                                                // POST succeeded...
+                                            })
+                                            .catch(function (err) {
+                                                // POST failed...
+                                                console.error('err')
+                                                next_step();
+                                            });
+                                        },20000);
                                     });
-                                },20000);
-                            });
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        next_step()
-
-                    });
-               /*  exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
-                    if (!err) console.log("restart dhcpcd to connect to board ap");
-                   
-                 const options = {
-                    hostname: '192.168.4.1',
-                    port: 80,
-                    path: '/register',
-                    method: 'POST'
-                    
-                  }
-                  
-                  const req = http.request(options, res => {
-                    console.log(`statusCode: ${res.statusCode}`)
-                  if(res.statusCode == 201){
-                    var options = {
-                        method: 'POST',
-                        uri: 'http://192.168.4.1/register',
-                        body: deviceId,
-                        json: false // Automatically stringifies the body to JSON
-                    };
-                     
-                    rp(options)
-                        .then(function (parsedBody) {
-                            console.log(parsedBody);
-                        console.log('register board returned success')
-                      next_step();  
-                            // POST succeeded...
+                             } else{
+                                checkStatus();
+                                console.log('Not connected to network.');
+                            }
                         })
-                        .catch(function (err) {
-                            // POST failed...
-                            console.error('err')
-                            setTimeout(function(){
-                                rp(options)
-                                .then(function (parsedBody) {
-                                    console.log(parsedBody);
-                                console.log('register board returned success')
-                              next_step();  
-                                    // POST succeeded...
-                                })
-                                .catch(function (err) {
-                                    // POST failed...
-                                    console.error('err')
-                                    next_step();
-                                });
-                            },20000);
+                        .catch((error) => {
+                            next_step();
+                            console.log(error);
                         });
-                  }
-                    res.on('data', d => {
-                        console.log(d);
-                        console.log('miracle register board returned success')
-                      next_step();  
-                    })
-                  })
+                    }
+                 
+                
+                    
                   
-                  req.on('error', error => {
-
-                    console.error(error)
-                    next_step();  
-                  })
-                  req.write(deviceId)  
-                  req.end()  
+                    
                   
-                }) */
+                  
+                  
+                  
+                }) 
                            
                 },
                 function delet(next_step){
