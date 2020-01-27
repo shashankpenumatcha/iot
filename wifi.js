@@ -2,6 +2,7 @@ var rp = require('request-promise');
 
 var http = require('http');
 var Wifi = require('rpi-wifi-connection');
+var piWifi = require('pi-wifi');
 
 //
 // wifi network selection code
@@ -16,6 +17,8 @@ _.templateSettings = {
   interpolate: /\{\{(.+?)\}\}/g,
   evaluate :   /\{\[([\s\S]+?)\]\}/g
 };
+
+
 // Helper function to write a given template to a file based on a given
 // context
 var wifi = new Wifi();
@@ -102,8 +105,17 @@ _reboot_wireless_network = function(wlan_iface, callback) {
               
               function add_board_http(next_step) {
                    console.log(connection_info.wifi_ssid)
-                
-                 exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
+                   piWifi.restartInterface('wlan0', function(err) {
+                    if (err) {
+                       console.error(err.message);
+                      return next_step();
+
+                    }
+                    console.log('Interface restarted succesfully!');
+                    next_step();
+
+                  });
+                /*  exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
                     if (!err) console.log("restart dhcpcd to connect to board ap");
                    var checkStatus = function(){
                         wifi.getState().then((connected) => {
@@ -157,7 +169,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                   
                   
                   
-                }) 
+                })  */
                            
                 },
                 function delet(next_step){

@@ -12,8 +12,8 @@
 #include "FS.h"
 
 
-const char* wifiName = "Shashank";
-const char* wifiPass = "meenakshi1234";
+const char* wifiName = "_AP_SSID_";
+const char* wifiPass = "_AP_PASSWORD_";
 const char* mqtt_server = NULL;
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -23,11 +23,15 @@ int value = 0;
 String id = "5e29d00a61f8612408c0cc51";
 int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
+StaticJsonDocument<200> con;
+
 ESP8266WebServer server(80);
  
 // the setup function runs once when you press reset or power the board
 void setup() {
-  Serial.begin(115200);
+    pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+
+  Serial.begin(9600);
   doc["id"] = id;
   //Initialize File System
   if(SPIFFS.begin())
@@ -49,14 +53,14 @@ void setup() {
   switches.add(true);
   if(NULL!=mqtt_server){
     setup_wifi();
+      setup_mqtt();
+
   }else{
     setup_AP();  
   }
      if (MDNS.begin(id)) {  //Start mDNS with name esp8266
       Serial.println("MDNS started");
     }
-  setup_mqtt();
-  server.on("/", handleRoot);  //Associate handler function to path
   server.on("/register", handleBody);  //Associate handler function to path
   server.onNotFound(handleNotFound);        // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
   server.begin();                           //Start server
@@ -76,12 +80,15 @@ void loop() {
 }
 
 void setup_mqtt(){
-  client.setServer(mqtt_server, 1883);
+  Serial.println("mqttt");
+  const char* sr = con["serverName"];
+  Serial.println(sr);
+  client.setServer(sr, 1883);
   client.setCallback(callback);  
 }
 
 bool loadConfig() {
-  File configFile = SPIFFS.open("/config", "r");
+   File configFile = SPIFFS.open("/config.json", "r");
   if (!configFile) {
     Serial.println("Failed to open config file");
     return false;
@@ -101,13 +108,21 @@ bool loadConfig() {
   // use configFile.readString instead.
   configFile.readBytes(buf.get(), size);
 
-  mqtt_server = buf.get();
+  StaticJsonDocument<200> doc;
+  auto error = deserializeJson(doc, buf.get());
+  if (error) {
+    Serial.println("Failed to parse config file");
+    return false;
+  }
+
+  con = doc;
 
   // Real world application would store these values in some variables for
   // later use.
-
-  Serial.print("Loadered config: ");
-  Serial.println(mqtt_server);
+mqtt_server = con["serverName"];
+  Serial.print("Loaded serverName: ");
+  const char* sr = con["serverName"];
+  Serial.println(sr);
 
   return true;
 }
@@ -115,23 +130,20 @@ bool loadConfig() {
 bool saveConfig(String deviceId) {
 
 
-  File configFile = SPIFFS.open("/config", "w");
+ StaticJsonDocument<200> doc;
+  doc["serverName"] = deviceId+".local";
+
+  File configFile = SPIFFS.open("/config.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
   }
-  String i = deviceId + ".local";
-  configFile.write(deviceId.c_str());
-  
+
+  serializeJson(doc, configFile);
   return true;
 }
 
-//Handles http request 
-void handleRoot() {
-  digitalWrite(2, 0);   //Blinks on board led on page request 
-  server.send(200, "text/plain", "hello from esp8266!");
-  digitalWrite(2, 1);
-}
+
 
 void handleNotFound(){
   server.send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
@@ -146,24 +158,29 @@ void handleBody() { //Handler for the body path
 
   }
 
-  String message = "Body received:\n";
+  String message = "";
          message += server.arg("plain");
-         message += "\n";
+
+
 
   if(NULL==mqtt_server){
-    if(saveConfig(server.arg("plain"))){
+    Serial.println("inside null check");
+    if(saveConfig(message)){
       Serial.println("saved config");
       };
     if(loadConfig()){
     Serial.println("loaded config");
+          server.send(200, "text/plain", message);
+
+
     }
     Serial.println(mqtt_server);
     WiFi.softAPdisconnect (true);
+
     setup_wifi();
     setup_mqtt();
   }
 
-  server.send(200, "text/plain", message);
   Serial.println(message);
 }
 
@@ -263,9 +280,11 @@ void reconnect() {
   
   // Loop until we're reconnected
   while (!client.connected()) {
- 
+    const char* sr = con["serverName"];
+     Serial.println(sr);
+
     Serial.print("Attempting MQTT connection...");
-    if (client.connect(id.c_str())) {
+    if (client.connect(sr)) {
       Serial.println("connected");
       client.subscribe("penumats/handshake/reinitiate");
       client.subscribe(("penumats/"+id+"/switch/on").c_str());
@@ -274,6 +293,7 @@ void reconnect() {
     size_t n = serializeJson(doc, buffer);
     client.publish("penumats/handshake/connect", buffer, n);
     } else {
+      Serial.println();
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");

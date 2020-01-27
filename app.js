@@ -183,19 +183,20 @@ function auth(req,res,next){
       if (err) {
         return console.error(err.message);
       }
-      console.log(networks);
+      network = networks.filter(f=>(f.ssid == payload.boardId));
+      if(!network.length){
+        console.log("error - no board network found")
+      }else{
+        wifiUtil._add_board(conn_info,payload.deviceId, function(err) {
+          if (err) {
+          console.log(err)
+          console.log("error setup")
+          }      
+            console.log('board registered new path')      //process.exit(0);
+        });
+      }
     });
-    // TODO: If wifi did not come up correctly, it should fail
-    // currently we ignore ifup failures.
-  /*   wifiUtil._add_board(conn_info,payload.deviceId, function(err) {
-      if (err) {
-      console.log(err)
-      console.log("error setup")
-      }      
-        console.log('board registered new path')      //process.exit(0);
-    }); */
-  
-
+    
    
   });
 
