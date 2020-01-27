@@ -65,10 +65,9 @@ function auth(req,res,next){
         return b.id;
       });
     }
-    if(!init){
 
       initDevice();
-    }
+    
 
   });
   //initDevice();
