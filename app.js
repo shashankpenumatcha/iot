@@ -65,7 +65,10 @@ function auth(req,res,next){
         return b.id;
       });
     }
-    initDevice();
+    if(!init){
+
+      initDevice();
+    }
 
   });
   //initDevice();
@@ -163,10 +166,18 @@ function auth(req,res,next){
     if(!payload.boardId || !payload.socketId){
       console.log('no board id to connect to ap')
     }
+    if(!payload.deviceInfo){
+      console.log('no deviceinfo')
+    }
     var conn_info ={
       wifi_ssid:payload.boardId
     }
-    
+    let device = payload.deviceInfo;
+    if(device&&device.boards&&device.boards.length){
+      boards =  device.boards.map(b=>{
+        return b.id;
+      });
+    }
     // TODO: If wifi did not come up correctly, it should fail
     // currently we ignore ifup failures.
     wifiUtil._add_board(conn_info,payload.deviceId, function(err) {
