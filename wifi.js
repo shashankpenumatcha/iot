@@ -109,7 +109,12 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                         wifi.getState().then((connected) => {
                             if (connected){
                                 console.log('Connected to network.');
-                                            
+                                wifi.getStatus().then((status) => {
+                                    console.log(status);
+                                })
+                                .catch((error) => {
+                                    console.log(error);
+                                });
                  
                   setTimeout(function(){
                     var options = {
@@ -129,7 +134,10 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                             console.error('err')
                           
                         }); 
-                        next_step();  
+                        setTimeout(function(){
+                            next_step();  
+
+                        },5000)
 
                    
                 },10000)
