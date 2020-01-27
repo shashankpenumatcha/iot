@@ -126,10 +126,11 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                                     .catch(function (err) {
                                         // POST failed...
                                         console.error('err')
+                                        next_step();
                                        
                                     });
                              } else{
-                                checkStatus();
+                                next_step();
                                 console.log('Not connected to network.');
                             }
                         })
