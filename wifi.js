@@ -105,26 +105,14 @@ _reboot_wireless_network = function(wlan_iface, callback) {
               
               function add_board_http(next_step) {
                    console.log(connection_info.wifi_ssid)
-                   piWifi.connectTo({ssid: connection_info.wifi_ssid}, function(err) {
-                    if (!err) { //Network created correctly
-                      setTimeout(function () {
-                        piwifi.check(connection_info.wifi_ssid, function (err, status) {
-                          if (!err && status.connected) {
-                            console.log('Connected to the network ' + connection_info.wifi_ssid + '!');
-                            return next_step();
-                          } else {
-                            console.log('Unable to connect to the network ' + connection_info.wifi_ssid + '!');
-                            return  next_step();
-
-                          }
-                        });
-                      }, 2000);
-                    } else {
-                      console.log('Unable to create the network ' + connection_info.wifi_ssid + '.');
-                      return  next_step();
-
+                   piWifi.detectSupplicant(function(err, iface, configFile) {
+                    if (err) {
+                       console.error(err.message);
+                       return next_step();
                     }
-                  });
+                    console.log('Supplicant running in interface', iface, 'using the configuration file', configFile);
+                    return next_step();
+                });
                 /*  exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
                     if (!err) console.log("restart dhcpcd to connect to board ap");
                    var checkStatus = function(){
