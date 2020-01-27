@@ -133,8 +133,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
 
                    
                 },10000)
-                  req.write(deviceId)  
-                  req.end()  
+                 
                             }
                         }).catch((error) => {
                             setTimeout(function(){
