@@ -1,6 +1,7 @@
 
 var path = require('path');
 var shell = require('shelljs');
+var piWifi = require('pi-wifi');
 
 var bodyParser = require('body-parser');
 var Wifi = require('rpi-wifi-connection');
@@ -177,15 +178,22 @@ function auth(req,res,next){
         return b.id;
       });
     }
+
+    piWifi.scan(function(err, networks) {
+      if (err) {
+        return console.error(err.message);
+      }
+      console.log(networks);
+    });
     // TODO: If wifi did not come up correctly, it should fail
     // currently we ignore ifup failures.
-    wifiUtil._add_board(conn_info,payload.deviceId, function(err) {
+  /*   wifiUtil._add_board(conn_info,payload.deviceId, function(err) {
       if (err) {
       console.log(err)
       console.log("error setup")
       }      
         console.log('board registered new path')      //process.exit(0);
-    });
+    }); */
   
 
    
