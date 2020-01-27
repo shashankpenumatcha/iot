@@ -105,23 +105,24 @@ _reboot_wireless_network = function(wlan_iface, callback) {
               
               function add_board_http(next_step) {
                    console.log(connection_info.wifi_ssid)
-                   piWifi.status('wlan0', function(err, status) {
-                    if (err) {
-                       console.error(err.message);
-                       return next_step();
-                    }
-                    console.log(status);
-                    return next_step();
-                  });
-                /*  exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
+                   
+                  exec("sudo systemctl restart dhcpcd.service", function(err, stdout, stderr) {
                     if (!err) console.log("restart dhcpcd to connect to board ap");
                    var checkStatus = function(){
                         wifi.getState().then((connected) => {
                             if (connected){
                                 console.log('Connected to network.');
+                                piWifi.status('wlan0', function(err, status) {
+                                    if (err) {
+                                       console.error(err.message);
+                                       return next_step();
+                                    }
+                                    console.log(status);
+                                    return next_step();
+                                  });
                               
                  
-                  setTimeout(function(){
+                 /*  setTimeout(function(){
                     var options = {
                         method: 'POST',
                         uri: 'http://192.168.4.1/register',
@@ -145,7 +146,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                         },5000)
 
                    
-                },10000)
+                },10000) */
                  
                             }
                         }).catch((error) => {
@@ -167,7 +168,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                   
                   
                   
-                })  */
+                })  
                            
                 },
                 function delet(next_step){
