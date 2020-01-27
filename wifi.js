@@ -147,7 +147,8 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                             }
                         })
                         .catch((error) => {
-                            next_step();
+                            checkStatus();
+
                             console.log(error);
                         });
                     }
