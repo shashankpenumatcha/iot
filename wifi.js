@@ -117,47 +117,29 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                     method: 'POST'
                     
                   }
-                  
-                  let req = http.request(options, res => {
-                    console.log(`statusCode: ${res.statusCode}`)
-                  if(res.statusCode == 201){
-                  
-                     next_step();
-                
-                  }
-                    res.on('data', d => {
-                        console.log(d);
-                        console.log('miracle register board returned success')
-                      next_step();  
-                    })
-                  })
-                  
-                  req.on('error', error => {
-                    console.error(error)
-                    setTimeout(function(){
-                        let req = http.request(options, res => {
-                            console.log(`statusCode: ${res.statusCode}`)
-                          if(res.statusCode == 201){
-                          
-                             next_step();
+                  setTimeout(function(){
+                    let req = http.request(options, res => {
+                        console.log(`statusCode: ${res.statusCode}`)
+                      if(res.statusCode == 201){
+                      
+                         next_step();
+                    
+                      }
+                        res.on('data', d => {
+                            console.log(d);
+                            console.log('miracle 2 register board returned success')
+                          next_step();  
+                        })
+                      })
+                      
+                      req.on('error', error => {
                         
-                          }
-                            res.on('data', d => {
-                                console.log(d);
-                                console.log('miracle 2 register board returned success')
-                              next_step();  
-                            })
-                          })
-                          
-                          req.on('error', error => {
-                            
-                            console.error(error)
-                            next_step();  
-                          })
-                          req.write(deviceId)  
-                          req.end() 
-                    },10000)
-                  })
+                        console.error(error)
+                        next_step();  
+                      })
+                      req.write(deviceId)  
+                      req.end() 
+                },10000)
                   req.write(deviceId)  
                   req.end()  
                             }
