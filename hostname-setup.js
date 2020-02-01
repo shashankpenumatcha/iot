@@ -1,5 +1,6 @@
 var wifiUtil = require('./wifi.js');
 var fs = require("fs");
+var shell = require('shelljs');
 
 
 function checkHostname(){
@@ -9,7 +10,7 @@ function checkHostname(){
        hostnameJSON = JSON.parse(hostnameFile);
     }
     
-    if(!hostnameFile || hostnameJSON && !hostnameJSON.id){
+    if(!hostnameFile || (hostnameJSON && !hostnameJSON.id)){
       let mac = fs.readFileSync('/sys/class/net/wlan0/address', 'utf8');
       if(mac&&mac.length){
         deviceId=mac.split(':').join('').trim();

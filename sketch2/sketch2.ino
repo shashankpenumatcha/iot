@@ -160,7 +160,7 @@ void handleBody() { //Handler for the body path
     Serial.println("loaded config");
           server.send(200, "text/plain", "okay");
 
-          delay(5000);
+          delay(100);
     }
     Serial.println(mqtt_server);
     WiFi.softAPdisconnect (true);
