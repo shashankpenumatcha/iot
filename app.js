@@ -170,6 +170,7 @@ function auth(req,res,next){
       return console.log('no board id to connect to ap')
     }
     let id  = payload.boardId;
+    currentBoard[id] = payload;
     if(!payload.deviceInfo){
       currentBoard[id].error = 'no deviceinfo'
       socket.emit("board_added", currentBoard[id]);
