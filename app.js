@@ -22,7 +22,7 @@ var registrationService = require('./services/registration.service');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
+var currentBoard={};
 var device = null; //registered device from server
 var boards = []; //registered boards from server
 let state={};
@@ -163,11 +163,19 @@ function auth(req,res,next){
 
   socket.on('addBoard',function(payload){
     console.log('add board request')
+    currentBoard[payload.boardId] = payload;
     if(!payload.boardId || !payload.socketId){
-      console.log('no board id to connect to ap')
+      currentBoard[id].error = 'no board id to connect to ap'
+      socket.emit("board_added", currentBoard[id]);
+      delete currentBoard[id];
+      return console.log('no board id to connect to ap')
     }
     if(!payload.deviceInfo){
-      console.log('no deviceinfo')
+      currentBoard[id].error = 'no deviceinfo'
+      socket.emit("board_added", currentBoard[id]);
+      delete currentBoard[id];
+      return console.log('no deviceinfo')
+      
     }
     var conn_info ={
       wifi_ssid:payload.boardId
@@ -181,20 +189,38 @@ function auth(req,res,next){
 
     piWifi.scan(function(err, networks) {
       if (err) {
+        currentBoard[id].error = err.message;
+        socket.emit("board_added", currentBoard[id]);
+        delete currentBoard[id];
         return console.error(err.message);
       }
       if(!networks||!networks.length){
+       currentBoard[id].error = "no networks found";
+       socket.emit("board_added", currentBoard[id]);
+       delete currentBoard[id];
        return console.log('no networks found');
+
       }
       network = networks.filter(f=>(f.ssid == payload.boardId));
       if(!network.length){
         console.log("error - no board network found")
+        currentBoard[id].error = "error - no board network found";
+        socket.emit("board_added", currentBoard[id]);
+        delete currentBoard[id];
       }else{
         wifiUtil._add_board(conn_info,payload.deviceId, function(err) {
           if (err) {
           console.log(err)
           console.log("error setup")
-          }      
+          currentBoard[id].error = "error while adding board";
+          socket.emit("board_added", currentBoard[id]);
+          delete currentBoard[id];
+
+          }
+          
+          socket.emit("board_added", currentBoard[id]);
+          delete currentBoard[id];
+
             console.log('board registered new path')      //process.exit(0);
         });
       }
@@ -230,6 +256,12 @@ function initDevice(){
         console.log("board registered",JSON.stringify(state.boards));
         let msg = {deviceId:deviceId,boards:state.boards}
        socket.emit("boards",msg);
+
+        if( currentBoard[id]){
+          socket.emit("board_added", currentBoard[id]);
+          delete currentBoard[id];
+        }
+
       }else if(id){
         console.log('rouge board detected ' + id);
       }else{

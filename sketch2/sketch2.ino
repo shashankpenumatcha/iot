@@ -6,11 +6,9 @@
 */
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include "FS.h"
-
 
 const char* wifiName = "_AP_SSID_";
 const char* wifiPass = "_AP_PASSWORD_";
@@ -20,7 +18,7 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
-String id = "5e29d00a61f8612408c0cc51";
+String id = "5e3510ebd3882a20200f5a80";
 int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
 StaticJsonDocument<200> con;
@@ -58,21 +56,11 @@ void setup() {
   }else{
     setup_AP();  
   }
-     if (MDNS.begin(id)) {  //Start mDNS with name esp8266
-      Serial.println("MDNS started");
-    }
-  server.on("/register", handleBody);  //Associate handler function to path
-  server.onNotFound(handleNotFound);        // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
-  server.begin();                           //Start server
-  Serial.println("HTTP server started");
-  //MDNS.addService("http", "tcp", 80);
-
 }
  
 // the loop function runs over and over again forever
 void loop() {
-     //MDNS.update();
-    server.handleClient();
+  server.handleClient();
   if (!client.connected()&&mqtt_server!=NULL) {
     reconnect();
   }
@@ -170,9 +158,9 @@ void handleBody() { //Handler for the body path
       };
     if(loadConfig()){
     Serial.println("loaded config");
-          server.send(200, "text/plain", message);
+          server.send(200, "text/plain", "okay");
 
-
+          delay(5000);
     }
     Serial.println(mqtt_server);
     WiFi.softAPdisconnect (true);
@@ -215,11 +203,16 @@ void setup_wifi() {
 
 
 void setup_AP(){
-if(WiFi.softAP(id)){
+    WiFi.disconnect(true);
+  WiFi.mode(WIFI_AP);
+
+  if(WiFi.softAP(id,"",1)){
  Serial.println("ap success");
-  //if (MDNS.begin(id)) {  //Start mDNS with name esp8266
-    //Serial.println("MDNS started");
-  //}
+   
+  server.on("/register", handleBody);  //Associate handler function to path
+  server.onNotFound(handleNotFound);        // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+  server.begin();                           //Start server
+  Serial.println("HTTP server started");
 }
   
 }
