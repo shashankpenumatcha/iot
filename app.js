@@ -163,13 +163,13 @@ function auth(req,res,next){
 
   socket.on('addBoard',function(payload){
     console.log('add board request')
-    currentBoard[payload.boardId] = payload;
     if(!payload.boardId || !payload.socketId){
-      currentBoard[id].error = 'no board id to connect to ap'
-      socket.emit("board_added", currentBoard[id]);
+      payload.error = 'no board id to connect to ap'
+      socket.emit("board_added", payload);
       delete currentBoard[id];
       return console.log('no board id to connect to ap')
     }
+    let id  = payload.boardId;
     if(!payload.deviceInfo){
       currentBoard[id].error = 'no deviceinfo'
       socket.emit("board_added", currentBoard[id]);
