@@ -130,22 +130,25 @@ _reboot_wireless_network = function(wlan_iface, callback) {
                                         body: deviceId,
                                         json: false // Automatically stringifies the body to JSON
                                     };
-                                     rp(options)
-                                        .then(function (parsedBody) {
-                                            console.log(parsedBody);
-                                        console.log('register board returned success')
-                                            // POST succeeded...
-                                            next_step();  
-                
-                                        })
-                                        .catch(function (err) {
-                                            // POST failed...
-                                            console.log(err)
-                                            console.error('err')
-                                            next_step();  
-                
-                                          
-                                        }); 
+                                    setTimeout(function(){
+
+                                        rp(options)
+                                           .then(function (parsedBody) {
+                                               console.log(parsedBody);
+                                           console.log('register board returned success')
+                                               // POST succeeded...
+                                               next_step();  
+                   
+                                           })
+                                           .catch(function (err) {
+                                               // POST failed...
+                                               console.log(err)
+                                               console.error('err')
+                                               next_step();  
+                   
+                                             
+                                           }); 
+                                    },5000)
                                    }else{
                                        next_step()
                                    }
