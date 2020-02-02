@@ -243,8 +243,72 @@ function auth(req,res,next){
   });
 
 
+function setSchedules(){
+  activeSchedules = {};
+  repo.scheduleRepository.getAllActive().then(schedules => {
+    if(schedules&&schedules.length){
+      schedules.map(s => {
+        activeSchedules[s.scheduleId]={};
+        activeSchedules[s.scheduleId].on = null;
+        activeSchedules[s.scheduleId].off = null;
+        activeSchedules[s.scheduleId].schedule = s;
+         return s
+      })
+      let scheduleKeys = Object.keys(activeSchedules);
+      if(scheduleKeys && scheduleKeys.length){
+        scheduleKeys.map(sk=>{
+          console.log(activeSchedules)
+          console.log(sk)
+          console.log(111111111111)
+          
+        let s = activeSchedules[sk].schedule;
+        console.log(s);
+        if(s.start){
+          var rule = new schedule.RecurrenceRule();
+          rule.hour = s.start.split(":")[0];
+          rule.minute = s.start.split(":")[1];
+          rule.second = s.start.split(":")[2];
+          if(s.days){
+            rule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
+  
+          } 
+          activeSchedules[sk].on  = schedule.scheduleJob(rule, function(){
+            console.log('rule on');
+            if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
+              client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:s.switch,state:true}));
+            }else{
+              console.log('bad request - schedule on board or switch not found')
+            }
+          });
+        }
 
-
+        if(s.end){
+          var endRule = new schedule.RecurrenceRule();
+          endRule.hour = parseInt(s.end.split(":")[0]);
+          endRule.minute = parseInt(s.end.split(":")[1]);
+          endRule.second = parseInt(s.end.split(":")[2]);
+          if(s.days){
+            endRule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
+  
+          }
+          activeSchedules[sk].off  = schedule.scheduleJob(endRule, function(){
+            console.log('rule off');
+            if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
+              client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:s.switch,state:false}));
+            }else{
+              console.log('bad request - schedule off board or switch not found')
+            }
+          });
+        }
+          return sk
+        })
+      }
+      console.log(activeSchedules);
+    }
+  },err=>{
+    console.log(err)
+  })
+}
 
 function initDevice(reinit){
 
@@ -431,70 +495,7 @@ function initDevice(reinit){
     });
   }
 
-
-  repo.scheduleRepository.getAllActive().then(schedules => {
-    console.log(schedules)
-    if(schedules&&schedules.length){
-      schedules.map(s => {
-        activeSchedules[s.scheduleId]={};
-        activeSchedules[s.scheduleId].on = null;
-        activeSchedules[s.scheduleId].off = null;
-        activeSchedules[s.scheduleId].schedule = s;
-         return s
-      })
-      let scheduleKeys = Object.keys(activeSchedules);
-      if(scheduleKeys && scheduleKeys.length){
-        scheduleKeys.map(sk=>{
-          console.log(activeSchedules)
-          console.log(sk)
-          console.log(111111111111)
-          
-        let s = activeSchedules[sk].schedule;
-        console.log(s);
-        var rule = new schedule.RecurrenceRule();
-        rule.hour = s.start.split(":")[0];
-        rule.minute = s.start.split(":")[1];
-        rule.second = s.start.split(":")[2];
-        if(s.days){
-          rule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
-
-        } 
-        activeSchedules[sk].on  = schedule.scheduleJob(rule, function(){
-          console.log('rule on');
-          if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
-            client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:s.switch,state:true}));
-          }else{
-            console.log('bad request - schedule on board or switch not found')
-          }
-        
-
-        });
-
-        var endRule = new schedule.RecurrenceRule();
-        endRule.hour = parseInt(s.end.split(":")[0]);
-        endRule.minute = parseInt(s.end.split(":")[1]);
-        endRule.second = parseInt(s.end.split(":")[2]);
-        if(s.days){
-          endRule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
-
-        }
-
-        activeSchedules[sk].off  = schedule.scheduleJob(endRule, function(){
-          console.log('rule off');
-          if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
-            client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:s.switch,state:false}));
-          }else{
-            console.log('bad request - schedule off board or switch not found')
-          }
-        });
-          return sk
-        })
-      }
-      console.log(activeSchedules);
-    }
-  },err=>{
-    console.log(err)
-  })
+  setSchedules();
 
   
 }
