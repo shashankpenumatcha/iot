@@ -429,6 +429,12 @@ function initDevice(reinit){
   }
 
 
+  repo.scheduleRepository.getAllActive().then(schedules => {
+    console.log(schedules)
+  },err=>{
+    console.log(err)
+  })
+
   
 }
 

@@ -25,7 +25,7 @@ class ScheduleRepository {
         switchId INTEGER NOT NULL,
         scheduleId INTEGER NOT NULL,
         CONSTRAINT schedules_switch_fk_switchId FOREIGN KEY (switchId)
-          REFERENCES switches(id) ON UPDATE CASCADE ON DELETE CASCADE),
+          REFERENCES switches(id) ON UPDATE CASCADE ON DELETE CASCADE,
           CONSTRAINT schedules_switch_fk_scheduleId FOREIGN KEY (scheduleId)
           REFERENCES schedules(id) ON UPDATE CASCADE ON DELETE CASCADE)`
       return this.dao.run(sql)
@@ -82,7 +82,9 @@ class ScheduleRepository {
     }
 
     getAllActive() {
-      return this.dao.all(`SELECT * FROM schedules where active = true`)
+      return this.dao.all(`SELECT * FROM schedules s INNER JOIN
+       schedules_switch_mapping ssm on ssm.scheduleid = s.id INNER JOIN
+        switches sw on sw.id = ssm.switchid where active = 1`)
     }
     
  
