@@ -439,6 +439,7 @@ function initDevice(reinit){
         activeSchedules[s.scheduleId]={};
         activeSchedules[s.scheduleId].on = null;
         activeSchedules[s.scheduleId].off = null;
+        activeSchedules[s.scheduleId].schedule = s;
          return s
       })
       let scheduleKeys = Object.keys(activeSchedules);
@@ -446,7 +447,7 @@ function initDevice(reinit){
         scheduleKeys.map(sk=>{
           console.log(activeSchedules)
           console.log(sk)
-          let s = activeSchedules[sk];
+        let s = activeSchedules[sk].schedule;
         var rule = new schedule.RecurrenceRule();
         rule.hour = s.start.split(":")[0];
         rule.minute = s.start.split(":")[1];
@@ -457,6 +458,12 @@ function initDevice(reinit){
         } 
         activeSchedules[sk].on  = schedule.scheduleJob(rule, function(){
           console.log('rule on');
+          if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[$switch]!=undefined){
+            client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
+          }else{
+            console.log('bad request - schedule on board or switch not found')
+          }
+        }
         });
 
         var endRule = new schedule.RecurrenceRule();
@@ -470,6 +477,11 @@ function initDevice(reinit){
 
         activeSchedules[sk].off  = schedule.scheduleJob(endRule, function(){
           console.log('rule off');
+          if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[$switch]!=undefined){
+            client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
+          }else{
+            console.log('bad request - schedule off board or switch not found')
+          }
         });
           return sk
         })
