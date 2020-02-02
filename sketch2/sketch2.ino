@@ -18,7 +18,7 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
-String id = "5e3510ebd3882a20200f5a80";
+String id = "5e36d51034bfa11b80244fe4";
 int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
 StaticJsonDocument<200> con;
@@ -41,7 +41,7 @@ void setup() {
     Serial.println("SPIFFS Initialization...failed");
   }
  
-  SPIFFS.format();
+ // SPIFFS.format();
   if(loadConfig()){
   Serial.println("loaded config");
   }else{
