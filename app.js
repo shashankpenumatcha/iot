@@ -61,7 +61,7 @@ function auth(req,res,next){
 
    // socket.removeAllListeners();
     socket.emit('join',deviceId);
-    initDevice(!init);
+    //initDevice(!init);
   });
     
   socket.on('deviceInfo',function(deviceEntitiy){
@@ -76,7 +76,7 @@ function auth(req,res,next){
       });
     }
 
-     // initDevice(false);
+      initDevice();
     
 
   });
@@ -246,8 +246,6 @@ function auth(req,res,next){
 function initDevice(reinit){
 
 
-  
-
  client  = mqtt.connect('mqtt://'+deviceId+'.local:1883')
   
   client.on('connect', function () {
@@ -293,7 +291,7 @@ function initDevice(reinit){
     }
   });
 
-  if(!reinit){
+  if(!reinit||reinit){
 
     socket.on('toggle',function(msg){
       if(msg.v==false){
