@@ -15,7 +15,7 @@ class ScheduleRepository {
         date TEXT,
         days TEXT,
         start TEXT NOT NULL,
-        end TEXT NOT NULL`
+        end TEXT NOT NULL)`
      
       return this.dao.run(sql)
     }
