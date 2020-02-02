@@ -32,6 +32,20 @@ class SwitchRepository {
           REFERENCES schedules(id) ON UPDATE CASCADE ON DELETE CASCADE)`
       return this.dao.run(sql)
     }
+
+    addMapping(switchId, scheduleId) {
+      return this.dao.run(
+        `INSERT INTO schedules_switch_mapping (switchId,scheduleId)
+          VALUES (?, ?)`,
+        [switchId,scheduleId])
+  }
+
+  delete(switchId, scheduleId) {
+    return this.dao.run(
+      `DELETE schedules_switch_mapping schedules WHERE switchId = ? AND scheduleId = ?`,
+      [switchId, scheduleId]
+    )
+}
     create(name, active, startDate, weekly, date, days, start, end) {
         return this.dao.run(
           `INSERT INTO schedules (name, board, switchId, active, startDate, weekly, date, days, start, end)
@@ -42,8 +56,7 @@ class SwitchRepository {
         const { id, name, active, startDate, weekly, date, days, start, end} = swtch
         return this.dao.run(
           `UPDATE schedules
-          SET name = ?,
-            
+            SET name = ?,
             active = ?,
             startDate =?,
             weekly = ?,
