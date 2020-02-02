@@ -56,7 +56,7 @@ function auth(req,res,next){
     console.log("connected to web sockets");
     if(client){
       console.log(client)
-      client.disconnect();
+    //  client.disconnect();
     }
 
    // socket.removeAllListeners();
