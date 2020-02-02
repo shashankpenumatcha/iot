@@ -447,7 +447,10 @@ function initDevice(reinit){
         scheduleKeys.map(sk=>{
           console.log(activeSchedules)
           console.log(sk)
+          console.log(111111111111)
+          
         let s = activeSchedules[sk].schedule;
+        console.log(s);
         var rule = new schedule.RecurrenceRule();
         rule.hour = s.start.split(":")[0];
         rule.minute = s.start.split(":")[1];
