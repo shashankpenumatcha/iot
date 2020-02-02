@@ -1,5 +1,5 @@
 
-class SwitchRepository {
+class ScheduleRepository {
     constructor(dao) {
       this.dao = dao
     }
