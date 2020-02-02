@@ -471,9 +471,9 @@ function initDevice(reinit){
         });
 
         var endRule = new schedule.RecurrenceRule();
-        endRule.hour = parseInt(s.start.split(":")[0]);
-        endRule.minute = parseInt(s.start.split(":")[1]);
-        endRule.second = parseInt(s.start.split(":")[2]);
+        endRule.hour = parseInt(s.end.split(":")[0]);
+        endRule.minute = parseInt(s.end.split(":")[1]);
+        endRule.second = parseInt(s.end.split(":")[2]);
         if(s.days){
           endRule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
 
