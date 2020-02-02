@@ -15,9 +15,7 @@ class ScheduleRepository {
         date TEXT,
         days TEXT,
         start TEXT NOT NULL,
-        end TEXT NOT NULL,
-        CONSTRAINT schedules_fk_switchId FOREIGN KEY (switchId)
-          REFERENCES switches(id) ON UPDATE CASCADE ON DELETE CASCADE)`
+        end TEXT NOT NULL,`
      
       return this.dao.run(sql)
     }
