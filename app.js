@@ -439,7 +439,12 @@ function initDevice(reinit){
         activeSchedules[s.scheduleId]={};
         activeSchedules[s.scheduleId].on = null;
         activeSchedules[s.scheduleId].off = null;
-
+         return s
+      })
+      let scheduleKeys = Object.keys(activeSchedules);
+      if(scheduleKeys && scheduleKeys.length){
+        scheduleKeys.map(sk=>{
+          let s = activeSchedules[sk];
         var rule = new schedule.RecurrenceRule();
         rule.hour = s.start.split(":")[0];
         rule.minute = s.start.split(":")[1];
@@ -448,7 +453,7 @@ function initDevice(reinit){
           rule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
 
         } 
-        activeSchedules[s.scheduleId].on  = schedule.scheduleJob(rule, function(){
+        activeSchedules[sk].on  = schedule.scheduleJob(rule, function(){
           console.log('rule on');
         });
 
@@ -461,14 +466,12 @@ function initDevice(reinit){
 
         }
 
-        activeSchedules[s.scheduleId].off  = schedule.scheduleJob(endRule, function(){
+        activeSchedules[sk].off  = schedule.scheduleJob(endRule, function(){
           console.log('rule off');
         });
-
-
-
-        return s
-      })
+          return sk
+        })
+      }
       console.log(activeSchedules);
     }
   },err=>{
