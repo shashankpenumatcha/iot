@@ -85,6 +85,10 @@ function auth(req,res,next){
           socket.emit('boards',board_message);
        // }   
       });
+      if(!init){
+        let board_message = {deviceId:deviceId,boards:state.boards}
+        socket.emit('boards',board_message);
+      }
       socket.emit('getDeviceInfo',deviceId);
     }
   });
