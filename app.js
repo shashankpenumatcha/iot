@@ -463,7 +463,8 @@ function initDevice(reinit){
           }else{
             console.log('bad request - schedule on board or switch not found')
           }
-        }
+        
+
         });
 
         var endRule = new schedule.RecurrenceRule();
