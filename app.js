@@ -54,6 +54,11 @@ function auth(req,res,next){
 
   socket.on('connect', function(){
     console.log("connected to web sockets");
+    if(client){
+      console.log(client)
+      client.disconnect();
+    }
+
    // socket.removeAllListeners();
     socket.emit('join',deviceId);
     initDevice(!init);
