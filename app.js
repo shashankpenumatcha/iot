@@ -2,6 +2,7 @@
 var path = require('path');
 var shell = require('shelljs');
 var piWifi = require('pi-wifi');
+var schedule = require('node-schedule');
 
 var bodyParser = require('body-parser');
 var Wifi = require('rpi-wifi-connection');
@@ -31,6 +32,8 @@ let localusers  = require('./local-users.js')();
 var wifi = new Wifi();
 var init = false;
 var client;
+var activeSchedules = {};
+
 function error(error){
   return {"error":error};
 }
@@ -431,6 +434,43 @@ function initDevice(reinit){
 
   repo.scheduleRepository.getAllActive().then(schedules => {
     console.log(schedules)
+    if(schedules&&schedules.length){
+      schedules.map(s => {
+        activeSchedules[s.scheduleId]={};
+        activeSchedules[s.scheduleId].on = null;
+        activeSchedules[s.scheduleId].off = null;
+
+        var rule = new schedule.RecurrenceRule();
+        rule.hour = s.start.split(":")[0];
+        rule.minute = s.start.split(":")[1];
+        rule.second = s.start.split(":")[2];
+        if(s.days){
+          rule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
+
+        } 
+        activeSchedules[s.scheduleId].on  = schedule.scheduleJob(rule, function(){
+          console.log('rule on');
+        });
+
+        var endRule = new schedule.RecurrenceRule();
+        endRule.hour = parseInt(s.start.split(":")[0]);
+        endRule.minute = parseInt(s.start.split(":")[1]);
+        endRule.second = parseInt(s.start.split(":")[2]);
+        if(s.days){
+          endRule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
+
+        }
+
+        activeSchedules[s.scheduleId].off  = schedule.scheduleJob(endRule, function(){
+          console.log('rule off');
+        });
+
+
+
+        return s
+      })
+      console.log(activeSchedules);
+    }
   },err=>{
     console.log(err)
   })
