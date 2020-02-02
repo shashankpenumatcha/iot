@@ -461,8 +461,8 @@ function initDevice(reinit){
         } 
         activeSchedules[sk].on  = schedule.scheduleJob(rule, function(){
           console.log('rule on');
-          if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[$switch]!=undefined){
-            client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
+          if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
+            client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:s.switch,state:true}));
           }else{
             console.log('bad request - schedule on board or switch not found')
           }
@@ -481,8 +481,8 @@ function initDevice(reinit){
 
         activeSchedules[sk].off  = schedule.scheduleJob(endRule, function(){
           console.log('rule off');
-          if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[$switch]!=undefined){
-            client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
+          if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
+            client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:s.switch,state:false}));
           }else{
             console.log('bad request - schedule off board or switch not found')
           }
