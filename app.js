@@ -67,7 +67,7 @@ function auth(req,res,next){
   socket.on('deviceInfo',function(deviceEntitiy){
     device = deviceEntitiy;
   console.log("got device info")
-  console.log('device')
+  console.log(device)
     if(device&&device.boards&&device.boards.length){
       console.log("rtjjjjjjjjjjjjjjjjjjjjjjjj");
       console.log(device)
