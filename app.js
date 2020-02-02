@@ -30,7 +30,7 @@ state.boards={};
 let localusers  = require('./local-users.js')();
 var wifi = new Wifi();
 var init = false;
-
+var client;
 function error(error){
   return {"error":error};
 }
@@ -247,7 +247,7 @@ function initDevice(reinit){
 
   
 
-  var client  = mqtt.connect('mqtt://'+deviceId+'.local:1883')
+ client  = mqtt.connect('mqtt://'+deviceId+'.local:1883')
   
   client.on('connect', function () {
     client.subscribe('penumats/handshake/connect',{qos:2,rh:false,rap:false}, function (err) {
