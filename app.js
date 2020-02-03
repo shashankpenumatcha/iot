@@ -189,6 +189,8 @@ socket.on('deleteSchedule',function(scheduleId){
             if(switches && switches.length){
               console.log('switches loop to create promise while creating schedule')
               switches.map(s => {
+                console.log('asasasa')
+                console.log(s)
                 switchesArray.push(s.id);
                 return s
               })
