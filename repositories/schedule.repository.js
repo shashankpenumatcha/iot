@@ -89,6 +89,11 @@ class ScheduleRepository {
         switches sw on sw.id = ssm.switchid where active = 1`)
     }
     
+    getAllActiveById() {
+      return this.dao.all(`SELECT * FROM schedules s INNER JOIN
+       schedules_switch_mapping ssm on ssm.scheduleid = s.id INNER JOIN
+        switches sw on sw.id = ssm.switchid where active = 1`)
+    }
  
   }
   

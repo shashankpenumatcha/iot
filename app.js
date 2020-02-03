@@ -212,7 +212,7 @@ socket.on('deleteSchedule',function(scheduleId){
         }, e => {
           console.log(`error - schedule not created on ${deviceId}`)
           socket.emit('scheduleAdded', {error: `error while creating schedule in ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
-
+          setSchedules();
         })
       }
     }) 
@@ -311,6 +311,9 @@ socket.on('deleteSchedule',function(scheduleId){
     
    
   });
+
+
+
 
 
 function setSchedules(){
