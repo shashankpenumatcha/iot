@@ -49,7 +49,7 @@ class ScheduleRepository {
         return this.dao.run(
           `INSERT INTO schedules (scheduleId,name, active, startDate, weekly, date, days, start, end) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [scheduleId, name, 1, startDate, weekly, date, days, start, end])
+          [scheduleId, name, active, startDate, weekly, date, days, start, end])
     }
     update(schedule) {
         const { id,scheduleId, name, active, startDate, weekly, date, days, start, end} = swtch
