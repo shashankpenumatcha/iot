@@ -200,7 +200,7 @@ socket.on('deleteSchedule',function(scheduleId){
       }
     }
     console.log(schedule)
-     repo.scheduleRepository.create(schedule.name, schedule.scheduleId,1,null,null,null,schedule.schedule.days,schedule.schedule.start,schedule.schedule.end).then(res=>{
+     repo.scheduleRepository.create( schedule.scheduleId,schedule.name,1,null,null,null,schedule.schedule.days,schedule.schedule.start,schedule.schedule.end).then(res=>{
       console.log(`schedule  created with id #${res.id}`);
       if(switchesArray.length){
         Promise.all(switchesArray.map((s) => {
@@ -209,9 +209,7 @@ socket.on('deleteSchedule',function(scheduleId){
           return repo.scheduleRepository.addMapping(s,res.id)
         })).then( r=> {
           socket.emit('scheduleAdded', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
-          setSchedules();
-          activeSchedules={}
-
+          setScheduleById(schedule.scheduleId)
         }, e => {
           console.log(`error - schedule not created on ${deviceId}`)
           socket.emit('scheduleAdded', {error: `error while creating schedule in ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
@@ -317,26 +315,29 @@ socket.on('deleteSchedule',function(scheduleId){
 
 
 
-
-function setSchedules(){
-  console.log("setting schedule")
-  activeSchedules = {};
-  repo.scheduleRepository.getAllActive().then(schedules => {
-    if(schedules&&schedules.length){
-      schedules.map(s => {
+function processSchedules(schedules) {
+  console.log(schedules)
+  if(schedules&&schedules.length){
+    schedules.map(s => {
+      if(!activeSchedules[s.scheduleId]){
         activeSchedules[s.scheduleId]={};
         activeSchedules[s.scheduleId].on = null;
         activeSchedules[s.scheduleId].off = null;
         activeSchedules[s.scheduleId].schedule = s;
-         return s
-      })
-      let scheduleKeys = Object.keys(activeSchedules);
-      if(scheduleKeys && scheduleKeys.length){
-        scheduleKeys.map(sk=>{
-     
+      }
+
+       return s
+    })
+    console.log(activeSchedules)
+    let scheduleKeys = Object.keys(activeSchedules);
+    if(scheduleKeys && scheduleKeys.length){
+      scheduleKeys.map(sk=>{
+   
+        
+      let s = activeSchedules[sk].schedule;
+      console.log(s);
+      if(!activeSchedules[sk].on){
           
-        let s = activeSchedules[sk].schedule;
-        console.log(s);
         if(s.start){
           var rule = new schedule.RecurrenceRule();
           rule.hour = s.start.split(":")[0];
@@ -355,7 +356,8 @@ function setSchedules(){
             }
           });
         }
-
+      }
+      if(!activeSchedules[sk].off){
         if(s.end){
           var endRule = new schedule.RecurrenceRule();
           endRule.hour = parseInt(s.end.split(":")[0]);
@@ -374,15 +376,36 @@ function setSchedules(){
             }
           });
         }
-          return sk
-        })
       }
-      console.log(activeSchedules);
+        return sk
+      })
     }
+    console.log(activeSchedules);
+  }
+}
+
+function setSchedules(){
+  console.log("setting schedule")
+  activeSchedules = {};
+  repo.scheduleRepository.getAllActive().then(schedules => {
+    processSchedules(schedules);
   },err=>{
     console.log(err)
   })
 }
+
+
+function setScheduleById(scheduleId){
+  console.log("setting schedule by scheduleId")
+  activeSchedules = {};
+  repo.scheduleRepository.getAllActiveById(scheduleId).then(schedules => {
+    processSchedules(schedules);
+  },err=>{
+    console.log(err)
+  })
+}
+
+
 
 function initDevice(reinit){
 
