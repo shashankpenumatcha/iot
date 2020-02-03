@@ -316,7 +316,6 @@ socket.on('deleteSchedule',function(scheduleId){
 
 
 function processSchedules(schedules) {
-  console.log(schedules)
   if(schedules&&schedules.length){
     schedules.map(s => {
       if(!activeSchedules[s.id]){
@@ -332,7 +331,6 @@ function processSchedules(schedules) {
 
        return s
     })
-    console.log(activeSchedules)
     let scheduleKeys = Object.keys(activeSchedules);
     if(scheduleKeys && scheduleKeys.length){
       scheduleKeys.map(sk=>{
