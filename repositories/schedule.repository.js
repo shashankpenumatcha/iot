@@ -45,7 +45,7 @@ class ScheduleRepository {
       [switchId, scheduleId]
     )
 }
-    create(name, active, startDate, weekly, date, days, start, end) {
+    create(scheduleId,name, active, startDate, weekly, date, days, start, end) {
         return this.dao.run(
           `INSERT INTO schedules (scheduleId,name, board, switchId, active, startDate, weekly, date, days, start, end)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
