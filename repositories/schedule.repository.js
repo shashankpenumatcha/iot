@@ -68,10 +68,10 @@ class ScheduleRepository {
           [id,scheduleId, name, active, startDate, weekly, date, days, start, end]
         )
     }
-    delete(id) {
+    delete(scheduleId) {
         return this.dao.run(
-          `DELETE FROM schedules WHERE id = ?`,
-          [id]
+          `DELETE FROM schedules WHERE scheduleId = ?`,
+          [scheduleId]
         )
     }
     getById(id) {

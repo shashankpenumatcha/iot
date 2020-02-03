@@ -146,7 +146,25 @@ function auth(req,res,next){
     })
   });
 
+socket.on('deleteLocation',function(locationId){
+  if(locationId){
+    repo.locationRepo.delete(locationId).then(res=>{
+      console.log('deleted location ' + locationId )
+    },e=>{
+      console.log(e);
+    })
+  }
+});
 
+socket.on('deleteSchedule',function(scheduleId){
+  if(scheduleId){
+    repo.scheduleRepository.delete(scheduleId).then(res=>{
+      console.log('deleted schedule ' + scheduleId )
+    },e=>{
+    console.log(e);
+    })
+  }
+});
   socket.on('addSchedule',function(schedule){
     console.log('add schedule request')
     if(!schedule.name){
@@ -180,22 +198,22 @@ function auth(req,res,next){
       }
     }
     console.log(schedule)
-    /* repo.scheduleRepository.create(location.name, location.locationId).then(res=>{
-      console.log(`Room  created with id #${res.id}`);
+     repo.scheduleRepository.create(schedule.name, schedule.scheduleId).then(res=>{
+      console.log(`schedule  created with id #${res.id}`);
       if(switchesArray.length){
         Promise.all(switchesArray.map((s) => {
           console.log(s)
           
-          return repo.switchRepo.create(s.label, s.b, s.i, res.id)
+          return repo.scheduleRepository.addMapping(s.id,res.id)
         })).then( r=> {
-          socket.emit('locationAdded', {deviceId: deviceId, name: location.name, socketId: location.socketId})
+          socket.emit('schedule', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
         }, e => {
-          console.log(`error - location not created on ${deviceId}`)
-          socket.emit('locationAdded', {error: `error while creating room in ${deviceId}`,deviceId: deviceId, name: location.name, socketId: location.socketId, devices: location.devices})
+          console.log(`error - schedule not created on ${deviceId}`)
+          socket.emit('scheduleAdded', {error: `error while creating schedule in ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
 
         })
       }
-    }) */
+    }) 
   });
 
   socket.on('getAssignedSwitches', function(socketId) {
