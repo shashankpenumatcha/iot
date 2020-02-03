@@ -228,6 +228,16 @@ socket.on('deleteSchedule',function(scheduleId){
     });
   });
 
+  socket.on('getSchedules',function(msg){
+    let schedules =  repo.scheduleRepository.getAll().then(schedules=>{
+      socket.emit('schedules', {socketId:msg.socketId, deviceId:msg.deviceId, schedules:schedules, activeSchedules:activeSchedules})
+
+    },err=>{
+      socket.emit('schedules', {socketId: msg.socketId, deviceId:msg.deviceId ,error : `error whlile getting schedules for ${deviceId}`});
+
+    });
+  });
+
   socket.on('getLocations', msg => {
     if(msg.socketId){
       let payload = {};
