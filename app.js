@@ -318,6 +318,7 @@ socket.on('deleteSchedule',function(scheduleId){
 
 
 function setSchedules(){
+  console.log("setting schedule")
   activeSchedules = {};
   repo.scheduleRepository.getAllActive().then(schedules => {
     if(schedules&&schedules.length){
@@ -331,9 +332,7 @@ function setSchedules(){
       let scheduleKeys = Object.keys(activeSchedules);
       if(scheduleKeys && scheduleKeys.length){
         scheduleKeys.map(sk=>{
-          console.log(activeSchedules)
-          console.log(sk)
-          console.log(111111111111)
+     
           
         let s = activeSchedules[sk].schedule;
         console.log(s);
