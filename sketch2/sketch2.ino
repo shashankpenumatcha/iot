@@ -18,7 +18,7 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
-String id = "5e36d51034bfa11b80244fe4";
+String id = "5e38573fe9388407d86997e1";
 int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
 StaticJsonDocument<200> con;
@@ -41,7 +41,7 @@ void setup() {
     Serial.println("SPIFFS Initialization...failed");
   }
  
- // SPIFFS.format();
+  //SPIFFS.format();
   if(loadConfig()){
   Serial.println("loaded config");
   }else{
@@ -274,10 +274,10 @@ void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
     const char* sr = con["serverName"];
-     Serial.println(sr);
+     Serial.println(id.c_str());
 
     Serial.print("Attempting MQTT connection...");
-    if (client.connect(sr)) {
+    if (client.connect(id.c_str())) {
       Serial.println("connected");
       client.subscribe("penumats/handshake/reinitiate");
       client.subscribe(("penumats/"+id+"/switch/on").c_str());

@@ -76,7 +76,7 @@ class ScheduleRepository {
     }
     getById(id) {
         return this.dao.get(
-          `SELECT * FROM schedules WHERE id = ?`,
+          `SELECT * FROM schedules WHERE id = ?`, ``
           [id])
     }
     getAll() {

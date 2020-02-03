@@ -319,11 +319,14 @@ function processSchedules(schedules) {
   console.log(schedules)
   if(schedules&&schedules.length){
     schedules.map(s => {
-      if(!activeSchedules[s.scheduleId]){
-        activeSchedules[s.scheduleId]={};
-        activeSchedules[s.scheduleId].on = null;
-        activeSchedules[s.scheduleId].off = null;
-        activeSchedules[s.scheduleId].schedule = s;
+      if(!activeSchedules[s.id]){
+        activeSchedules[s.id]={};
+        if(!activeSchedules[s.id][s.sw_id]){
+          activeSchedules[s.id][s.sw_id]={};
+        }
+        activeSchedules[s.id][s.sw_id].on = null;
+        activeSchedules[s.id][s.sw_id].off = null;
+        activeSchedules[s.id][s.sw_id].schedule = s;
       }
 
        return s
@@ -332,51 +335,57 @@ function processSchedules(schedules) {
     let scheduleKeys = Object.keys(activeSchedules);
     if(scheduleKeys && scheduleKeys.length){
       scheduleKeys.map(sk=>{
-   
-        
-      let s = activeSchedules[sk].schedule;
-      console.log(s);
-      if(!activeSchedules[sk].on){
+        let switchKeys = Object.keys(activeSchedules[sk]);
+        if(switchKeys&&switchKeys.length){
+          switchKeys.map(swk=>{
           
-        if(s.start){
-          var rule = new schedule.RecurrenceRule();
-          rule.hour = s.start.split(":")[0];
-          rule.minute = s.start.split(":")[1];
-          rule.second = s.start.split(":")[2];
-          if(s.days){
-            rule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
-  
-          } 
-          activeSchedules[sk].on  = schedule.scheduleJob(rule, function(){
-            console.log('rule on');
-            if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
-              client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:s.switch,state:true}));
-            }else{
-              console.log('bad request - schedule on board or switch not found')
+            let s = activeSchedules[sk][swk].schedule;
+            console.log(s);
+            if(!activeSchedules[sk][swk].on){
+                
+              if(s.start){
+                var rule = new schedule.RecurrenceRule();
+                rule.hour = s.start.split(":")[0];
+                rule.minute = s.start.split(":")[1];
+                rule.second = s.start.split(":")[2];
+                if(s.days){
+                  rule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
+        
+                } 
+                activeSchedules[sk][swk].on  = schedule.scheduleJob(rule, function(){
+                  console.log('rule on');
+                  if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
+                    client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:s.switch,state:true}));
+                  }else{
+                    console.log('bad request - schedule on board or switch not found')
+                  }
+                });
+              }
             }
-          });
-        }
-      }
-      if(!activeSchedules[sk].off){
-        if(s.end){
-          var endRule = new schedule.RecurrenceRule();
-          endRule.hour = parseInt(s.end.split(":")[0]);
-          endRule.minute = parseInt(s.end.split(":")[1]);
-          endRule.second = parseInt(s.end.split(":")[2]);
-          if(s.days){
-            endRule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
-  
-          }
-          activeSchedules[sk].off  = schedule.scheduleJob(endRule, function(){
-            console.log('rule off');
-            if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
-              client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:s.switch,state:false}));
-            }else{
-              console.log('bad request - schedule off board or switch not found')
+            if(!activeSchedules[sk][swk].off){
+              if(s.end){
+                var endRule = new schedule.RecurrenceRule();
+                endRule.hour = parseInt(s.end.split(":")[0]);
+                endRule.minute = parseInt(s.end.split(":")[1]);
+                endRule.second = parseInt(s.end.split(":")[2]);
+                if(s.days){
+                  endRule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
+        
+                }
+                activeSchedules[sk][swk].off  = schedule.scheduleJob(endRule, function(){
+                  console.log('rule off');
+                  if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
+                    client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:s.switch,state:false}));
+                  }else{
+                    console.log('bad request - schedule off board or switch not found')
+                  }
+                });
+              }
             }
-          });
+            return swk
+          })
         }
-      }
+        
         return sk
       })
     }
