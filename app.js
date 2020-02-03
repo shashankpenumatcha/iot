@@ -208,11 +208,12 @@ socket.on('deleteSchedule',function(scheduleId){
           
           return repo.scheduleRepository.addMapping(s,res.id)
         })).then( r=> {
-          socket.emit('schedule', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
+          socket.emit('scheduleAdded', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
+          setSchedules();
+
         }, e => {
           console.log(`error - schedule not created on ${deviceId}`)
           socket.emit('scheduleAdded', {error: `error while creating schedule in ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
-          setSchedules();
         })
       }
     }) 
