@@ -405,7 +405,6 @@ function setSchedules(){
 
 function setScheduleById(scheduleId){
   console.log("setting schedule by scheduleId")
-  activeSchedules = {};
   repo.scheduleRepository.getAllActiveById(scheduleId).then(schedules => {
     processSchedules(schedules);
   },err=>{
