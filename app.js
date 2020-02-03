@@ -206,7 +206,7 @@ socket.on('deleteSchedule',function(scheduleId){
         Promise.all(switchesArray.map((s) => {
           console.log(s)
           
-          return repo.scheduleRepository.addMapping(s.id,res.id)
+          return repo.scheduleRepository.addMapping(s,res.id)
         })).then( r=> {
           socket.emit('schedule', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
         }, e => {
