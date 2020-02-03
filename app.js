@@ -229,6 +229,8 @@ socket.on('deleteSchedule',function(scheduleId){
   });
 
   socket.on('getSchedules',function(msg){
+    console.log('rtjjjjjjjjjjjjjj')
+    console.log(activeSchedules)
     let schedules =  repo.scheduleRepository.getAll().then(schedules=>{
       socket.emit('schedules', {socketId:msg.socketId, deviceId:msg.deviceId, schedules:schedules, activeSchedules:activeSchedules})
 
