@@ -321,13 +321,14 @@ function processSchedules(schedules) {
     schedules.map(s => {
       if(!activeSchedules[s.id]){
         activeSchedules[s.id]={};
+      }
         if(!activeSchedules[s.id][s.sw_id]){
           activeSchedules[s.id][s.sw_id]={};
         }
         activeSchedules[s.id][s.sw_id].on = null;
         activeSchedules[s.id][s.sw_id].off = null;
         activeSchedules[s.id][s.sw_id].schedule = s;
-      }
+      
 
        return s
     })
