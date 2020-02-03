@@ -210,6 +210,7 @@ socket.on('deleteSchedule',function(scheduleId){
         })).then( r=> {
           socket.emit('scheduleAdded', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
           setSchedules();
+          activeSchedules={}
 
         }, e => {
           console.log(`error - schedule not created on ${deviceId}`)
