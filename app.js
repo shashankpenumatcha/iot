@@ -102,8 +102,6 @@ function auth(req,res,next){
   });
 
 
-  // TODO multiple devices for room
-  //TODO addlocation socket id for concurrent location creation
   socket.on('addLocation',function(location){
     console.log('add location request')
     if(!location.name){
@@ -146,6 +144,58 @@ function auth(req,res,next){
         })
       }
     })
+  });
+
+
+  socket.on('addSchedule',function(schedule){
+    console.log('add schedule request')
+    if(!schedule.name){
+      console.log('error - no name for schedule')
+      return socket.emit('scheduleAdded', {error: `error no schedule name in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+
+    }
+    if(!schedule.schedule){
+      console.log('error - no schedule in request')
+      return socket.emit('scheduleAdded', {error: `error no schedule in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+
+    }
+    let switchesArray = [];
+
+    if(schedule.boards){
+      let boards = Object.keys(schedule.boards);
+      if(boards && boards.length){
+           boards.map(m => {
+            if(schedule.boards[m]) {
+              switches = Object.keys(schedule.boards[m]);
+            } 
+            if(switches && switches.length){
+              console.log('switches loop to create promise while creating schedule')
+              switches.map(s => {
+                switchesArray.push(s.id);
+                return s
+              })
+            }
+            return m           
+          });
+      }
+    }
+    console.log(schedule)
+    /* repo.scheduleRepository.create(location.name, location.locationId).then(res=>{
+      console.log(`Room  created with id #${res.id}`);
+      if(switchesArray.length){
+        Promise.all(switchesArray.map((s) => {
+          console.log(s)
+          
+          return repo.switchRepo.create(s.label, s.b, s.i, res.id)
+        })).then( r=> {
+          socket.emit('locationAdded', {deviceId: deviceId, name: location.name, socketId: location.socketId})
+        }, e => {
+          console.log(`error - location not created on ${deviceId}`)
+          socket.emit('locationAdded', {error: `error while creating room in ${deviceId}`,deviceId: deviceId, name: location.name, socketId: location.socketId, devices: location.devices})
+
+        })
+      }
+    }) */
   });
 
   socket.on('getAssignedSwitches', function(socketId) {

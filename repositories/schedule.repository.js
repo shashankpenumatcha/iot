@@ -8,6 +8,7 @@ class ScheduleRepository {
       const sql = `
       CREATE TABLE IF NOT EXISTS schedules (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        scheduleId STRING NOT NULL,
         name TEXT,
         active BOOLEAN NOT NULL,
         startDate TEXT,
@@ -46,15 +47,16 @@ class ScheduleRepository {
 }
     create(name, active, startDate, weekly, date, days, start, end) {
         return this.dao.run(
-          `INSERT INTO schedules (name, board, switchId, active, startDate, weekly, date, days, start, end)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-          [name, active, startDate, weekly, date, days, start, end])
+          `INSERT INTO schedules (scheduleId,name, board, switchId, active, startDate, weekly, date, days, start, end)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [scheduleId, name, active, startDate, weekly, date, days, start, end])
     }
     update(schedule) {
-        const { id, name, active, startDate, weekly, date, days, start, end} = swtch
+        const { id,scheduleId, name, active, startDate, weekly, date, days, start, end} = swtch
         return this.dao.run(
           `UPDATE schedules
-            SET name = ?,
+            SET scheduleId = ?,
+            name = ?,
             active = ?,
             startDate =?,
             weekly = ?,
@@ -63,7 +65,7 @@ class ScheduleRepository {
             start = ?,
             end = ? 
           WHERE id = ?`,
-          [id, name, active, startDate, weekly, date, days, start, end]
+          [id,scheduleId, name, active, startDate, weekly, date, days, start, end]
         )
     }
     delete(id) {
