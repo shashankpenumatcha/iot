@@ -323,6 +323,49 @@ socket.on('deleteSchedule',function(scheduleId){
    
   });
 
+  socket.on('deleteSchedule', payload => {
+    console.log('request to delete schedule');
+    repo.scheduleRepository.getAllById(payload.scheduleId).then(res => {
+      console.log(09230920432)
+      console.log(res)
+      console.log(294234242)
+      console.log('all schedules by id')
+      if(res && res.length){
+        repo.scheduleRepository.deleteById( payload.scheduleId).then(r => {
+          console.log('deleted schedule by id')
+          if(r){
+            socket.emit('scheduleDeleted', payload); 
+              let id;
+              res.map(m => {
+                id = m.id;
+                if(activeSchedules&&activeSchedules[m.id]) {
+                  if(activeSchedules[m.id][m.sw_id]){
+                    if(activeSchedules[m.id][m.sw_id].on){
+                      activeSchedules[m.id][m.sw_id].on.cancel();
+                    }
+                    if(activeSchedules[m.id][m.sw_id].off){
+                      activeSchedules[m.id][m.sw_id].off.cancel();
+                    }
+                  }
+                }
+                return m;
+              })
+              if(id) {
+  
+                activeSchedules[id] = null;
+              }
+            
+           
+          }
+        }, err => {
+          socket.emit('scheduleToggled', payload);
+        })
+      }
+    }, err => {
+      socket.emit('scheduleToggled', payload);
+    })
+    console.log(activeSchedules)
+  })
 
 socket.on('toggleSchedule', payload => {
   console.log('request to toggle schedule' + payload.active);
