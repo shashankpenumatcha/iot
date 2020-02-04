@@ -357,6 +357,12 @@ socket.on('toggleSchedule', payload => {
               activeSchedules[id] = null;
             }
           }
+          if(!payload.active){
+              if(res && res.length){
+                processSchedules(res);
+                console.log(activeSchedules);
+              }
+          }
         }
       }, err => {
         socket.emit('scheduleToggled', payload);
