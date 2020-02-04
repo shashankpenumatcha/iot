@@ -76,7 +76,7 @@ class ScheduleRepository {
     }
     deleteById(id) {
       return this.dao.all(
-        `DELETE from schedules s where s.scheduleId = ?`,
+        `DELETE from schedules where scheduleId = ?`,
         [id])
     }
     getAllById(id) {
