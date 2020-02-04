@@ -38,6 +38,8 @@ class LocationRepository {
     getAll() {
         return this.dao.all(`SELECT * FROM locations`)
     }
+
+
     
   }
   

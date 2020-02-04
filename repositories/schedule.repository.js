@@ -74,9 +74,11 @@ class ScheduleRepository {
           [scheduleId]
         )
     }
-    getById(id) {
-        return this.dao.get(
-          `SELECT * FROM schedules WHERE id = ?`, ``
+    getAllById(id) {
+        return this.dao.getAll(
+          `SELECT s.*, sw.id as sw_id,sw.name as sw_name,sw.board,sw.locationId, sw.switch FROM schedules s INNER JOIN
+          schedules_switch_mapping ssm on ssm.scheduleid = s.id INNER JOIN
+           switches sw on sw.id = ssm.switchid where s.scheduleId = ?`
           [id])
     }
     getAll() {
@@ -96,6 +98,13 @@ class ScheduleRepository {
       schedules_switch_mapping ssm on ssm.scheduleid = s.id INNER JOIN
        switches sw on sw.id = ssm.switchid where active = 1 AND s.scheduleId = ?`,
        [scheduleId])
+    }
+
+    updateActiveById(active, scheduleId) {
+      return this.dao.run(
+        `UPDATE locations SET active = ? where scheduleId= ?`,
+        [active, scheduleId]
+      )
     }
  
   }

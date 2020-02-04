@@ -324,7 +324,38 @@ socket.on('deleteSchedule',function(scheduleId){
   });
 
 
-
+socket.on('toggleSchedule', payload => {
+  console.log('request to toggle schedule' + payload.status);
+  repo.scheduleRepository.getAllById(payload.scheduleId).then(res => {
+    if(res && res.length){
+      repo.scheduleRepository.updateActiveById(!payload.active, payload.scheduleId).then(r => {
+        if(r){
+          socket.emit('scheduleToggled', payload); 
+          if(payload.active){
+            res.map(m => {
+              if(this.activeSchedules&&this.activeSchedules[m.id]) {
+                if(this.activeSchedules[m.id][m.sw_id]){
+                  if(this.activeSchedules[m.id][m.sw_id].on){
+                    this.activeSchedules[m.id][m.sw_id].on.cancel();
+                  }
+                  if(this.activeSchedules[m.id][m.sw_id].off){
+                    this.activeSchedules[m.id][m.sw_id].off.cancel();
+                  }
+                }
+              }
+              return m;
+            })
+            this.activeSchedules[payload.scheduleId] = null;
+          }
+        }
+      }, err => {
+        socket.emit('scheduleToggled', payload);
+      })
+    }
+  }, err => {
+    socket.emit('scheduleToggled', payload);
+  })
+})
 
 function processSchedules(schedules) {
   if(schedules&&schedules.length){
