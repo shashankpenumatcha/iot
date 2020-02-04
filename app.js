@@ -338,19 +338,19 @@ socket.on('toggleSchedule', payload => {
           socket.emit('scheduleToggled', payload); 
           if(payload.active){
             res.map(m => {
-              if(this.activeSchedules&&this.activeSchedules[m.id]) {
-                if(this.activeSchedules[m.id][m.sw_id]){
-                  if(this.activeSchedules[m.id][m.sw_id].on){
-                    this.activeSchedules[m.id][m.sw_id].on.cancel();
+              if(activeSchedules&&activeSchedules[m.id]) {
+                if(activeSchedules[m.id][m.sw_id]){
+                  if(activeSchedules[m.id][m.sw_id].on){
+                    activeSchedules[m.id][m.sw_id].on.cancel();
                   }
-                  if(this.activeSchedules[m.id][m.sw_id].off){
-                    this.activeSchedules[m.id][m.sw_id].off.cancel();
+                  if(activeSchedules[m.id][m.sw_id].off){
+                    activeSchedules[m.id][m.sw_id].off.cancel();
                   }
                 }
               }
               return m;
             })
-            this.activeSchedules[payload.scheduleId] = null;
+            activeSchedules[payload.scheduleId] = null;
           }
         }
       }, err => {
@@ -360,7 +360,7 @@ socket.on('toggleSchedule', payload => {
   }, err => {
     socket.emit('scheduleToggled', payload);
   })
-  console.log(this.activeSchedules)
+  console.log(activeSchedules)
 })
 
 function processSchedules(schedules) {
