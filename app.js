@@ -297,25 +297,27 @@ socket.on('deleteSchedule',function(scheduleId){
       }
       network = networks.filter(f=>(f.ssid == payload.boardId));
       if(!network.length){
-        console.log("error - no board network found")
         currentBoard[id].error = "error - no board network found";
         socket.emit("board_added", currentBoard[id]);
         delete currentBoard[id];
+        return  console.log("error - no board network found")
+
       }else{
         wifiUtil._add_board(conn_info,payload.deviceId, function(err) {
           if (err) {
           console.log(err)
-          console.log("error setup")
           currentBoard[id].error = "error while adding board";
           socket.emit("board_added", currentBoard[id]);
           delete currentBoard[id];
+          return     console.log("error setup")
+
 
           }
           
           socket.emit("board_added", currentBoard[id]);
           delete currentBoard[id];
 
-            console.log('board registered new path')      //process.exit(0);
+            return console.log('board registered new path')      //process.exit(0);
         });
       }
     });
