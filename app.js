@@ -325,10 +325,12 @@ socket.on('deleteSchedule',function(scheduleId){
 
 
 socket.on('toggleSchedule', payload => {
-  console.log('request to toggle schedule' + payload.status);
+  console.log('request to toggle schedule' + payload.active);
   repo.scheduleRepository.getAllById(payload.scheduleId).then(res => {
+    console.log('all schedules by id')
     if(res && res.length){
       repo.scheduleRepository.updateActiveById(!payload.active, payload.scheduleId).then(r => {
+        console.log('updated active by id')
         if(r){
           socket.emit('scheduleToggled', payload); 
           if(payload.active){
@@ -355,6 +357,7 @@ socket.on('toggleSchedule', payload => {
   }, err => {
     socket.emit('scheduleToggled', payload);
   })
+  console.log(this.activeSchedules)
 })
 
 function processSchedules(schedules) {
