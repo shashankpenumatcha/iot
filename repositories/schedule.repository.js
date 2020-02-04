@@ -102,7 +102,7 @@ class ScheduleRepository {
 
     updateActiveById(active, scheduleId) {
       return this.dao.run(
-        `UPDATE locations SET active = ? where scheduleId= ?`,
+        `UPDATE schedules SET active = ? where scheduleId= ?`,
         [active, scheduleId]
       )
     }
