@@ -327,6 +327,9 @@ socket.on('deleteSchedule',function(scheduleId){
 socket.on('toggleSchedule', payload => {
   console.log('request to toggle schedule' + payload.active);
   repo.scheduleRepository.getAllById(payload.scheduleId).then(res => {
+    console.log(222222222220)
+    console.log(res)
+    console.log(2323232332)
     console.log('all schedules by id')
     if(res && res.length){
       repo.scheduleRepository.updateActiveById(!payload.active, payload.scheduleId).then(r => {
