@@ -200,7 +200,7 @@ socket.on('deleteSchedule',function(scheduleId){
       }
     }
     console.log(schedule)
-     repo.scheduleRepository.create( schedule.scheduleId,schedule.name,1,null,null,null,schedule.schedule.days,schedule.schedule.start,schedule.schedule.end).then(res=>{
+     repo.scheduleRepository.create( schedule.scheduleId,schedule.name,1,null,null,null,schedule.schedule.days.toString(),schedule.schedule.start,schedule.schedule.end).then(res=>{
       console.log(`schedule  created with id #${res.id}`);
       if(switchesArray.length){
         Promise.all(switchesArray.map((s) => {
