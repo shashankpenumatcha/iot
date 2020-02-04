@@ -364,6 +364,13 @@ socket.on('toggleSchedule', payload => {
 })
 
 function processSchedules(schedules) {
+  console.log('---------------------------------------')
+  console.log(schedules)
+  console.log('---------------------------------------')
+  console.log(activeSchedules)
+  console.log('---------------------------------------')
+
+
   if(schedules&&schedules.length){
     schedules.map(s => {
       if(!activeSchedules[s.id]){
