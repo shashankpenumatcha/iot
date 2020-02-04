@@ -337,7 +337,9 @@ socket.on('toggleSchedule', payload => {
         if(r){
           socket.emit('scheduleToggled', payload); 
           if(payload.active){
+            let id;
             res.map(m => {
+              id = m.id;
               if(activeSchedules&&activeSchedules[m.id]) {
                 if(activeSchedules[m.id][m.sw_id]){
                   if(activeSchedules[m.id][m.sw_id].on){
@@ -350,7 +352,10 @@ socket.on('toggleSchedule', payload => {
               }
               return m;
             })
-            activeSchedules[payload.scheduleId] = null;
+            if(id) {
+
+              activeSchedules[id] = null;
+            }
           }
         }
       }, err => {
