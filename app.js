@@ -608,7 +608,7 @@ async function persistUsage(){
         var duration = moment.duration(moment(current.off).diff(moment(current.on)));
        console.log(duration.humanize())
        console.log(duration.asHours())
-       console.log(duration)
+       console.log(duration.toJSON())
 
 
       }
