@@ -564,57 +564,43 @@ async function persistUsage(){
     }else{
       if(!current.off){
         console.log("no off time in current")
-        if(!res.lastOnTime){
-          console.log('no lastOnTime')
-          try{
-            console.log('creating usage from switch')
-            console.log(s)
-            let ob=res;
-            ob.lastOnTime = current.on;
-            ob.switchId = s.id;
-            let usage = await repo.usageRepository.create(ob)
-            console.log('created usage')
-            console.log(usage)
-          }catch (e){
-            console.log('error while creating usage')
-            console.log(e)
-          }
-        }else{
-          let lastYear = moment(res.lastOnTime).year()
-          let currentYear = moment(current.on).year()
-          let lastMonth = moment(res.lastOnTime).month()
-          let currentMonth = moment(current.on).month()
-          let lastWeek = moment(res.lastOnTime).week()
-          let currentWeek = moment(current.on).week()
-          let ob = {};
-          if(lastYear!=currentYear){
-            days.map(m=>{
-              ob[m] = null;
-              return m;
-            })
-          }else{
-            if(lastMonth!=currentMonth){
+          if(res.lastOnTime){
+            let lastYear = moment(res.lastOnTime).year()
+            let currentYear = moment(current.on).year()
+            let lastMonth = moment(res.lastOnTime).month()
+            let currentMonth = moment(current.on).month()
+            let lastWeek = moment(res.lastOnTime).week()
+            let currentWeek = moment(current.on).week()
+            let ob = res
+            if(lastYear!=currentYear){
               days.map(m=>{
                 ob[m] = null;
                 return m;
               })
             }else{
-              if(lastWeek!=currentWeek){
+              if(lastMonth!=currentMonth){
                 days.map(m=>{
                   ob[m] = null;
                   return m;
                 })
               }else{
-                days.map(m=>{
-                  if(!ob[m]){
-
+                if(lastWeek!=currentWeek){
+                  days.map(m=>{
                     ob[m] = null;
-                  }
-                  return m;
-                })
+                    return m;
+                  })
+                }else{
+                  days.map(m=>{
+                    if(!ob[m]){
+
+                      ob[m] = null;
+                    }
+                    return m;
+                  })
+
+                }
 
               }
-
             }
           }
           ob.lastOnTime=current.on;
@@ -630,7 +616,7 @@ async function persistUsage(){
             console.log('error while - persisting usage -update- no off in current')
             console.log(e)
           }
-        }
+        
       }
 
     }
