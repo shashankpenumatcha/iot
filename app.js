@@ -529,8 +529,9 @@ async function persistUsage(){
   if(!current||!current.on){
     return persistUsage()
   }
+  let res =null;
   try{
-    let res = await   repo.usageRepository.getByAddress(current.b,current.s);
+     res = await   repo.usageRepository.getByAddress(current.b,current.s);
   }catch(e){
     console.log("error while getting by address - persistUsage()")  
     console.log(e)
