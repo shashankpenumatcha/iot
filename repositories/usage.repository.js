@@ -29,6 +29,7 @@ class UsageRepository {
     }
     update(usage) {
       const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId} = usage;
+      console.log(switchId)
         return this.dao.run(
           `UPDATE usage SET monday =? , 
           tuesday =?, 
