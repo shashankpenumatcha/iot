@@ -551,6 +551,8 @@ try{
       }
       if(!current.off){
         try{
+          console.log('creating usgae from switch')
+          console.log(s)
           let ob={}
           ob.lastOnTime = current.on;
           ob.switchId = s.id;
