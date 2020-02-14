@@ -614,8 +614,17 @@ async function persistUsage(){
         }else {
           ob[days[day]] = (moment.duration(ob[days[day]]).add(moment.duration(currentDifference))).toJSON();
         }
+        ob.switchId = parseInt(res.switchId);
+        ob.lastOnTime = null;
         console.log(ob);
-
+        try{
+          console.log('persisting usage -update-  off in current')
+          let updatedUsage = await repo.usageRepository.update(ob);
+          console.log(updatedUsage)
+        }catch(e){
+          console.log('error while - persisting usage -update-  off in current')
+          console.log(e)
+        }
       }
 
     }
