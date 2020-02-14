@@ -27,4 +27,4 @@ async function initDB() {
 
 initDB();
 
-module.exports = {locationRepo, switchRepo, scheduleRepository};
+module.exports = {locationRepo, switchRepo, scheduleRepository, usageRepository};

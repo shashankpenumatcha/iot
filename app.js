@@ -520,7 +520,24 @@ function initStats(b,s) {
   }
 
 }
+function persistUsage(){
+  if(!pendingStats.length){
+    return
+  }
+  let current  = pendingStats.shift();
+  if(!current||!current.on){
+    return
+  }
+  repo.usageRepository.getByAddress(current.b,current.s).then(function(res){
+    console.log("got by address - persistUsage()")  
+    console.log(res)  
 
+  },function(err){
+    console.log("error while getting by address - persistUsage()")  
+    console.log(err)
+  })
+  
+}
 function handleOnForTracking(b,s) {
   initStats(b,s);
   let current = stats[b][s].current;
@@ -530,6 +547,7 @@ function handleOnForTracking(b,s) {
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   current.off=null;
   console.log(pendingStats)
+  persistUsage()
 
 }
 
@@ -545,6 +563,8 @@ function handleOffForTracking(b,s) {
   current.on=null;
   current.off=null;
   console.log(pendingStats)
+  persistUsage()
+
 }
 
 

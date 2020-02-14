@@ -53,7 +53,11 @@ class UsageRepository {
         return this.dao.all(`SELECT * FROM usage`)
     }
 
-
+    getByAddress(b,s) {
+      return this.dao.get(
+        `SELECT * FROM usage u join switches s on s.id = u.switchId WHERE s.board = ? and s.switch = ?`,
+        [b,s])
+  }
     
   }
   
