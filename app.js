@@ -540,7 +540,7 @@ function handleOffForTracking(b,s) {
   if(!current.on){
     return
   }
-  current.off = moment().format;
+  current.off = moment().format();
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   current.on=null;
   current.off=null;
