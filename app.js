@@ -520,7 +520,8 @@ function initStats(b,s) {
   }
 
 }
-function persistUsage(){
+async function persistUsage(){
+  ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
   if(!pendingStats.length){
     return
   }
@@ -531,6 +532,33 @@ function persistUsage(){
   repo.usageRepository.getByAddress(current.b,current.s).then(function(res){
     console.log("got by address - persistUsage()")  
     console.log(res)  
+    let s = null;
+    
+    if(!res){
+      if(!s){
+        try{
+          s = await repo.switchRepo.getSwitchByAddress(current.b,current.s)
+        }catch (e){
+          console.log('error while getting switch')
+        }
+      
+      }
+      if(!s){
+        return
+      }
+      if(!current.off){
+        try{
+          let ob={}
+          ob.lastOnTime = current.on;
+          ob.switchId = s.id;
+          let usage = await repo.usageRepository.create(s)
+          console.log('created usage')
+          console.log(usage)
+        }catch (e){
+          console.log('error while creating usage')
+        }
+      }
+    }
 
   },function(err){
     console.log("error while getting by address - persistUsage()")  

@@ -8,13 +8,13 @@ class UsageRepository {
       const sql = `
       CREATE TABLE IF NOT EXISTS usage (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        monday TEXT NOT NULL,
-        tuesday TEXT NOT NULL,
-        wednesday TEXT NOT NULL,
-        thursday TEXT NOT NULL,
-        friday TEXT NOT NULL,
-        saturday TEXT NOT NULL,
-        sunday TEXT NOT NULL,
+        monday TEXT,
+        tuesday TEXT,
+        wednesday TEXT,
+        thursday TEXT,
+        friday TEXT,
+        saturday TEXT,
+        sunday TEXT,
         lastOnTime TEXT,
         switchId TEXT NOT NULL,
         CONSTRAINT usage_switch_fk_switchId FOREIGN KEY (switchId)
