@@ -616,9 +616,19 @@ async function persistUsage(){
 
           try{
             console.log('persisting usage -update- no off in current')
-            let updatedUsage = await repo.usageRepository.update(ob);
+            let updatedUsage = await repo.usageRepository.delete(ob.switchId);
             console.log(updatedUsage)
             console.log(ob)
+            
+            try{
+              console.log('persisting usage -update- no off in current -2')
+              let updatedUsage = await repo.usageRepository.create(ob);
+              console.log(updatedUsage)
+              console.log(ob)
+            }catch(e){
+              console.log('error while - persisting usage -update- no off in current - 2')
+              console.log(e)
+            }
           }catch(e){
             console.log('error while - persisting usage -update- no off in current')
             console.log(e)
