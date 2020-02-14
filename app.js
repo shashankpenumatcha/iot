@@ -542,6 +542,7 @@ try{
           s = await repo.switchRepo.getSwitchByAddress(current.b,current.s)
         }catch (e){
           console.log('error while getting switch')
+          console.log(e)
         }
       
       }
@@ -558,6 +559,7 @@ try{
           console.log(usage)
         }catch (e){
           console.log('error while creating usage')
+          console.log(e)
         }
       }
     }
