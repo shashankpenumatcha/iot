@@ -31,7 +31,7 @@ class UsageRepository {
       const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId} = usage;
       console.log(switchId)
         return this.dao.run(
-          `UPDATE usage SET monday =? WHERE switchId = ?`,
+          `UPDATE usage SET monday = ? WHERE switchId = ?`,
           [monday,switchId])
     }
     patch(usage,id) {
