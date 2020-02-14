@@ -37,8 +37,7 @@ class UsageRepository {
           friday =?,
           saturday =?,
           sunday =?,
-          lastOnTime =?,
-          switchId =? WHERE switchId = ?`,
+          lastOnTime =? WHERE switchId = ?`,
           [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,switchId])
     }
     patch(usage,id) {
