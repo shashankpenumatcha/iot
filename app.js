@@ -527,10 +527,16 @@ async function persistUsage(){
   }
   let current  = pendingStats.shift();
   if(!current||!current.on){
-    return
+    return persistUsage()
   }
   try{
     let res = await   repo.usageRepository.getByAddress(current.b,current.s);
+  }catch(e){
+    console.log("error while getting by address - persistUsage()")  
+    console.log(e)
+   return  persistUsage()
+
+  }
     console.log("got by address - persistUsage()")  
     console.log(res)  
     let s = null;
@@ -543,7 +549,7 @@ async function persistUsage(){
       }
     }
     if(!s){
-      return
+     return persistUsage()
     }
     if(!res){
       if(!current.off){
@@ -620,13 +626,10 @@ async function persistUsage(){
       }
 
     }
-  }catch(e){
-    console.log("error while getting by address - persistUsage()")  
-    console.log(e)
-  }
+
   if(pendingStats.length){
   
-    persistUsage()
+   return persistUsage()
   }
 }
 function handleOnForTracking(b,s) {

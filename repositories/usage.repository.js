@@ -31,8 +31,16 @@ class UsageRepository {
       const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId} = usage;
       console.log(switchId)
         return this.dao.run(
-          `UPDATE usage SET monday = ? WHERE switchId = ?`,
-          [monday,switchId])
+          `UPDATE usage SET monday =? , 
+          tuesday =?, 
+          wednesday = ?,
+          thursday =?,
+          friday =?,
+          saturday =?,
+          sunday =?,
+          lastOnTime =?
+           WHERE switchId = ?`,
+          [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId])
     }
     patch(usage,id) {
       let keys = Object.keys(usage);
@@ -47,7 +55,7 @@ class UsageRepository {
     }
     delete(id) {
         return this.dao.run(
-            `DELETE FROM usage WHERE id = ?`,
+            `DELETE FROM usage WHERE switchId = ?`,
             [id]
         )
     }
