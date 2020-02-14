@@ -616,6 +616,8 @@ async function persistUsage(){
           try{
             console.log('persisting usage -update- no off in current')
             let updatedUsage = await repo.usageRepository.update(ob);
+            console.log(updatedUsage)
+            console.log(ob)
           }catch(e){
             console.log('error while - persisting usage -update- no off in current')
             console.log(e)
