@@ -38,8 +38,8 @@ class UsageRepository {
           saturday =?,
           sunday =?,
           lastOnTime =?,
-          switchId =? WHERE id = ?`,
-          [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,id])
+          switchId =? WHERE switchId = ?`,
+          [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,switchId])
     }
     patch(usage,id) {
       let keys = Object.keys(usage);
