@@ -618,7 +618,7 @@ async function persistUsage(){
             }
           }
           ob.lastOnTime=current.on;
-          ob.switchId = res.switchId;
+          ob.switchId = parseInt(res.switchId);
           ob.id=res.id;
           try{
             console.log('persisting usage -update- no off in current')
