@@ -57,4 +57,4 @@ class UsageRepository {
     
   }
   
-  module.exports = LocationRepository;
+  module.exports = UsageRepository;
