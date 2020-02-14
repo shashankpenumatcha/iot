@@ -278,12 +278,12 @@ socket.on('deleteSchedule',function(scheduleId){
                 }else{
                   duration.add(moment.duration(m[d]))
                 }
-                m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minute()}:${moment.duration(m[d]).second()}`
+                m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minutes()}:${moment.duration(m[d]).seconds()}`
               }
             return d
           })
           if(duration){
-            m.duration = `${duration.hours()}:${duration.minute()}:${duration.second()}`
+            m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
           }
 
           return m;
