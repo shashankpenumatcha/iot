@@ -36,7 +36,7 @@ var client;
 var activeSchedules = {};
 var stats =  {};
 var pendingStats = [];
-
+var persisting = false;
 function error(error){
   return {"error":error};
 }
@@ -521,7 +521,7 @@ function initStats(b,s) {
 
 }
 async function persistUsage(){
-  ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+ let days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
   if(!pendingStats.length){
     return
   }
@@ -529,29 +529,26 @@ async function persistUsage(){
   if(!current||!current.on){
     return
   }
-try{
-  let res = await   repo.usageRepository.getByAddress(current.b,current.s);
-/*   repo.usageRepository.getByAddress(current.b,current.s).then(function(res){
- */    console.log("got by address - persistUsage()")  
+  try{
+    let res = await   repo.usageRepository.getByAddress(current.b,current.s);
+    console.log("got by address - persistUsage()")  
     console.log(res)  
     let s = null;
-    
+    if(!s){
+      try{
+        s = await repo.switchRepo.getSwitchByAddress(current.b,current.s)
+      }catch (e){
+        console.log('error while getting switch')
+        console.log(e)
+      }
+    }
+    if(!s){
+      return
+    }
     if(!res){
-      if(!s){
-        try{
-          s = await repo.switchRepo.getSwitchByAddress(current.b,current.s)
-        }catch (e){
-          console.log('error while getting switch')
-          console.log(e)
-        }
-      
-      }
-      if(!s){
-        return
-      }
       if(!current.off){
         try{
-          console.log('creating usgae from switch')
+          console.log('creating usage from switch')
           console.log(s)
           let ob={}
           ob.lastOnTime = current.on;
@@ -564,16 +561,77 @@ try{
           console.log(e)
         }
       }
+    }else{
+      if(!current.off){
+        console.log("no off time in current")
+        if(!res.lastOnTime){
+          console.log('no lastOnTime')
+          try{
+            console.log('creating usage from switch')
+            console.log(s)
+            let ob={}
+            ob.lastOnTime = current.on;
+            ob.switchId = s.id;
+            let usage = await repo.usageRepository.create(ob)
+            console.log('created usage')
+            console.log(usage)
+          }catch (e){
+            console.log('error while creating usage')
+            console.log(e)
+          }
+        }else{
+          let lastYear = moment(res.lastOnTime).year()
+          let currentYear = moment(current.on).year()
+          let lastMonth = moment(res.lastOnTime).month()
+          let currentMonth = moment(current.on).month()
+          let lastWeek = moment(res.lastOnTime).week()
+          let currentWeek = moment(current.on).week()
+          let ob = {};
+          if(lastYear!=currentYear){
+            days.map(m=>{
+              ob[m] = null;
+              return m;
+            })
+          }else{
+            if(lastMonth!=currentMonth){
+              days.map(m=>{
+                ob[m] = null;
+                return m;
+              })
+            }else{
+              if(lastWeek!=currentWeek){
+                days.map(m=>{
+                  ob[m] = null;
+                  return m;
+                })
+              }else{
+
+              }
+
+            }
+          }
+          ob.lastOnTime=current.on;
+          ob.switchId = res.switchId;
+          ob.id=res.id;
+          try{
+            console.log('persisting usage -update- no off in current')
+            let updatedUsage = await repo.usageRepository.update(ob);
+          }catch(e){
+            console.log('error while - persisting usage -update- no off in current')
+            console.log(e)
+          }
+        }
+      }
+
     }
   }catch(e){
     console.log("error while getting by address - persistUsage()")  
-  console.log(e)
+    console.log(e)
   }
- /*  },function(err){
-    console.log("error while getting by address - persistUsage()")  
-    console.log(err)
-  }) */
+  if(pendingStats.length){
   
+    persistUsage()
+  }
 }
 function handleOnForTracking(b,s) {
   initStats(b,s);
@@ -582,10 +640,11 @@ function handleOnForTracking(b,s) {
   current.on = moment().format();
   current.off = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
-  current.off=null;
   console.log(pendingStats)
-  persistUsage()
-
+  if(pendingStats.length){
+  
+    persistUsage()
+  }
 }
 
 function handleOffForTracking(b,s) {
@@ -600,7 +659,10 @@ function handleOffForTracking(b,s) {
   current.on=null;
   current.off=null;
   console.log(pendingStats)
-  persistUsage()
+  if(pendingStats.length){
+  
+    persistUsage()
+  }
 
 }
 

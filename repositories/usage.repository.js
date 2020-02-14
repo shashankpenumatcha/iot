@@ -27,6 +27,20 @@ class UsageRepository {
           'INSERT INTO usage (monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId) VALUES (?, ?,?,?,?,?,?,?,?)',
           [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId])
     }
+    update(usage) {
+      const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,id} = usage;
+        return this.dao.run(
+          `UPDATE usage set monday =? , 
+          tuesday =?, 
+          wednesday = ?,
+          thursday =?,
+          friday =?,
+          saturday =?,
+          sunday =?,
+          lastOnTime =?,
+          switchId =? WHERE id = ?`,
+          [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,id])
+    }
     patch(usage,id) {
       let keys = Object.keys(usage);
       if(!keys.length){
