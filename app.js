@@ -564,6 +564,8 @@ async function persistUsage(){
     }else{
       if(!current.off){
         console.log("no off time in current")
+        let ob = res
+
           if(res.lastOnTime){
             let lastYear = moment(res.lastOnTime).year()
             let currentYear = moment(current.on).year()
@@ -571,7 +573,6 @@ async function persistUsage(){
             let currentMonth = moment(current.on).month()
             let lastWeek = moment(res.lastOnTime).week()
             let currentWeek = moment(current.on).week()
-            let ob = res
             if(lastYear!=currentYear){
               days.map(m=>{
                 ob[m] = null;
