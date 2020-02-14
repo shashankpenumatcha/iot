@@ -3,6 +3,7 @@ var path = require('path');
 var shell = require('shelljs');
 var piWifi = require('pi-wifi');
 var schedule = require('node-schedule');
+var moment = require('moment');
 
 var bodyParser = require('body-parser');
 var Wifi = require('rpi-wifi-connection');
@@ -33,10 +34,14 @@ var wifi = new Wifi();
 var init = false;
 var client;
 var activeSchedules = {};
+var stats =  {};
+var pendingStats = [];
 
 function error(error){
   return {"error":error};
 }
+
+
 
 //auth middleware
 function auth(req,res,next){  
@@ -70,10 +75,10 @@ function auth(req,res,next){
   socket.on('deviceInfo',function(deviceEntitiy){
     device = deviceEntitiy;
   console.log("got device info")
-  console.log(device)
+  //console.log(device)
     if(device&&device.boards&&device.boards.length){
-      console.log("rtjjjjjjjjjjjjjjjjjjjjjjjj");
-      console.log(device)
+      //console.log("rtjjjjjjjjjjjjjjjjjjjjjjjj");
+      //console.log(device)
       boards =  device.boards.map(b=>{
         return b.id;
       });
@@ -132,7 +137,7 @@ function auth(req,res,next){
       console.log(`Room  created with id #${res.id}`);
       if(switchesArray.length){
         Promise.all(switchesArray.map((s) => {
-          console.log(s)
+         // console.log(s)
           
           return repo.switchRepo.create(s.label, s.b, s.i, res.id)
         })).then( r=> {
@@ -189,8 +194,8 @@ socket.on('deleteSchedule',function(scheduleId){
             if(switches && switches.length){
               console.log('switches loop to create promise while creating schedule')
               switches.map(s => {
-                console.log('asasasa')
-                console.log(schedule.boards[m][s])
+              //  console.log('asasasa')
+              //  console.log(schedule.boards[m][s])
                 switchesArray.push(schedule.boards[m][s].id);
                 return s
               })
@@ -204,7 +209,7 @@ socket.on('deleteSchedule',function(scheduleId){
       console.log(`schedule  created with id #${res.id}`);
       if(switchesArray.length){
         Promise.all(switchesArray.map((s) => {
-          console.log(s)
+        //  console.log(s)
           
           return repo.scheduleRepository.addMapping(s,res.id)
         })).then( r=> {
@@ -328,9 +333,7 @@ socket.on('deleteSchedule',function(scheduleId){
   socket.on('deleteSchedule', payload => {
     console.log('request to delete schedule');
     repo.scheduleRepository.getAllById(payload.scheduleId).then(res => {
-      console.log(09230920432)
-      console.log(res)
-      console.log(294234242)
+      
       console.log('all schedules by id')
       if(res && res.length){
         repo.scheduleRepository.deleteById( payload.scheduleId).then(r => {
@@ -372,9 +375,7 @@ socket.on('deleteSchedule',function(scheduleId){
 socket.on('toggleSchedule', payload => {
   console.log('request to toggle schedule' + payload.active);
   repo.scheduleRepository.getAllById(payload.scheduleId).then(res => {
-    console.log(222222222220)
-    console.log(res)
-    console.log(2323232332)
+
     console.log('all schedules by id')
     if(res && res.length){
       repo.scheduleRepository.updateActiveById(!payload.active, payload.scheduleId).then(r => {
@@ -420,12 +421,7 @@ socket.on('toggleSchedule', payload => {
 })
 
 function processSchedules(schedules) {
-  console.log('---------------------------------------')
-  console.log(schedules)
-  console.log('---------------------------------------')
-  console.log(activeSchedules)
-  console.log('---------------------------------------')
-
+  console.log("processing schedules");
 
   if(schedules&&schedules.length){
     schedules.map(s => {
@@ -467,6 +463,8 @@ function processSchedules(schedules) {
                     console.log('rule on');
                     if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
                       client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:s.switch,state:true}));
+                      console.error(s)
+                      handleOnForTracking(s.board,s.switch)
                     }else{
                       console.log('bad request - schedule on board or switch not found')
                     }
@@ -487,6 +485,7 @@ function processSchedules(schedules) {
                     console.log('rule off');
                     if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
                       client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:s.switch,state:false}));
+                      handleOffForTracking(s.board,s.switch)
                     }else{
                       console.log('bad request - schedule off board or switch not found')
                     }
@@ -500,9 +499,55 @@ function processSchedules(schedules) {
         return sk
       })
     }
-    console.log(activeSchedules);
+   // console.log(activeSchedules);
   }
 }
+
+function initStats(b,s) {
+  if(!stats[b]){
+    stats[b] = {};
+  }
+  if(!stats[b][s]){
+    stats[b][s] = {};
+  }
+  if(!stats[b][s].current){
+    stats[b][s].current = {
+      on:null,
+      off:null,
+      b:b,
+      s:s
+    };
+  }
+
+}
+
+function handleOnForTracking(b,s) {
+  initStats(b,s);
+  let current = stats[b][s].current;
+  let pending = stats[b][s].pending;
+  current.on = moment().format();
+  current.off = null;
+  pendingStats.push(current);
+  current.on=null;
+  current.off=null;
+  console.log(pendingStats)
+
+}
+
+function handleOffForTracking(b,s) {
+  initStats(b,s);
+  let current = stats[b][s].current;
+  let pending = stats[b][s].pending;
+  if(!current.on){
+    return
+  }
+  current.off = moment().format;
+  pendingStats.push(current);
+  current.on=null;
+  current.off=null;
+  console.log(pendingStats)
+}
+
 
 function setSchedules(){
   console.log("setting schedule")
@@ -547,7 +592,7 @@ function initDevice(reinit){
       let id = JSON.parse(message.toString()).id;
       if(id && boards.indexOf(id)>=0){
         state.boards[id]=JSON.parse(message.toString());
-        console.log("board registered",JSON.stringify(state.boards));
+       // console.log("board registered",JSON.stringify(state.boards));
         let msg = {deviceId:deviceId,boards:state.boards}
        socket.emit("boards",msg);
 
@@ -585,6 +630,7 @@ function initDevice(reinit){
           let $switch = msg.s;
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
+            handleOffForTracking(board,$switch)
           }else{
             console.log('bad request - board or switch not found')
           }
@@ -598,6 +644,8 @@ function initDevice(reinit){
           let $switch = msg.s;
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
+            handleOnForTracking(board,$switch)
+
           }else{
             console.log('bad request - board or switch not found')
           }
@@ -710,6 +758,8 @@ function initDevice(reinit){
     
     });
   }
+
+  
 
   setSchedules();
 
