@@ -619,7 +619,6 @@ async function persistUsage(){
           }
           ob.lastOnTime=current.on;
           ob.switchId = parseInt(res.switchId);
-          ob.id=res.id;
           try{
             console.log('persisting usage -update- no off in current')
             let updatedUsage = await repo.usageRepository.update(ob);
