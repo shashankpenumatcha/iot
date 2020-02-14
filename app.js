@@ -605,6 +605,13 @@ async function persistUsage(){
                   return m;
                 })
               }else{
+                days.map(m=>{
+                  if(!ob[m]){
+
+                    ob[m] = null;
+                  }
+                  return m;
+                })
 
               }
 
