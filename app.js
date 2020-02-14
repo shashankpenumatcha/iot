@@ -569,28 +569,29 @@ async function persistUsage(){
         }
       }
     }else{
+      let ob = res
+
+ /*      if(res.lastOnTime){
+        let lastYear = moment(res.lastOnTime).year()
+        let currentYear = moment(current.on).year()
+        let lastMonth = moment(res.lastOnTime).month()
+        let currentMonth = moment(current.on).month()
+        let lastWeek = moment(res.lastOnTime).week()
+        let currentWeek = moment(current.on).week()
+       
+        days.map(m=>{
+          if(lastYear!=currentYear|| lastMonth!=currentMonth||lastWeek!=currentWeek){
+            ob[m] = null;
+          }else if(!ob[m]){
+            ob[m] = null;
+          }
+          return m;
+        });
+
+      } */
       if(!current.off){
         console.log("no off time in current")
-        let ob = res
-
-          if(res.lastOnTime){
-            let lastYear = moment(res.lastOnTime).year()
-            let currentYear = moment(current.on).year()
-            let lastMonth = moment(res.lastOnTime).month()
-            let currentMonth = moment(current.on).month()
-            let lastWeek = moment(res.lastOnTime).week()
-            let currentWeek = moment(current.on).week()
-           
-            days.map(m=>{
-              if(lastYear!=currentYear|| lastMonth!=currentMonth||lastWeek!=currentWeek){
-                ob[m] = null;
-              }else if(!ob[m]){
-                ob[m] = null;
-              }
-              return m;
-            });
-
-          }
+     
           ob.lastOnTime=current.on;
           ob.switchId = parseInt(res.switchId);
 
@@ -606,14 +607,20 @@ async function persistUsage(){
       }else{
         console.log("off time present in current")
         var duration = moment.duration(moment(current.off).diff(moment(current.on)));
-       console.log(duration.humanize())
-       console.log(duration.asHours())
-       console.log(duration.toJSON())
-
+        let currentDifference = duration.toJSON();
+        let day = moment(current.on).day() - 1;
+        if(!ob[days[day]]){
+          ob[days[day]] = currentDifference;
+        }else {
+          ob[days[day]] = moment.duration(ob[days[day]]).add(currentDifference);
+        }
+        
 
       }
 
     }
+    console.log('pending stats')
+    console.log(pendingStats)
 
   if(pendingStats.length){
   
