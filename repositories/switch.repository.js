@@ -60,7 +60,12 @@ class SwitchRepository {
     }
     
     getLocations() {
-      return this.dao.all(`select switches.id,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationid`)
+      return this.dao.all(`select switches.id,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationId`)
+    }
+
+    getStats() {
+      return this.dao.all(`select u.id, u.switchId,u.monday,u.tuesday,u.wednesday,u.thursday,u.friday,u.saturday,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationId
+       join usage u on u.switchId = switches.id`)
     }
   }
   

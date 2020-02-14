@@ -259,6 +259,22 @@ socket.on('deleteSchedule',function(scheduleId){
     }
   })
 
+  
+  socket.on('getUsage', msg => {
+    if(msg.socketId){
+      let payload = {};
+      payload.socketId = msg.socketId;
+      payload.deviceId = deviceId;
+      repo.switchRepo.getStats().then(res => {
+        payload.switches = res;
+        socket.emit('usage',payload);
+      }, error => {
+        payload.error = 'error getting usage'
+        socket.emit('usage', payload)
+      })
+    }
+  })
+
   socket.on('addBoard',function(payload){
     console.log('add board request')
     if(!payload.boardId || !payload.socketId){
