@@ -606,7 +606,9 @@ async function persistUsage(){
       }else{
         console.log("off time present in current")
         var duration = moment.duration(moment(current.off).diff(moment(current.on)));
-       console.log(duration)
+       console.log(duration.humanize())
+       console.log(duration.asHours())
+
 
       }
 
