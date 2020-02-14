@@ -52,7 +52,7 @@ class ScheduleRepository {
           [scheduleId, name, active, startDate, weekly, date, days, start, end])
     }
     update(schedule) {
-        const { id,scheduleId, name, active, startDate, weekly, date, days, start, end} = swtch
+        const { id,scheduleId, name, active, startDate, weekly, date, days, start, end} = schedule
         return this.dao.run(
           `UPDATE schedules
             SET scheduleId = ?,

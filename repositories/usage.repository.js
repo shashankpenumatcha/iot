@@ -28,7 +28,7 @@ class UsageRepository {
           [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId])
     }
     update(usage) {
-      const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,id} = usage;
+      const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId} = usage;
         return this.dao.run(
           `UPDATE usage SET monday =? , 
           tuesday =?, 
@@ -37,7 +37,8 @@ class UsageRepository {
           friday =?,
           saturday =?,
           sunday =?,
-          lastOnTime =? WHERE switchId = ?`,
+          lastOnTime =?
+           WHERE switchId = ?`,
           [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId])
     }
     patch(usage,id) {
