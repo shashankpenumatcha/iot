@@ -569,7 +569,7 @@ async function persistUsage(){
           try{
             console.log('creating usage from switch')
             console.log(s)
-            let ob={}
+            let ob=res;
             ob.lastOnTime = current.on;
             ob.switchId = s.id;
             let usage = await repo.usageRepository.create(ob)
