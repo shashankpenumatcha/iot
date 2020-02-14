@@ -580,36 +580,16 @@ async function persistUsage(){
             let currentMonth = moment(current.on).month()
             let lastWeek = moment(res.lastOnTime).week()
             let currentWeek = moment(current.on).week()
-            if(lastYear!=currentYear){
-              days.map(m=>{
+           
+            days.map(m=>{
+              if(lastYear!=currentYear|| lastMonth!=currentMonth||lastWeek!=currentWeek){
                 ob[m] = null;
-                return m;
-              })
-            }else{
-              if(lastMonth!=currentMonth){
-                days.map(m=>{
-                  ob[m] = null;
-                  return m;
-                })
-              }else{
-                if(lastWeek!=currentWeek){
-                  days.map(m=>{
-                    ob[m] = null;
-                    return m;
-                  })
-                }else{
-                  days.map(m=>{
-                    if(!ob[m]){
-
-                      ob[m] = null;
-                    }
-                    return m;
-                  })
-
-                }
-
+              }else if(!ob[m]){
+                ob[m] = null;
               }
-            }
+              return m;
+            });
+
           }
           ob.lastOnTime=current.on;
           ob.switchId = parseInt(res.switchId);
@@ -618,12 +598,15 @@ async function persistUsage(){
             console.log('persisting usage -update- no off in current')
             let updatedUsage = await repo.usageRepository.update(ob);
             console.log(updatedUsage)
-            console.log(ob)
           }catch(e){
             console.log('error while - persisting usage -update- no off in current')
             console.log(e)
           }
         
+      }else{
+        console.log("off time present in current")
+       console.log(moment(current.on).diff(moment(current.off)))
+
       }
 
     }
