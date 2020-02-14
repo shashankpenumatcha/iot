@@ -619,11 +619,13 @@ async function persistUsage(){
           }
           ob.lastOnTime=current.on;
           ob.switchId = parseInt(res.switchId);
+
           try{
             console.log('persisting usage -update- no off in current')
             let updatedUsage = await repo.usageRepository.update(ob);
             console.log(updatedUsage)
             console.log(ob)
+            console.log(res)
           }catch(e){
             console.log('error while - persisting usage -update- no off in current')
             console.log(e)
