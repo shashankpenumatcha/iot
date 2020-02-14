@@ -612,9 +612,9 @@ async function persistUsage(){
         if(!ob[days[day]]){
           ob[days[day]] = currentDifference;
         }else {
-          ob[days[day]] = moment.duration(ob[days[day]]).add(currentDifference);
+          ob[days[day]] = (moment.duration(ob[days[day]]).add(moment.duration(currentDifference))).toJSON();
         }
-        
+        console.log(ob);
 
       }
 
