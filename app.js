@@ -267,6 +267,28 @@ socket.on('deleteSchedule',function(scheduleId){
       payload.deviceId = deviceId;
       repo.switchRepo.getStats().then(res => {
         payload.switches = res;
+        payload.switches = payload.switches.map(m=>{
+          let days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+          let duration = null;
+
+          days.map(d => {
+              if(m[d]){
+                if(!duration){
+                  duration = moment.duration(m[d]);
+                }else{
+                  duration.add(moment.duration(m[d]))
+                }
+                m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minute()}:${moment.duration(m[d]).second()}`
+              }
+            return d
+          })
+          if(duration){
+            m.duration = `${duration.hours()}:${duration.minute()}:${duration.second()}`
+          }
+
+          return m;
+
+        })
         socket.emit('usage',payload);
       }, error => {
         payload.error = 'error getting usage'
