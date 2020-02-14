@@ -56,7 +56,7 @@ class SwitchRepository {
     getSwitchByAddress(board,swtch) {
       return this.dao.get(
         `SELECT * FROM switches WHERE board = ? AND switch = ?`,
-        [id, swtch])
+        [board, swtch])
     }
     
     getLocations() {
