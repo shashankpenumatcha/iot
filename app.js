@@ -528,7 +528,6 @@ function handleOnForTracking(b,s) {
   current.on = moment().format();
   current.off = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
-  current.on=null;
   current.off=null;
   console.log(pendingStats)
 
