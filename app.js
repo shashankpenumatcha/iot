@@ -529,8 +529,10 @@ async function persistUsage(){
   if(!current||!current.on){
     return
   }
-  repo.usageRepository.getByAddress(current.b,current.s).then(function(res){
-    console.log("got by address - persistUsage()")  
+try{
+  let res = await   repo.usageRepository.getByAddress(current.b,current.s);
+/*   repo.usageRepository.getByAddress(current.b,current.s).then(function(res){
+ */    console.log("got by address - persistUsage()")  
     console.log(res)  
     let s = null;
     
@@ -559,11 +561,14 @@ async function persistUsage(){
         }
       }
     }
-
-  },function(err){
+  }catch(e){
+    console.log("error while getting by address - persistUsage()")  
+  console.log(e)
+  }
+ /*  },function(err){
     console.log("error while getting by address - persistUsage()")  
     console.log(err)
-  })
+  }) */
   
 }
 function handleOnForTracking(b,s) {
