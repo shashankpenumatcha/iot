@@ -556,7 +556,7 @@ try{
           let ob={}
           ob.lastOnTime = current.on;
           ob.switchId = s.id;
-          let usage = await repo.usageRepository.create(s)
+          let usage = await repo.usageRepository.create(ob)
           console.log('created usage')
           console.log(usage)
         }catch (e){
