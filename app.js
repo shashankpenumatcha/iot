@@ -270,7 +270,7 @@ socket.on('deleteSchedule',function(scheduleId){
         payload.switches = payload.switches.map(m=>{
           let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
           let duration = null;
-
+console.log(m)
           days.map(d => {
               if(m[d]){
                 if(!duration){
