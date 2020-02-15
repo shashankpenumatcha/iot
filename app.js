@@ -356,6 +356,7 @@ socket.on('deleteSchedule',function(scheduleId){
 
 
           }
+          console.log('rtjjjjjjjjjjjjjjjjjjjjjjjjj')
           
           socket.emit("board_added", currentBoard[id]);
           delete currentBoard[id];
