@@ -560,7 +560,7 @@ function initStats(b,s) {
 
 }
 async function persistUsage(){
- let days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+ let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
   if(!pendingStats.length){
     return
   }
