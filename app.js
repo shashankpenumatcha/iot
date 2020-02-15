@@ -268,7 +268,7 @@ socket.on('deleteSchedule',function(scheduleId){
       repo.switchRepo.getStats().then(res => {
         payload.switches = res;
         payload.switches = payload.switches.map(m=>{
-          let days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+          let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
           let duration = null;
 
           days.map(d => {
@@ -285,6 +285,8 @@ socket.on('deleteSchedule',function(scheduleId){
           if(duration){
             m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
           }
+          console.log(m)
+
 
           return m;
 
