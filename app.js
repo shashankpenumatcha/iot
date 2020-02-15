@@ -650,6 +650,8 @@ async function persistUsage(){
         var duration = moment.duration(moment(current.off).diff(moment(current.on)));
         let currentDifference = duration.toJSON();
         let day = moment(current.on).day() - 1;
+        console.log(day)
+        console.log(days[day])
         if(!ob[days[day]]){
           ob[days[day]] = currentDifference;
         }else {
