@@ -48,6 +48,8 @@ statsRule.minute = new schedule.Range(0, 59, 1);
  
 var j = schedule.scheduleJob(statsRule, function(){
   console.log('Usage schedule');
+  usageSchedule = true;
+
   repo.switchRepo.getOnStats().then(res=>{
     let currentTime = moment(new Date())
     console.log(res);
@@ -73,7 +75,6 @@ var j = schedule.scheduleJob(statsRule, function(){
         }
         return m;
       })
-      usageSchedule = true;
     }
   })
 },err=>{
@@ -607,14 +608,18 @@ async function persistUsage(){
     return persistUsage()
   }
   let res =null;
-  try{
-     res = await   repo.usageRepository.getByAddress(current.b,current.s);
-  }catch(e){
-    console.log("error while getting by address - persistUsage()")  
-    console.log(e)
-   return  persistUsage()
+    if(!current.off&&usageSchedule){
 
-  }
+      try{
+         res = await   repo.usageRepository.getByAddress(current.b,current.s);
+      }catch(e){
+        console.log("error while getting by address - persistUsage()")  
+        console.log(e)
+       return  persistUsage()
+    
+      }
+    }
+  
     console.log("got by address - persistUsage()")  
     //console.log(res)  
     let s = null;
