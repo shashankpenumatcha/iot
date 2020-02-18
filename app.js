@@ -48,8 +48,6 @@ statsRule.minute = new schedule.Range(0, 59, 1);
  
 var j = schedule.scheduleJob(statsRule, function(){
   console.log('Usage schedule');
-  usageSchedule = true;
-
   repo.switchRepo.getOnStats().then(res=>{
     let currentTime = moment(new Date())
     console.log(res);
@@ -62,7 +60,7 @@ var j = schedule.scheduleJob(statsRule, function(){
             stats[m.board] = {};
           }
           stats[m.board][m.switch]={};
-          handleOnForTracking(m.board,m.switch,m.lastOnTime)
+          handleOnForTracking(m.board,m.switch,currentTime.format())
           console.log('rtjjjj1')
           handleOffForTracking(m.board,m.switch,moment(new Date()).format())
           console.log('rtjjjj2')
@@ -75,6 +73,7 @@ var j = schedule.scheduleJob(statsRule, function(){
         }
         return m;
       })
+      usageSchedule = true;
     }
   })
 },err=>{
@@ -598,7 +597,7 @@ function initStats(b,s) {
   }
 
 }
-async function persistUsage(on,schedule){
+async function persistUsage(){
  let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
   if(!pendingStats.length){
     return
@@ -608,21 +607,14 @@ async function persistUsage(on,schedule){
     return persistUsage()
   }
   let res =null;
-    if(on&&schedule){
-      res = JSON.parse(JSON.stringify(schedule));
-      res.lastOnTime = on;
-    }else{
-    
-      try{
-          res = await   repo.usageRepository.getByAddress(current.b,current.s);
-      }catch(e){
-        console.log("error while getting by address - persistUsage()")  
-        console.log(e)
-        return  persistUsage(on,schedule)
-    
-      }
-    }
-  
+  try{
+     res = await   repo.usageRepository.getByAddress(current.b,current.s);
+  }catch(e){
+    console.log("error while getting by address - persistUsage()")  
+    console.log(e)
+   return  persistUsage()
+
+  }
     console.log("got by address - persistUsage()")  
     //console.log(res)  
     let s = null;
@@ -635,7 +627,7 @@ async function persistUsage(on,schedule){
       }
     }
     if(!s){
-     return persistUsage(on,schedule)
+     return persistUsage()
     }
     if(!res){
       if(!current.off){
@@ -723,7 +715,7 @@ async function persistUsage(on,schedule){
 
   if(pendingStats.length){
   
-   return persistUsage(on,schedule)
+   return persistUsage()
   }else{
     if(usageSchedule){
       usageSchedule = false;
@@ -740,12 +732,8 @@ function handleOnForTracking(b,s,on) {
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   console.log(pendingStats)
   if(pendingStats.length){
-    if(!on){
-
-      persistUsage()
-    }else{
-      persistUsage(on,schedule)
-    }
+  
+    persistUsage()
   }
 }
 
@@ -763,7 +751,7 @@ function handleOffForTracking(b,s,off) {
   console.log(pendingStats)
   if(pendingStats.length){
   
-    persistUsage(null,null)
+    persistUsage()
   }
 
 }
