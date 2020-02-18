@@ -615,7 +615,7 @@ async function persistUsage(){
 
   }
     console.log("got by address - persistUsage()")  
-    console.log(res)  
+    //console.log(res)  
     let s = null;
     if(!s){
       try{
@@ -632,13 +632,13 @@ async function persistUsage(){
       if(!current.off){
         try{
           console.log('creating usage from switch')
-          console.log(s)
+        //  console.log(s)
           let ob={}
           ob.lastOnTime = current.on;
           ob.switchId = s.id;
           let usage = await repo.usageRepository.create(ob)
           console.log('created usage')
-          console.log(usage)
+         // console.log(usage)
           console.log(1111111111111111111111111111111111111111111111111111111)
         }catch (e){
           console.log('error while creating usage')
@@ -677,7 +677,7 @@ async function persistUsage(){
           try{
             console.log('persisting usage -update- no off in current')
             let updatedUsage = await repo.usageRepository.update(ob);
-            console.log(updatedUsage)
+           // console.log(updatedUsage)
           }catch(e){
             console.log('error while - persisting usage -update- no off in current')
             console.log(e)
@@ -688,8 +688,8 @@ async function persistUsage(){
         var duration = moment.duration(moment(current.off).diff(moment(current.on)));
         let currentDifference = duration.toJSON();
         let day = moment(current.on).day();
-        console.log(day)
-        console.log(days[day])
+       // console.log(day)
+       // console.log(days[day])
         if(!ob[days[day]]){
           ob[days[day]] = currentDifference;
         }else {
@@ -701,7 +701,7 @@ async function persistUsage(){
         try{
           console.log('persisting usage -update-  off in current')
           let updatedUsage = await repo.usageRepository.update(ob);
-          console.log(updatedUsage)
+         // console.log(updatedUsage)
         }catch(e){
           console.log('error while - persisting usage -update-  off in current')
           console.log(e)
@@ -710,7 +710,7 @@ async function persistUsage(){
 
     }
     console.log('pending stats')
-    console.log(pendingStats)
+   // console.log(pendingStats)
 
   if(pendingStats.length){
   
