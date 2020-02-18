@@ -75,10 +75,10 @@ var j = schedule.scheduleJob(statsRule, function(){
       })
       usageSchedule = true;
     }
+  },err=>{
+    console.log(err)
+    console.log("usage schedule error")
   })
-},err=>{
-  console.log(err)
-  console.log("usage schedule error")
 });
 
 //auth middleware
