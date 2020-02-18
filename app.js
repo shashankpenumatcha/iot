@@ -598,7 +598,7 @@ function initStats(b,s) {
   }
 
 }
-async function persistUsage(){
+async function persistUsage(on,schedule){
  let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
   if(!pendingStats.length){
     return
@@ -608,14 +608,17 @@ async function persistUsage(){
     return persistUsage()
   }
   let res =null;
-    if(!current.off&&usageSchedule){
-
+    if(on&&schedule){
+      res = JSON.parse(JSON.stringify(schedule));
+      res.lastOnTime = on;
+    }else{
+    
       try{
-         res = await   repo.usageRepository.getByAddress(current.b,current.s);
+          res = await   repo.usageRepository.getByAddress(current.b,current.s);
       }catch(e){
         console.log("error while getting by address - persistUsage()")  
         console.log(e)
-       return  persistUsage()
+        return  persistUsage(on,schedule)
     
       }
     }
@@ -632,7 +635,7 @@ async function persistUsage(){
       }
     }
     if(!s){
-     return persistUsage()
+     return persistUsage(on,schedule)
     }
     if(!res){
       if(!current.off){
@@ -720,7 +723,7 @@ async function persistUsage(){
 
   if(pendingStats.length){
   
-   return persistUsage()
+   return persistUsage(on,schedule)
   }else{
     if(usageSchedule){
       usageSchedule = false;
@@ -737,8 +740,12 @@ function handleOnForTracking(b,s,on) {
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   console.log(pendingStats)
   if(pendingStats.length){
-  
-    persistUsage()
+    if(!on){
+
+      persistUsage()
+    }esle{
+      persistUsage(on,schedule)
+    }
   }
 }
 
@@ -756,7 +763,7 @@ function handleOffForTracking(b,s,off) {
   console.log(pendingStats)
   if(pendingStats.length){
   
-    persistUsage()
+    persistUsage(null,null)
   }
 
 }
