@@ -67,6 +67,7 @@ var j = schedule.scheduleJob(statsRule, function(){
 
           handleOnForTracking(m.board,m.switch)
           console.log('rtjjjj3')
+          persistUsage();
 
 
         }
