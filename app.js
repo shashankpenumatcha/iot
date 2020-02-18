@@ -60,7 +60,7 @@ var j = schedule.scheduleJob(statsRule, function(){
             stats[m.board] = {};
           }
           stats[m.board][m.switch]={};
-          handleOnForTracking(m.board,m.switch,currentTime.format())
+          handleOnForTracking(m.board,m.switch,m.lastOnTime)
           console.log('rtjjjj1')
           handleOffForTracking(m.board,m.switch,moment(new Date()).format())
           console.log('rtjjjj2')
@@ -730,6 +730,7 @@ function handleOnForTracking(b,s,on) {
   current.on = on?on:moment().format();
   current.off = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
+  console.log(333333333333333333333333333333333)
   console.log(pendingStats)
   if(pendingStats.length){
   
