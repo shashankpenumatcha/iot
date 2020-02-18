@@ -41,7 +41,21 @@ function error(error){
   return {"error":error};
 }
 
-
+var statsRule = new schedule.RecurrenceRule();
+//statsRule.hour = 17;
+statsRule.minute = new schedule.Range(0, 59, 5);
+ 
+var j = schedule.scheduleJob(statsRule, function(){
+  console.log('Usage schedule');
+  repo.usageRepository.getAllOn().then(res=>{
+    let currentTime = moment(new Date()).format();
+    console.log(res);
+    console.log(currentTime)
+    console.log(currentTime.week())
+  })
+},err=>{
+  console.log("usage schedule error")
+});
 
 //auth middleware
 function auth(req,res,next){  
@@ -270,7 +284,6 @@ socket.on('deleteSchedule',function(scheduleId){
         payload.switches = payload.switches.map(m=>{
           let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
           let duration = null;
-console.log(m)
           days.map(d => {
               if(m[d]){
                 if(!duration){
@@ -285,7 +298,6 @@ console.log(m)
           if(duration){
             m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
           }
-          console.log(m)
 
 
           return m;
