@@ -76,6 +76,7 @@ var j = schedule.scheduleJob(statsRule, function(){
     }
   })
 },err=>{
+  console.log(err)
   console.log("usage schedule error")
 });
 
