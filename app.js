@@ -37,6 +37,7 @@ var activeSchedules = {};
 var stats =  {};
 var pendingStats = [];
 var persisting = false;
+var usageSchedule = false;
 function error(error){
   return {"error":error};
 }
@@ -52,6 +53,18 @@ var j = schedule.scheduleJob(statsRule, function(){
     console.log(res);
     console.log(currentTime.format())
     console.log(currentTime.week())
+    if(res&&res.length){
+      res.map(m=>{
+        if(m.lastOnTime){
+          handleOnForTracking(m.board,m.switch,currentTime.format())
+          handleOffForTracking(m.board,m.switch,moment(new Date()).format())
+          handleOnForTracking(m.board,m.switch)
+
+        }
+        return m;
+      })
+      usageSchedule = true;
+    }
   })
 },err=>{
   console.log("usage schedule error")
@@ -517,7 +530,7 @@ function processSchedules(schedules) {
                     if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
                       client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:s.switch,state:true}));
                       console.error(s)
-                      handleOnForTracking(s.board,s.switch)
+                      handleOnForTracking(s.board,s.switch,null)
                     }else{
                       console.log('bad request - schedule on board or switch not found')
                     }
@@ -538,7 +551,7 @@ function processSchedules(schedules) {
                     console.log('rule off');
                     if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
                       client.publish("penumats/"+s.board+"/switch/off",JSON.stringify({switch:s.switch,state:false}));
-                      handleOffForTracking(s.board,s.switch)
+                      handleOffForTracking(s.board,s.switch,null)
                     }else{
                       console.log('bad request - schedule off board or switch not found')
                     }
@@ -633,7 +646,7 @@ async function persistUsage(){
         let currentWeek = moment(current.on).week()
        
         days.map(m=>{
-          if(lastYear!=currentYear|| lastMonth!=currentMonth||lastWeek!=currentWeek){
+          if(lastWeek!=currentWeek){
             ob[m] = null;
           }else if(!ob[m]){
             ob[m] = null;
@@ -691,13 +704,18 @@ async function persistUsage(){
   if(pendingStats.length){
   
    return persistUsage()
+  }else{
+    if(usageSchedule){
+      usageSchedule = false;
+      console.log('send usage schedule mail')
+    }
   }
 }
-function handleOnForTracking(b,s) {
+function handleOnForTracking(b,s,on) {
   initStats(b,s);
   let current = stats[b][s].current;
   let pending = stats[b][s].pending;
-  current.on = moment().format();
+  current.on = on?on:moment().format();
   current.off = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   console.log(pendingStats)
@@ -707,14 +725,14 @@ function handleOnForTracking(b,s) {
   }
 }
 
-function handleOffForTracking(b,s) {
+function handleOffForTracking(b,s,off) {
   initStats(b,s);
   let current = stats[b][s].current;
   let pending = stats[b][s].pending;
   if(!current.on){
     return
   }
-  current.off = moment().format();
+  current.off = off?off:moment().format();
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   current.on=null;
   current.off=null;
@@ -808,7 +826,7 @@ function initDevice(reinit){
           let $switch = msg.s;
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
-            handleOffForTracking(board,$switch)
+            handleOffForTracking(board,$switch,null)
           }else{
             console.log('bad request - board or switch not found')
           }
@@ -822,7 +840,7 @@ function initDevice(reinit){
           let $switch = msg.s;
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
-            handleOnForTracking(board,$switch)
+            handleOnForTracking(board,$switch,null)
 
           }else{
             console.log('bad request - board or switch not found')
