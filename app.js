@@ -61,8 +61,13 @@ var j = schedule.scheduleJob(statsRule, function(){
           }
           stats[m.board][m.switch]={};
           handleOnForTracking(m.board,m.switch,m.lastOnTime)
+          console.log('rtjjjj1')
           handleOffForTracking(m.board,m.switch,moment(new Date()).format())
+          console.log('rtjjjj2')
+
           handleOnForTracking(m.board,m.switch)
+          console.log('rtjjjj3')
+
 
         }
         return m;
@@ -633,6 +638,7 @@ async function persistUsage(){
           let usage = await repo.usageRepository.create(ob)
           console.log('created usage')
           console.log(usage)
+          console.log(1111111111111111111111111111111111111111111111111111111)
         }catch (e){
           console.log('error while creating usage')
           console.log(e)
