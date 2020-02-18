@@ -56,6 +56,7 @@ var j = schedule.scheduleJob(statsRule, function(){
     if(res&&res.length){
       res.map(m=>{
         if(m.lastOnTime){
+          stats[b][s]={};
           handleOnForTracking(m.board,m.switch,m.lastOnTime)
           handleOffForTracking(m.board,m.switch,moment(new Date()).format())
           handleOnForTracking(m.board,m.switch)
