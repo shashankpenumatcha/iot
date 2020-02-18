@@ -43,15 +43,15 @@ function error(error){
 
 var statsRule = new schedule.RecurrenceRule();
 //statsRule.hour = 17;
-statsRule.minute = new schedule.Range(0, 59, 5);
+statsRule.minute = new schedule.Range(0, 59, 2);
  
 var j = schedule.scheduleJob(statsRule, function(){
   console.log('Usage schedule');
-  repo.usageRepository.getAllOn().then(res=>{
+  repo.switchRepo.getOnStats().then(res=>{
     let currentTime = moment(new Date()).format();
     console.log(res);
     console.log(currentTime)
-    console.log(currentTime.week())
+    console.log(currentTime.getWeek())
   })
 },err=>{
   console.log("usage schedule error")
