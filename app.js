@@ -743,7 +743,7 @@ function handleOnForTracking(b,s,on) {
     if(!on){
 
       persistUsage()
-    }esle{
+    }else{
       persistUsage(on,schedule)
     }
   }
