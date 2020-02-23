@@ -626,9 +626,12 @@ async function persistUsage(){
         console.log('error while getting switch')
         console.log(e)
       }
+
     }
+    
     if(!s){
-     return persistUsage()
+      return persistUsage()
+
     }
     if(!res){
       if(!current.off){
@@ -716,7 +719,9 @@ async function persistUsage(){
     persisting =false;
   if(pendingStats.length){
   
-   return persistUsage()
+  // setTimeout(function(){
+    persistUsage()
+  // })
   }else{
     if(usageSchedule){
       usageSchedule = false;
