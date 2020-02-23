@@ -59,6 +59,8 @@ var j = schedule.scheduleJob(statsRule, function(){
           if(!stats[m.board]){
             stats[m.board] = {};
           }
+          persisting = true;
+
           stats[m.board][m.switch]={};
           handleOnForTracking(m.board,m.switch,m.lastOnTime)
           console.log('rtjjjj1')
@@ -67,6 +69,7 @@ var j = schedule.scheduleJob(statsRule, function(){
 
           handleOnForTracking(m.board,m.switch)
           console.log('rtjjjj3')
+          persisting=false;
           persistUsage();
 
 
@@ -599,10 +602,12 @@ function initStats(b,s) {
 }
 async function persistUsage(){
   persisting = true;
+
  let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
   if(!pendingStats.length){
     return
   }
+
   let current  = pendingStats.shift();
   if(!current||!current.on){
     return persistUsage()
@@ -719,9 +724,9 @@ async function persistUsage(){
     persisting =false;
   if(pendingStats.length){
   
-  // setTimeout(function(){
+   setTimeout(function(){
     persistUsage()
-  // })
+   })
   }else{
     if(usageSchedule){
       usageSchedule = false;
