@@ -10,49 +10,114 @@
 #include <ArduinoJson.h>
 #include "FS.h"
 
-const char* wifiName = "_AP_SSID_";
-const char* wifiPass = "_AP_PASSWORD_";
+const char* wifiName = NULL;
+const char* wifiPass = NULL;
 const char* mqtt_server = NULL;
 WiFiClient espClient;
 PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
-String id = "5e38573fe9388407d86997e1";
+String id = "5e484f6132f6541dfcec8689";
 int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
 StaticJsonDocument<200> con;
 
 ESP8266WebServer server(80);
+
+const String postForms = "<html>\
+  <head>\
+    <title>ESP8266 Web Server POST handling</title>\
+    <style>\
+      body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
+    </style>\
+  </head>\
+  <body>\
+    <h1>POST form data to /postform/</h1><br>\
+    <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/postform/\">\
+      <input placeholder=\"device id\" type=\"text\" name=\"device\" value=\"\"><br>\
+      <input placeholder=\"wifi name\" type=\"text\" name=\"name\" value=\"\"><br>\
+      <input placeholder=\"wifi key\" type=\"password\" name=\"pass\" value=\"\"><br>\
+      <input type=\"submit\" value=\"Submit\">\
+    </form>\
+  </body>\
+</html>";
+
+
+void handleRoot() {
+  Serial.println("got request for /");
+  server.send(200, "text/html", postForms);
+}
+
+void handleForm() {
+  Serial.println("handling post...");
+  if (server.method() != HTTP_POST) {
+    server.send(405, "text/plain", "Method Not Allowed");
+  } else {
+    String message = "POST form was:\n";
+    String d;
+    String n;
+    String pass;
+    for (uint8_t i = 0; i < server.args(); i++) {
+      message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+      if(server.argName(i) == "device"){
+        d = server.arg(i);
+      }
+      if(server.argName(i) == "name"){
+        n = server.arg(i);
+      }
+      if(server.argName(i) == "pass"){
+        pass = server.arg(i);
+      }
+    }
+        if(saveConfig(d,n,pass)){
+          Serial.println("saved config");
+         };
+        if(loadConfig()){
+        Serial.println("loaded config");
+              server.send(200, "text/plain", "okay");
+    
+              delay(100);
+        }
+        Serial.println(mqtt_server);
+        WiFi.softAPdisconnect (true);
+    
+        setup_wifi();
+        setup_mqtt();
+         char buffer[512];
+        client.publish("penumats/register", buffer, id);
+ 
+        server.send(200, "text/plain", message);
+        Serial.println("post 200 ok");
+    
+
+  }
+}
  
 // the setup function runs once when you press reset or power the board
 void setup() {
-    pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
-
+  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   Serial.begin(9600);
+  Serial.println("Setting up...");
   doc["id"] = id;
   //Initialize File System
-  if(SPIFFS.begin())
-  {
+  if(SPIFFS.begin()){
     Serial.println("SPIFFS Initialize....ok");
-  }
-  else
-  {
+  }else{
     Serial.println("SPIFFS Initialization...failed");
   }
- 
-  //SPIFFS.format();
+  Serial.println("Wiping out SPIFFS...");
+  SPIFFS.format();
   if(loadConfig()){
-  Serial.println("loaded config");
+    Serial.println("loaded config");
   }else{
-    Serial.println("couldnt load config");
+    Serial.println("failed to load config");
   };
   JsonArray switches = doc.createNestedArray("switches");
   switches.add(true);
   if(NULL!=mqtt_server){
     setup_wifi();
-      setup_mqtt();
-
+    setup_mqtt();
   }else{
     setup_AP();  
   }
@@ -76,57 +141,51 @@ void setup_mqtt(){
 }
 
 bool loadConfig() {
-   File configFile = SPIFFS.open("/config.json", "r");
+  File configFile = SPIFFS.open("/config.json", "r");
   if (!configFile) {
     Serial.println("Failed to open config file");
     return false;
   }
-
   size_t size = configFile.size();
   if (size > 1024) {
     Serial.println("Config file size is too large");
     return false;
   }
-
   // Allocate a buffer to store contents of the file.
   std::unique_ptr<char[]> buf(new char[size]);
-
   // We don't use String here because ArduinoJson library requires the input
   // buffer to be mutable. If you don't use ArduinoJson, you may as well
   // use configFile.readString instead.
   configFile.readBytes(buf.get(), size);
-
   StaticJsonDocument<200> doc;
   auto error = deserializeJson(doc, buf.get());
   if (error) {
     Serial.println("Failed to parse config file");
     return false;
   }
-
   con = doc;
-
   // Real world application would store these values in some variables for
   // later use.
-mqtt_server = con["serverName"];
+  mqtt_server = con["serverName"];
+  wifiName = con["wifiName"];
+  wifiPass = con["wifiPass"];
   Serial.print("Loaded serverName: ");
-  const char* sr = con["serverName"];
-  Serial.println(sr);
-
   return true;
 }
 
-bool saveConfig(String deviceId) {
+bool saveConfig(String deviceId, String wifiName, String wifiPass) {
 
 
  StaticJsonDocument<200> doc;
   doc["serverName"] = deviceId+".local";
+  doc["wifiName"] = wifiName;
+  doc["wifiPass"] = wifiPass;
 
   File configFile = SPIFFS.open("/config.json", "w");
   if (!configFile) {
     Serial.println("Failed to open config file for writing");
     return false;
   }
-
   serializeJson(doc, configFile);
   return true;
 }
@@ -135,41 +194,6 @@ bool saveConfig(String deviceId) {
 
 void handleNotFound(){
   server.send(404, "text/plain", "404: Not found"); // Send HTTP status 404 (Not Found) when there's no handler for the URI in the request
-}
-
-void handleBody() { //Handler for the body path
-
-  if (server.hasArg("plain")== false){ //Check if body received
-
-        server.send(201, "text/plain", "Body not received");
-        return;
-
-  }
-
-  String message = "";
-         message += server.arg("plain");
-
-
-
-  if(NULL==mqtt_server){
-    Serial.println("inside null check");
-    if(saveConfig(message)){
-      Serial.println("saved config");
-      };
-    if(loadConfig()){
-    Serial.println("loaded config");
-          server.send(200, "text/plain", "okay");
-
-          delay(100);
-    }
-    Serial.println(mqtt_server);
-    WiFi.softAPdisconnect (true);
-
-    setup_wifi();
-    setup_mqtt();
-  }
-
-  Serial.println(message);
 }
 
  
@@ -203,17 +227,17 @@ void setup_wifi() {
 
 
 void setup_AP(){
-    WiFi.disconnect(true);
-  WiFi.mode(WIFI_AP);
-
-  if(WiFi.softAP(id,"",1)){
- Serial.println("ap success");
-   
-  server.on("/register", handleBody);  //Associate handler function to path
-  server.onNotFound(handleNotFound);        // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
-  server.begin();                           //Start server
-  Serial.println("HTTP server started");
-}
+   WiFi.disconnect(true);
+   WiFi.mode(WIFI_AP);
+   if(WiFi.softAP(id,"",1)){
+      Serial.println("ap success");
+      server.on("/register", handleBody);  //Associate handler function to path
+      server.on("/", handleRoot);
+      server.on("/postform/", handleForm);
+      server.onNotFound(handleNotFound);        // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
+      server.begin();                           //Start server
+      Serial.println("HTTP server started");
+   }
   
 }
 

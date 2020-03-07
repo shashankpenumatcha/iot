@@ -129,6 +129,22 @@ function auth(req,res,next){
     
 
   });
+  socket.on('deviceInfo2',function(deviceEntitiy){
+    device = deviceEntitiy;
+  console.log("got device info")
+  //console.log(device)
+    if(device&&device.boards&&device.boards.length){
+      //console.log("rtjjjjjjjjjjjjjjjjjjjjjjjj");
+      //console.log(device)
+      boards =  device.boards.map(b=>{
+        return b.id;
+      });
+    }
+
+    client.publish('penumats/handshake/reinitiate',"hi")
+    
+  });
+
   //initDevice();
   socket.on('joined',function(device){
     let message_boards = {deviceId:deviceId,boards:state.boards}
@@ -649,7 +665,6 @@ async function persistUsage(){
           let usage = await repo.usageRepository.create(ob)
           console.log('created usage')
          // console.log(usage)
-          console.log(1111111111111111111111111111111111111111111111111111111)
         }catch (e){
           console.log('error while creating usage')
           console.log(e)
@@ -707,7 +722,6 @@ async function persistUsage(){
         }
         ob.switchId = parseInt(res.switchId);
         ob.lastOnTime = null;
-        console.log(ob);
         try{
           console.log('persisting usage -update-  off in current')
           let updatedUsage = await repo.usageRepository.update(ob);
@@ -719,8 +733,7 @@ async function persistUsage(){
       }
 
     }
-    console.log('pending stats')
-   // console.log(pendingStats)
+
     persisting =false;
   if(pendingStats.length){
   
@@ -730,6 +743,35 @@ async function persistUsage(){
   }else{
     if(usageSchedule){
       usageSchedule = false;
+      repo.switchRepo.getStats().then(res => {
+        payload.switches = res;
+        payload.switches = payload.switches.map(m=>{
+          let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
+          let duration = null;
+          days.map(d => {
+              if(m[d]){
+                if(!duration){
+                  duration = moment.duration(m[d]);
+                }else{
+                  duration.add(moment.duration(m[d]))
+                }
+                m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minutes()}:${moment.duration(m[d]).seconds()}`
+              }
+            return d
+          })
+          if(duration){
+            m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
+          }
+
+
+          return m;
+
+        })
+        socket.emit('sendMail',payload);
+      }, error => {
+        payload.error = 'error sending weekly mail'
+        socket.emit('usage', payload)
+      })
       console.log('send usage schedule mail')
     }
   }
@@ -741,7 +783,6 @@ function handleOnForTracking(b,s,on) {
   current.on = on?on:moment().format();
   current.off = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
-  console.log(333333333333333333333333333333333)
   console.log(pendingStats)
   if(pendingStats.length&&!persisting){
   
@@ -760,7 +801,6 @@ function handleOffForTracking(b,s,off) {
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   current.on=null;
   current.off=null;
-  console.log(pendingStats)
   if(pendingStats.length && !persisting){
   
     persistUsage()
@@ -837,6 +877,28 @@ function initDevice(reinit){
         socket.emit('boards',msg);
       }
     }
+
+    if(topic=="penumats/register"&&!packet.retain){
+      console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+      console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+      console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+      console.log("request to add board");
+      console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+      console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+      console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
+
+      let id = message;
+      if(id){
+        socket.emit('addBoard',id,function(res){
+          console.log("board added in db")  
+          if(res=="success"){
+            socket.emit('getDeviceInfo2',deviceId);
+          }
+        });
+      }
+    }
+
+  
   });
 
   if(!reinit||reinit){
