@@ -84,11 +84,10 @@ void handleForm() {
     
         setup_wifi();
         setup_mqtt();
-         char buffer[512];
+       char buffer[512];
         client.publish("penumats/register", buffer, id);
- 
-        server.send(200, "text/plain", message);
-        Serial.println("post 200 ok");
+    server.send(200, "text/plain", message);
+    Serial.println("post 200 ok");
     
 
   }
@@ -231,7 +230,6 @@ void setup_AP(){
    WiFi.mode(WIFI_AP);
    if(WiFi.softAP(id,"",1)){
       Serial.println("ap success");
-      server.on("/register", handleBody);  //Associate handler function to path
       server.on("/", handleRoot);
       server.on("/postform/", handleForm);
       server.onNotFound(handleNotFound);        // When a client requests an unknown URI (i.e. something other than "/"), call function "handleNotFound"
