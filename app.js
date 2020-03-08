@@ -890,12 +890,14 @@ function initDevice(reinit){
 
       let id = message;
       if(id){
-        socket.emit('addBoard',id,function(res){
-          console.log("board added in db")  
+        let msg = {deviceId:deviceId, boardId:id};
+        socket.emit('addBoard',msg,function(res){
           console.log(res)
           if(res=="success"){
+            console.log("board added in db")  
             socket.emit('getDeviceInfo2',deviceId);
           }
+
         });
       }
     }
