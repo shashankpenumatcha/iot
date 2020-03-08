@@ -888,7 +888,7 @@ function initDevice(reinit){
       console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
       console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
-      let id = message;
+      let id = message.toString();
       if(id){
         let msg = {deviceId:deviceId, boardId:id};
         socket.emit('addBoard',msg,function(res){
