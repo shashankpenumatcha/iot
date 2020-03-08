@@ -844,6 +844,7 @@ function initDevice(reinit){
       }
     });
     client.subscribe("penumats/update");
+    client.subscribe("penumats/register");
   });
    
   client.on('message', function (topic, message,packet) {
@@ -878,7 +879,7 @@ function initDevice(reinit){
       }
     }
 
-    if(topic=="penumats/register"&&!packet.retain){
+    if(topic=="penumats/register" && !packet.retain){
       console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
       console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
       console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");

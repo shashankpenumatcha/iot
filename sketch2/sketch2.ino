@@ -84,8 +84,7 @@ void handleForm() {
     
         setup_wifi();
         setup_mqtt();
-       char buffer[512];
-        client.publish("penumats/register", buffer, id);
+     
     server.send(200, "text/plain", message);
     Serial.println("post 200 ok");
     
@@ -137,6 +136,7 @@ void setup_mqtt(){
   Serial.println(sr);
   client.setServer(sr, 1883);
   client.setCallback(callback);  
+  
 }
 
 bool loadConfig() {
@@ -307,6 +307,8 @@ void reconnect() {
       char buffer[512];
     size_t n = serializeJson(doc, buffer);
     client.publish("penumats/handshake/connect", buffer, n);
+    char bufferr[512];
+  client.publish("penumats/register", bufferr, id);
     } else {
       Serial.println();
       Serial.print("failed, rc=");
