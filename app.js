@@ -892,6 +892,7 @@ function initDevice(reinit){
       if(id){
         socket.emit('addBoard',id,function(res){
           console.log("board added in db")  
+          console.log(res)
           if(res=="success"){
             socket.emit('getDeviceInfo2',deviceId);
           }
