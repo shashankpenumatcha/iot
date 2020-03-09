@@ -180,6 +180,23 @@ function auth(req,res,next){
     })
   });
 
+  socket.on('deleteLocation',function(msg){
+    console.log('deleteLocation request')
+    if(!msg || !msg.locationId){
+      console.log('bad deleteLocation request from device')
+      socket.emit('deletedLocation',{error:'bad deletedLocation request from device',socket:msg.socket});
+    }
+    repo.locationRepo.delete(msg.locationId).then(res=>{
+      console.log(`location deleted`);
+      socket.emit('deletedLocation',{id:msg.locationId,socket:msg.socket});
+    },err=>{
+      console.log('error while deletedLocation')
+      console.log(err);
+      socket.emit('deletedLocation',{error:'error while deletedLocation',socket:msg.socket});
+
+    })
+  });
+
   socket.on('addLocation',function(location){
     console.log('add location request')
     if(!location.name){
