@@ -163,6 +163,21 @@ function auth(req,res,next){
     }
   });
 
+  socket.on('editLocationName',function(location,callback){
+    console.log('edit location name request')
+    if(!location.name){
+      console.log('bad request from device')
+      callback({error:'bad request from device'});
+    }
+    repo.locationRepo.updateName(location).then(res=>{
+      console.log(`location name updated`);
+      callback({name:location.name})
+    },err=>{
+      console.log('error while editing location name')
+      console.log(err);
+      callback({error:'error while editing location name'});
+    })
+  });
 
   socket.on('addLocation',function(location){
     console.log('add location request')
@@ -785,7 +800,6 @@ function handleOnForTracking(b,s,on) {
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   console.log(pendingStats)
   if(pendingStats.length&&!persisting){
-  
     persistUsage()
   }
 }
@@ -889,7 +903,7 @@ function initDevice(reinit){
       console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
       let id = message.toString();
-      if(id){
+      if(id && state.boards && state.boards.indexOf(id)==-1){
         let msg = {deviceId:deviceId, boardId:id};
         socket.emit('addBoard',msg,function(res){
           console.log(res)

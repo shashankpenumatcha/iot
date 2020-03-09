@@ -10,6 +10,18 @@
 #include <ArduinoJson.h>
 #include "FS.h"
 
+
+// Callback function to be called when the button is pressed.
+void onPressed() {
+    Serial.println("Button has been pressed!");
+}
+
+
+void reset(){
+   SPIFFS.format();
+   ESP.restart();
+}
+
 const char* wifiName = NULL;
 const char* wifiPass = NULL;
 const char* mqtt_server = NULL;
@@ -18,7 +30,7 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
-String id = "5e484f6132f6541dfcec8689";
+String id = "5e38573fe9388407d86997e1";
 int pins[] = {BUILTIN_LED};
 StaticJsonDocument<200> doc;
 StaticJsonDocument<200> con;
@@ -84,7 +96,8 @@ void handleForm() {
     
         setup_wifi();
         setup_mqtt();
-     
+                digitalWrite(BUILTIN_LED, HIGH);
+
     server.send(200, "text/plain", message);
     Serial.println("post 200 ok");
     
@@ -94,7 +107,12 @@ void handleForm() {
  
 // the setup function runs once when you press reset or power the board
 void setup() {
+ 
+pinMode(0, INPUT_PULLUP);
+
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+         digitalWrite(BUILTIN_LED, LOW);
+
   Serial.begin(9600);
   Serial.println("Setting up...");
   doc["id"] = id;
@@ -105,7 +123,7 @@ void setup() {
     Serial.println("SPIFFS Initialization...failed");
   }
   Serial.println("Wiping out SPIFFS...");
-  SPIFFS.format();
+
   if(loadConfig()){
     Serial.println("loaded config");
   }else{
@@ -114,6 +132,8 @@ void setup() {
   JsonArray switches = doc.createNestedArray("switches");
   switches.add(true);
   if(NULL!=mqtt_server){
+           digitalWrite(BUILTIN_LED, HIGH);
+
     setup_wifi();
     setup_mqtt();
   }else{
@@ -123,7 +143,10 @@ void setup() {
  
 // the loop function runs over and over again forever
 void loop() {
-  server.handleClient();
+if(digitalRead(0)==0){
+reset();
+}
+server.handleClient();
   if (!client.connected()&&mqtt_server!=NULL) {
     reconnect();
   }
@@ -307,8 +330,7 @@ void reconnect() {
       char buffer[512];
     size_t n = serializeJson(doc, buffer);
     client.publish("penumats/handshake/connect", buffer, n);
-    char bufferr[512];
-  client.publish("penumats/register", bufferr, id);
+    client.publish("penumats/register", id.c_str());
     } else {
       Serial.println();
       Serial.print("failed, rc=");

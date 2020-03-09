@@ -24,6 +24,13 @@ class LocationRepository {
           [name, locationId, id]
         )
     }
+    updateName(location) {
+      const { name , locationId } = location
+      return this.dao.run(
+        `UPDATE locations SET name = ? , WHERE locationId = ?`,
+        [name, locationId]
+      )
+    }
     delete(locationId) {
         return this.dao.run(
             `DELETE FROM locations WHERE locationId = ?`,
