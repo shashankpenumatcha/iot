@@ -163,19 +163,20 @@ function auth(req,res,next){
     }
   });
 
-  socket.on('editLocationName',function(location,callback){
+  socket.on('editLocationName',function(msg){
     console.log('edit location name request')
-    if(!location.name){
+    if(!msg || !msg.location || !msg.location.name){
       console.log('bad request from device')
-      callback({error:'bad request from device'});
+      socket.emit('editedLocationName',{error:'bad request from device',socket:msg.socket});
     }
-    repo.locationRepo.updateName(location).then(res=>{
+    repo.locationRepo.updateName(msg.location).then(res=>{
       console.log(`location name updated`);
-      callback({name:location.name})
+      socket.emit('editedLocationName',{name:msg.location.name,socket:msg.socket});
     },err=>{
       console.log('error while editing location name')
       console.log(err);
-      callback({error:'error while editing location name'});
+      socket.emit('editedLocationName',{error:'error while editing location name',socket:msg.socket});
+
     })
   });
 
