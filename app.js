@@ -240,16 +240,16 @@ function auth(req,res,next){
     let switchesArray = [];
 
     if(msg.boards){
-      let boards = Object.keys(location.boards);
+      let boards = Object.keys(msg.boards);
       if(boards && boards.length){
            boards.map(m => {
-            if(location.boards[m]) {
-              switches = Object.keys(location.boards[m]);
+            if(msg.boards[m]) {
+              switches = Object.keys(msg.boards[m]);
             } 
             if(switches && switches.length){
               console.log('switches loop to create promise')
               switches.map(s => {
-                let swtch = {i:s , b: m, label: location.boards[m][s].label}
+                let swtch = {i:s , b: m, label: msg.boards[m][s].label}
                 switchesArray.push(swtch);
                 return swtch
               })
@@ -269,7 +269,7 @@ function auth(req,res,next){
           socket.emit('switchesAdded', {deviceId: deviceId, name: msg.name, socketId: msg.socketId, location:msg.location})
         }, e => {
           console.log(`error - switches not added on ${deviceId}`)
-          socket.emit('switchesAdded', {error: `error adding switches in ${msg.locationId}`,deviceId: deviceId, name: location.name, socketId: location.socketId, devices: location.devices})
+          socket.emit('switchesAdded', {error: `error adding switches in ${msg.locationId}`,deviceId: deviceId, name: msg.name, socketId: msg.socketId, devices: msg.devices})
 
         })
       }
