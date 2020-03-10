@@ -232,6 +232,50 @@ function auth(req,res,next){
     })
   });
 
+  socket.on('addSwitches',function(msg){
+    console.log('add switches request')
+    if(!msg.locationId){
+      console.log('error')
+    }
+    let switchesArray = [];
+
+    if(msg.boards){
+      let boards = Object.keys(location.boards);
+      if(boards && boards.length){
+           boards.map(m => {
+            if(location.boards[m]) {
+              switches = Object.keys(location.boards[m]);
+            } 
+            if(switches && switches.length){
+              console.log('switches loop to create promise')
+              switches.map(s => {
+                let swtch = {i:s , b: m, label: location.boards[m][s].label}
+                switchesArray.push(swtch);
+                return swtch
+              })
+            }
+            return m           
+          });
+      }
+    }
+    repo.locationRepo.getById(msg.locationId).then(res=>{
+      console.log(`found location with id #${res.id}`);
+      if(switchesArray.length){
+        Promise.all(switchesArray.map((s) => {
+         // console.log(s)
+          
+          return repo.switchRepo.create(s.label, s.b, s.i, res.id)
+        })).then( r=> {
+          socket.emit('switchesAdded', {deviceId: deviceId, name: msg.name, socketId: msg.socketId, location:msg.location})
+        }, e => {
+          console.log(`error - switches not added on ${deviceId}`)
+          socket.emit('switchesAdded', {error: `error adding switches in ${msg.locationId}`,deviceId: deviceId, name: location.name, socketId: location.socketId, devices: location.devices})
+
+        })
+      }
+    })
+  });
+
   socket.on('addLocation',function(location){
     console.log('add location request')
     if(!location.name){
