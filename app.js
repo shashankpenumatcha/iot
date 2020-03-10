@@ -186,7 +186,7 @@ function auth(req,res,next){
       console.log('bad deleteLocation request from device')
       socket.emit('deletedLocation',{error:'bad deletedLocation request from device',socket:msg.socket});
     }
-    repo.locationRepo.delete(msg.locationId).then(res=>{
+    repo.locationRepo.deletegetAssignedSwitches(msg.locationId).then(res=>{
       console.log(`location deleted`);
       socket.emit('deletedLocation',{id:msg.locationId,socket:msg.socket});
     },err=>{
@@ -921,7 +921,7 @@ function initDevice(reinit){
       console.log("::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
 
       let id = message.toString();
-      if(id && state.boards && state.boards.indexOf(id)==-1){
+      if(id && state.boards && !state.boards[id]){
         let msg = {deviceId:deviceId, boardId:id};
         socket.emit('addBoard',msg,function(res){
           console.log(res)
