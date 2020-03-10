@@ -171,7 +171,7 @@ function auth(req,res,next){
     }
     repo.switchRepo.updateName(msg.switch).then(res=>{
       console.log(`switch name updated`);
-      socket.emit('editedSwitch',msg.switch);
+      socket.emit('editedSwitch',{switch:msg.switch, socket:msg.socket});
     },err=>{
       console.log('error while editing switch name')
       console.log(err);
