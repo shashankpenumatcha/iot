@@ -197,6 +197,24 @@ function auth(req,res,next){
     })
   });
 
+  socket.on('deleteSwitch',function(msg){
+    console.log('delete switch request')
+    if(!msg || !msg.switch || !msg.switch.id){
+      console.log('bad deleteSwitch request from device')
+      socket.emit('deletedSwitch',{error:'bad deletedSwitch request from device',socket:msg.socket});
+    }
+    repo.switchRepo.delete(msg.switch.id).then(res=>{
+      console.log(`switch deleted`);
+      socket.emit('deletedSwitch',{switch:msg.switch,socket:msg.socket});
+    },err=>{
+      console.log('error while deletedSwitch')
+      console.log(err);
+      socket.emit('deletedSwitch',{error:'error while deletedSwitch',socket:msg.socket});
+
+    })
+  });
+
+
   socket.on('deleteLocation',function(msg){
     console.log('deleteLocation request')
     if(!msg || !msg.locationId){
