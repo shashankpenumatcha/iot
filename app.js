@@ -203,7 +203,7 @@ function auth(req,res,next){
       console.log('bad deleteLocation request from device')
       socket.emit('deletedLocation',{error:'bad deletedLocation request from device',socket:msg.socket});
     }
-    repo.locationRepo.deletegetAssignedSwitches(msg.locationId).then(res=>{
+    repo.locationRepo.delete(msg.locationId).then(res=>{
       console.log(`location deleted`);
       socket.emit('deletedLocation',{id:msg.locationId,socket:msg.socket});
     },err=>{
