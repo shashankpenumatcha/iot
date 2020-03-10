@@ -163,6 +163,23 @@ function auth(req,res,next){
     }
   });
 
+  socket.on('editSwitch',function(msg){
+    console.log('editSwitch name request')
+    if(!msg || !msg.switch || !msg.switch.name || !msg.switch.id){
+      console.log('bad request from device')
+      socket.emit('editSwitch',{error:'bad request from editSwitch device',socket:msg.socket});
+    }
+    repo.switchRepo.updateName(msg.switch).then(res=>{
+      console.log(`switch name updated`);
+      socket.emit('editedSwitch',msg.switch);
+    },err=>{
+      console.log('error while editing switch name')
+      console.log(err);
+      socket.emit('editedSwitch',{error:'error while editing switch name',socket:msg.socket});
+
+    })
+  });
+
   socket.on('editLocationName',function(msg){
     console.log('edit location name request')
     if(!msg || !msg.location || !msg.location.name){

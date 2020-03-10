@@ -34,6 +34,14 @@ class SwitchRepository {
           [name, board, sw, locationId, id]
         )
     }
+    updateName(swtch) {
+      const { id, name } = swtch
+      return this.dao.run(
+        `UPDATE switches
+        SET name = ? WHERE id = ?`,
+        [name,id]
+      )
+  }
     delete(id) {
         return this.dao.run(
           `DELETE FROM switches WHERE id = ?`,
