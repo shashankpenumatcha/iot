@@ -733,6 +733,7 @@ async function persistUsage(){
 
  let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
   if(!pendingStats.length){
+    persisting = false
     return
   }
 
