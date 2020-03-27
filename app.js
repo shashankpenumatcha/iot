@@ -763,11 +763,16 @@ async function persistUsage(){
     }
     
     if(!s){
+      console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
       return persistUsage()
 
     }
     if(!res){
+      console.log(">>>>>>>>>>>>>>>>>>>>>","no usage persistUsage()")
+
       if(!current.off){
+        console.log(">>>>>>>>>>>>>>>>>>>>>","no usage no off persistUsage()")
+
         try{
           console.log('creating usage from switch')
         //  console.log(s)
@@ -783,6 +788,8 @@ async function persistUsage(){
         }
       }
     }else{
+      console.log(">>>>>>>>>>>>>>>>>>>>>","got usage persistUsage()")
+
       let ob = res
 
      if(res.lastOnTime){
