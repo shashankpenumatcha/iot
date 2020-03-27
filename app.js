@@ -897,6 +897,7 @@ function handleOnForTracking(b,s,on) {
   current.off = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   console.log(">>>>>>>>>>pending",pendingStats)
+  console.log(">>>>>>>>persisting",persisting)
   if(pendingStats.length&&!persisting){
     persistUsage()
   }
