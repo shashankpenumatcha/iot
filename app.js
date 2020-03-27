@@ -47,12 +47,12 @@ var statsRule = new schedule.RecurrenceRule();
 statsRule.minute = new schedule.Range(0, 59, 1);
  
 var j = schedule.scheduleJob(statsRule, function(){
-  console.log('Usage schedule');
+  //console.log('Usage schedule');
   repo.switchRepo.getOnStats().then(res=>{
     let currentTime = moment(new Date())
-    console.log(res);
+   /*  console.log(res);
     console.log(currentTime.format())
-    console.log(currentTime.week())
+    console.log(currentTime.week()) */
     if(res&&res.length){
       res.map(m=>{
         if(m.lastOnTime){
@@ -63,12 +63,12 @@ var j = schedule.scheduleJob(statsRule, function(){
 
           stats[m.board][m.switch]={};
           handleOnForTracking(m.board,m.switch,m.lastOnTime)
-          console.log('rtjjjj1')
+          //console.log('rtjjjj1')
           handleOffForTracking(m.board,m.switch,moment(new Date()).format())
-          console.log('rtjjjj2')
+          //console.log('rtjjjj2')
 
           handleOnForTracking(m.board,m.switch)
-          console.log('rtjjjj3')
+          //console.log('rtjjjj3')
           persisting=false;
           persistUsage();
 
@@ -131,7 +131,7 @@ function auth(req,res,next){
   });
   socket.on('deviceInfo2',function(deviceEntitiy){
     device = deviceEntitiy;
-  console.log("got device info")
+  console.log("got device info2")
   //console.log(device)
     if(device&&device.boards&&device.boards.length){
       //console.log("rtjjjjjjjjjjjjjjjjjjjjjjjj");
@@ -373,7 +373,7 @@ socket.on('deleteSchedule',function(scheduleId){
           });
       }
     }
-    console.log(schedule)
+    //console.log(schedule)
      repo.scheduleRepository.create( schedule.scheduleId,schedule.name,1,null,null,null,schedule.schedule.days.toString(),schedule.schedule.start,schedule.schedule.end).then(res=>{
       console.log(`schedule  created with id #${res.id}`);
       if(switchesArray.length){
@@ -394,7 +394,7 @@ socket.on('deleteSchedule',function(scheduleId){
 
   socket.on('getAssignedSwitches', function(socketId) {
     repo.switchRepo.getAll().then(assignedSwitches => {
-      console.log(`assigned switchs - ${assignedSwitches}`);
+    //  console.log(`assigned switchs - ${assignedSwitches}`);
       socket.emit('assignedSwitches', {socketId: socketId, deviceId: deviceId, switches: assignedSwitches})
     }, err => {
       socket.emit('assignedSwitches', {socketId: socketId, deviceId:deviceId ,error : `error whlile getting switches for ${deviceId}`});
@@ -525,7 +525,7 @@ socket.on('deleteSchedule',function(scheduleId){
 
 
           }
-          console.log('rtjjjjjjjjjjjjjjjjjjjjjjjjj')
+         // console.log('rtjjjjjjjjjjjjjjjjjjjjjjjjj')
           
           socket.emit("board_added", currentBoard[id]);
           delete currentBoard[id];
@@ -577,11 +577,11 @@ socket.on('deleteSchedule',function(scheduleId){
     }, err => {
       socket.emit('scheduleToggled', payload);
     })
-    console.log(activeSchedules)
+   // console.log(activeSchedules)
   })
 
 socket.on('toggleSchedule', payload => {
-  console.log('request to toggle schedule' + payload.active);
+//  console.log('request to toggle schedule' + payload.active);
   repo.scheduleRepository.getAllById(payload.scheduleId).then(res => {
 
     console.log('all schedules by id')
@@ -614,7 +614,7 @@ socket.on('toggleSchedule', payload => {
           if(!payload.active){
               if(res && res.length){
                 processSchedules(res);
-                console.log(activeSchedules);
+              //  console.log(activeSchedules);
               }
           }
         }
@@ -625,7 +625,7 @@ socket.on('toggleSchedule', payload => {
   }, err => {
     socket.emit('scheduleToggled', payload);
   })
-  console.log(activeSchedules)
+ // console.log(activeSchedules)
 })
 
 function processSchedules(schedules) {
@@ -655,7 +655,7 @@ function processSchedules(schedules) {
             switchKeys.map(swk=>{
             
               let s = activeSchedules[sk][swk].schedule;
-              console.log(s);
+             // console.log(s);
               if(!activeSchedules[sk][swk].on){
                   
                 if(s.start){
@@ -671,7 +671,7 @@ function processSchedules(schedules) {
                     console.log('rule on');
                     if(state.boards[s.board]&&state.boards[s.board].switches!=undefined&&state.boards[s.board].switches[s.switch]!=undefined){
                       client.publish("penumats/"+s.board+"/switch/on",JSON.stringify({switch:s.switch,state:true}));
-                      console.error(s)
+                    //  console.error(s)
                       handleOnForTracking(s.board,s.switch,null)
                     }else{
                       console.log('bad request - schedule on board or switch not found')
@@ -889,13 +889,14 @@ async function persistUsage(){
   }
 }
 function handleOnForTracking(b,s,on) {
+  console.log(">>>>>>>>>>>>>>>>>>>came here","on for tracking")
   initStats(b,s);
   let current = stats[b][s].current;
   let pending = stats[b][s].pending;
   current.on = on?on:moment().format();
   current.off = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
-  console.log(pendingStats)
+  //console.log(pendingStats)
   if(pendingStats.length&&!persisting){
     persistUsage()
   }
@@ -1003,7 +1004,7 @@ function initDevice(reinit){
       if(id && state.boards && !state.boards[id]){
         let msg = {deviceId:deviceId, boardId:id};
         socket.emit('addBoard',msg,function(res){
-          console.log(res)
+        //  console.log(res)
           if(res=="success"){
             console.log("board added in db")  
             socket.emit('getDeviceInfo2',deviceId);
@@ -1025,6 +1026,7 @@ function initDevice(reinit){
         }else{
           let board = msg.b;
           let $switch = msg.s;
+          console.log('>>>>>>>>>>>>>>>>>>check this',state)
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
             handleOffForTracking(board,$switch,null)
@@ -1037,6 +1039,8 @@ function initDevice(reinit){
         if(!msg||!msg.b||msg.s==undefined||msg.s==null){
           console.log('bad request')
         }else{
+          console.log('>>>>>>>>>>>>>>>>>>check this',state)
+
           let board = msg.b;
           let $switch = msg.s;
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
