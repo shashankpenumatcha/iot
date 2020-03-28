@@ -47,12 +47,13 @@ var statsRule = new schedule.RecurrenceRule();
 statsRule.minute = new schedule.Range(0, 59, 1);
  
 var j = schedule.scheduleJob(statsRule, function(){
-  //console.log('Usage schedule');
+  console.log("#############################schedule log")
+  console.log('Usage schedule');
   repo.switchRepo.getOnStats().then(res=>{
     let currentTime = moment(new Date())
-   /*  console.log(res);
+    console.log(res);
     console.log(currentTime.format())
-    console.log(currentTime.week()) */
+    console.log(currentTime.week()) 
     if(res&&res.length){
       res.map(m=>{
         if(m.lastOnTime){
@@ -77,10 +78,14 @@ var j = schedule.scheduleJob(statsRule, function(){
         return m;
       })
       usageSchedule = true;
+      console.log("#############################schedule log end")
+
     }
   },err=>{
     console.log(err)
     console.log("usage schedule error")
+    console.log("#############################schedule log end")
+
   })
 });
 
