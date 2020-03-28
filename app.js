@@ -44,7 +44,7 @@ function error(error){
 
 var statsRule = new schedule.RecurrenceRule();
 //statsRule.hour = 17;
-statsRule.minute = new schedule.Range(0, 59, 1);
+statsRule.minute = 1
  
 var j = schedule.scheduleJob(statsRule, function(){
   console.log("#############################schedule log")
