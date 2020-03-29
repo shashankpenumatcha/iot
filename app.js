@@ -38,6 +38,9 @@ var stats =  {};
 var pendingStats = [];
 var persisting = false;
 var usageSchedule = false;
+let one = '2020-03-30T02:47:00+05:30';
+let two = '2020-03-30T23:50:00+05:30';
+let three =  '2020-04-30T00:00:10+05:30';
 function error(error){
   return {"error":error};
 }
@@ -58,9 +61,13 @@ var j = schedule.scheduleJob(statsRule, function(){
           }
           persisting = true;
           stats[m.board][m.switch]={};
-          handleOnForTracking(m.board,m.switch,m.lastOnTime)
+       
+          /* handleOnForTracking(m.board,m.switch,m.lastOnTime)
           handleOffForTracking(m.board,m.switch,moment(new Date()).format())
-          handleOnForTracking(m.board,m.switch)
+          handleOnForTracking(m.board,m.switch) */
+          handleOnForTracking(m.board,m.switch,one)
+          handleOffForTracking(m.board,m.switch,two)
+          handleOnForTracking(m.board,three)
           persisting=false;
           persistUsage(true);
         }
@@ -835,7 +842,6 @@ async function persistUsage(us){
 
     persisting =false;
   if(pendingStats.length){
-  
    setTimeout(function(){
     persistUsage(us)
    })
@@ -873,10 +879,7 @@ function mailer(){
         if(duration){
           m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
         }
-
-
         return m;
-
       })
       console.log('###################payload',payload)
       socket.emit('sendMail',payload);
@@ -906,13 +909,7 @@ function mailer(){
             })
           }
         })
-
-
       })
-
-      //get on stats 
-      //delete stats 
-      //persist on stats
     }, error => {
       payload.error = 'error sending weekly mail'
       socket.emit('usage', payload)
@@ -1060,7 +1057,10 @@ function initDevice(reinit){
           console.log('>>>>>>>>>>>>>>>>>>check this',state)
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
-            handleOffForTracking(board,$switch,null)
+/*             handleOffForTracking(board,$switch,null)
+ */         
+            handleOffForTracking(board,$switch,'2020-04-30T05:00:10+05:30')
+
           }else{
             console.log('bad request - board or switch not found')
           }
@@ -1076,8 +1076,9 @@ function initDevice(reinit){
           let $switch = msg.s;
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
-            handleOnForTracking(board,$switch,null)
-
+/*             handleOnForTracking(board,$switch,null)
+ */
+            handleOnForTracking(board,$switch,'2020-04-30T00:15:10+05:30')
           }else{
             console.log('bad request - board or switch not found')
           }
