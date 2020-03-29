@@ -899,6 +899,15 @@ async function persistUsage(){
           })
           console.log('###################payload',payload)
           socket.emit('sendMail',payload);
+          repo.switchRepo.getOnStats().then(res => {
+            if(res.length){
+              console.log('###################on stats are present',res)
+              let onStats = res;
+            }
+
+
+          })
+
           //get on stats 
           //delete stats 
           //persist on stats

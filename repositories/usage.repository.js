@@ -76,6 +76,9 @@ class UsageRepository {
         `SELECT * FROM usage u join switches s on s.id = u.switchId WHERE s.board = ? and s.switch = ?`,
         [b,s])
   }
+  clearUsage() {
+      return this.dao.run(`DELETE from usage`)
+  }
     
   }
   
