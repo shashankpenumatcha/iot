@@ -81,6 +81,8 @@ var j = schedule.scheduleJob(statsRule, function(){
       
      // console.log("#############################schedule log end")
 
+    }else{
+      mailer()
     }
   },err=>{
     console.log(err)
@@ -868,56 +870,59 @@ async function persistUsage(){
    })
   }else{
     if(usageSchedule){
-      usageSchedule = false;
-
-      console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
-      if(moment(new Date()).day()==0){
-        repo.switchRepo.getStats().then(res => {
-          let payload = {};
-          payload.switches = res;
-          payload.switches = payload.switches.map(m=>{
-            let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
-            let duration = null;
-            days.map(d => {
-                if(m[d]){
-                  if(!duration){
-                    duration = moment.duration(m[d]);
-                  }else{
-                    duration.add(moment.duration(m[d]))
-                  }
-                  m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minutes()}:${moment.duration(m[d]).seconds()}`
-                }
-              return d
-            })
-            if(duration){
-              m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
-            }
-  
-  
-            return m;
-  
-          })
-          console.log('###################payload',payload)
-          socket.emit('sendMail',payload);
-          repo.switchRepo.getOnStats().then(res => {
-            if(res.length){
-              console.log('###################on stats are present',res)
-              let onStats = res;
-            }
-
-
-          })
-
-          //get on stats 
-          //delete stats 
-          //persist on stats
-        }, error => {
-          payload.error = 'error sending weekly mail'
-          socket.emit('usage', payload)
-        })
-        console.log('send usage schedule mail')
-      }
+     mailer()
     }
+  }
+}
+function mailer(){
+  usageSchedule = false;
+
+  console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
+  if(moment(new Date()).day()==0){
+    repo.switchRepo.getStats().then(res => {
+      let payload = {};
+      payload.switches = res;
+      payload.switches = payload.switches.map(m=>{
+        let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
+        let duration = null;
+        days.map(d => {
+            if(m[d]){
+              if(!duration){
+                duration = moment.duration(m[d]);
+              }else{
+                duration.add(moment.duration(m[d]))
+              }
+              m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minutes()}:${moment.duration(m[d]).seconds()}`
+            }
+          return d
+        })
+        if(duration){
+          m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
+        }
+
+
+        return m;
+
+      })
+      console.log('###################payload',payload)
+      socket.emit('sendMail',payload);
+      repo.switchRepo.getOnStats().then(res => {
+        if(res.length){
+          console.log('###################on stats are present',res)
+          let onStats = res;
+        }
+
+
+      })
+
+      //get on stats 
+      //delete stats 
+      //persist on stats
+    }, error => {
+      payload.error = 'error sending weekly mail'
+      socket.emit('usage', payload)
+    })
+    console.log('send usage schedule mail')
   }
 }
 function handleOnForTracking(b,s,on) {
