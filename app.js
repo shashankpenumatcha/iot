@@ -881,29 +881,31 @@ function mailer(){
       console.log('###################payload',payload)
       socket.emit('sendMail',payload);
       repo.switchRepo.getOnStats().then(res => {
+        let onStats = null;
+
         if(res.length){
           console.log('###################on stats are present',res)
-          let onStats = res;
-          repo.usageRepository.clearUsage().then(res=>{
-            console.log("deleteeeed",res)
-            console.log('###################on stats ',onStats)
-            if(onStats&&onStats.length){
-              onStats.map(m=>{
-                if(m.lastOnTime){
-                  if(!stats[m.board]){
-                    stats[m.board] = {};
-                  }
-                  persisting = true;
-                  stats[m.board][m.switch]={};
-                  handleOnForTracking(m.board,m.switch,m.lastOnTime)
-                  persisting=false;
-                  persistUsage(false);
-                }
-                return m;
-              })
-            }
-          })
+           onStats = res;
         }
+        repo.usageRepository.clearUsage().then(resp=>{
+          console.log("deleteeeed",res)
+          console.log('###################on stats ',onStats)
+          if(onStats&&onStats.length){
+            onStats.map(m=>{
+              if(m.lastOnTime){
+                if(!stats[m.board]){
+                  stats[m.board] = {};
+                }
+                persisting = true;
+                stats[m.board][m.switch]={};
+                handleOnForTracking(m.board,m.switch,m.lastOnTime)
+                persisting=false;
+                persistUsage(false);
+              }
+              return m;
+            })
+          }
+        })
 
 
       })
