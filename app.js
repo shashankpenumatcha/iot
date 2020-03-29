@@ -868,7 +868,7 @@ async function persistUsage(){
    })
   }else{
     if(usageSchedule){
-      console.log("day>>>>>>>>>>>>>>>>>",moment.getDay())
+      console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).getDay())
       usageSchedule = false;
       repo.switchRepo.getStats().then(res => {
         payload.switches = res;
