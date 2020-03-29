@@ -897,7 +897,7 @@ function mailer(){
                   stats[m.board][m.switch]={};
                   handleOnForTracking(m.board,m.switch,m.lastOnTime)
                   persisting=false;
-                  persistUsage(true);
+                  persistUsage(false);
                 }
                 return m;
               })
