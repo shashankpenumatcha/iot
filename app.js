@@ -873,6 +873,7 @@ async function persistUsage(){
       console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
       if(moment(new Date()).day()==0){
         repo.switchRepo.getStats().then(res => {
+          let payload;
           payload.switches = res;
           payload.switches = payload.switches.map(m=>{
             let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
