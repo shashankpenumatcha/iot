@@ -868,41 +868,45 @@ async function persistUsage(){
    })
   }else{
     if(usageSchedule){
-      console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).getDay())
       usageSchedule = false;
-      repo.switchRepo.getStats().then(res => {
-        payload.switches = res;
-        payload.switches = payload.switches.map(m=>{
-          let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
-          let duration = null;
-          days.map(d => {
-              if(m[d]){
-                if(!duration){
-                  duration = moment.duration(m[d]);
-                }else{
-                  duration.add(moment.duration(m[d]))
+
+      console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
+      if(moment(new Date()).day()==0){
+        repo.switchRepo.getStats().then(res => {
+          payload.switches = res;
+          payload.switches = payload.switches.map(m=>{
+            let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
+            let duration = null;
+            days.map(d => {
+                if(m[d]){
+                  if(!duration){
+                    duration = moment.duration(m[d]);
+                  }else{
+                    duration.add(moment.duration(m[d]))
+                  }
+                  m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minutes()}:${moment.duration(m[d]).seconds()}`
                 }
-                m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minutes()}:${moment.duration(m[d]).seconds()}`
-              }
-            return d
+              return d
+            })
+            if(duration){
+              m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
+            }
+  
+  
+            return m;
+  
           })
-          if(duration){
-            m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
-          }
-
-
-          return m;
-
+          console.log('###################payload',payload)
+          socket.emit('sendMail',payload);
+          //get on stats 
+          //delete stats 
+          //persist on stats
+        }, error => {
+          payload.error = 'error sending weekly mail'
+          socket.emit('usage', payload)
         })
-        socket.emit('sendMail',payload);
-        //get on stats 
-        //delete stats 
-        //persist on stats
-      }, error => {
-        payload.error = 'error sending weekly mail'
-        socket.emit('usage', payload)
-      })
-      console.log('send usage schedule mail')
+        console.log('send usage schedule mail')
+      }
     }
   }
 }
