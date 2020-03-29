@@ -40,7 +40,7 @@ var persisting = false;
 var usageSchedule = false;
 let one = '2020-03-30T02:47:00+05:30';
 let two = '2020-03-30T23:50:00+05:30';
-let three =  '2020-04-30T00:00:10+05:30';
+let three =  '2020-03-31T00:00:10+05:30';
 function error(error){
   return {"error":error};
 }
@@ -1059,7 +1059,7 @@ function initDevice(reinit){
             client.publish("penumats/"+board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
 /*             handleOffForTracking(board,$switch,null)
  */         
-            handleOffForTracking(board,$switch,'2020-04-30T05:00:10+05:30')
+            handleOffForTracking(board,$switch,'2020-03-31T05:00:10+05:30')
 
           }else{
             console.log('bad request - board or switch not found')
@@ -1078,7 +1078,7 @@ function initDevice(reinit){
             client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
 /*             handleOnForTracking(board,$switch,null)
  */
-            handleOnForTracking(board,$switch,'2020-04-30T00:15:10+05:30')
+            handleOnForTracking(board,$switch,'2020-03-31T00:15:10+05:30')
           }else{
             console.log('bad request - board or switch not found')
           }
