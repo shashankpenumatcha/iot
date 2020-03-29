@@ -47,40 +47,25 @@ var statsRule = new schedule.RecurrenceRule();
 statsRule.minute = new schedule.Range(0, 59)
  
 var j = schedule.scheduleJob(statsRule, function(){
- // console.log("#############################schedule log")
-  console.log('Usage schedule');
   repo.switchRepo.getOnStats().then(res=>{
     let currentTime = moment(new Date())
-    console.log(res);
-    console.log(currentTime.format())
-    console.log(currentTime.week()) 
     if(res&&res.length){
       res.map(m=>{
         if(m.lastOnTime){
+          usageSchedule = true;
           if(!stats[m.board]){
             stats[m.board] = {};
           }
           persisting = true;
-
           stats[m.board][m.switch]={};
           handleOnForTracking(m.board,m.switch,m.lastOnTime)
-          console.log('rtjjjj1')
           handleOffForTracking(m.board,m.switch,moment(new Date()).format())
-          //console.log('rtjjjj2')
-
           handleOnForTracking(m.board,m.switch)
-          //console.log('rtjjjj3')
           persisting=false;
-          persistUsage();
-          usageSchedule = true;
-
-
+          persistUsage(true);
         }
         return m;
       })
-      
-     // console.log("#############################schedule log end")
-
     }else{
       console.log('calling mailer')
       mailer()
@@ -88,10 +73,10 @@ var j = schedule.scheduleJob(statsRule, function(){
   },err=>{
     console.log(err)
     console.log("usage schedule error")
-    //console.log("#############################schedule log end")
-
   })
 });
+
+
 
 //auth middleware
 function auth(req,res,next){  
@@ -737,49 +722,39 @@ function initStats(b,s) {
   }
 
 }
-async function persistUsage(){
+async function persistUsage(us){
   persisting = true;
-
- let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
+  let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
   if(!pendingStats.length){
     persisting = false
     return
   }
-
   let current  = pendingStats.shift();
   if(!current||!current.on){
-    return persistUsage()
+    return persistUsage(us)
   }
   let res =null;
   try{
-     res = await   repo.usageRepository.getByAddress(current.b,current.s);
+     res = await repo.usageRepository.getByAddress(current.b,current.s);
   }catch(e){
     console.log("error while getting by address - persistUsage()")  
     console.log(e)
-   return  persistUsage()
-
+   return  persistUsage(us)
   }
-    console.log("got by address - persistUsage()")  
-    //console.log(res)  
-    let s = null;
-
-      try{
-        s = await repo.switchRepo.getSwitchByAddress(current.b,current.s)
-      }catch (e){
-        console.log('error while getting switch')
-        console.log(e)
-      }
-
-    
-    
-    if(!s){
-      console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
-      return persistUsage()
-
-    }
+  console.log("got by address - persistUsage()")  
+  let s = null;
+  try{
+    s = await repo.switchRepo.getSwitchByAddress(current.b,current.s)
+  }catch (e){
+    console.log('error while getting switch')
+    console.log(e)
+  }
+  if(!s){
+    console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
+    return persistUsage(us)
+  }
     if(!res){
       console.log(">>>>>>>>>>>>>>>>>>>>>","no usage persistUsage()")
-
       if(!current.off){
         console.log(">>>>>>>>>>>>>>>>>>>>>","no usage no off persistUsage()")
 
@@ -803,15 +778,10 @@ async function persistUsage(){
       let ob = res
 
      if(res.lastOnTime){
-        let lastYear = moment(res.lastOnTime).year()
-        let currentYear = moment(current.on).year()
-        let lastMonth = moment(res.lastOnTime).month()
-        let currentMonth = moment(current.on).month()
         let lastWeek = moment(res.lastOnTime).week()
         let currentWeek = moment(current.on).week()
-       
         days.map(m=>{
-          if(lastWeek!=currentWeek){
+          if(lastWeek!=currentWeek && !us){
             ob[m] = null;
           }else if(!ob[m]){
             ob[m] = null;
@@ -867,18 +837,20 @@ async function persistUsage(){
   if(pendingStats.length){
   
    setTimeout(function(){
-    persistUsage()
+    persistUsage(us)
    })
   }else{
-    if(usageSchedule){
+    if(us){
       usageSchedule = false;
 
      mailer()
     }
   }
 }
-function mailer(){
 
+
+
+function mailer(){
   console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
   if(moment(new Date()).day()==0){
     repo.switchRepo.getStats().then(res => {
@@ -927,6 +899,7 @@ function mailer(){
     console.log('send usage schedule mail')
   }
 }
+
 function handleOnForTracking(b,s,on) {
   console.log(">>>>>>>>>>>>>>>>>>>came here","on for tracking")
   initStats(b,s);
@@ -935,10 +908,8 @@ function handleOnForTracking(b,s,on) {
   current.on = on?on:moment().format();
   current.off = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
-  console.log(">>>>>>>>>>pending",pendingStats)
-  console.log(">>>>>>>>persisting",persisting)
   if(pendingStats.length&&!persisting){
-    persistUsage()
+    persistUsage(false)
   }
 }
 
@@ -954,8 +925,7 @@ function handleOffForTracking(b,s,off) {
   current.on=null;
   current.off=null;
   if(pendingStats.length && !persisting){
-  
-    persistUsage()
+    persistUsage(false)
   }
 
 }
