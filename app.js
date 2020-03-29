@@ -47,7 +47,7 @@ var statsRule = new schedule.RecurrenceRule();
 statsRule.minute = 1
  
 var j = schedule.scheduleJob(statsRule, function(){
-  console.log("#############################schedule log")
+ // console.log("#############################schedule log")
   console.log('Usage schedule');
   repo.switchRepo.getOnStats().then(res=>{
     let currentTime = moment(new Date())
@@ -72,19 +72,20 @@ var j = schedule.scheduleJob(statsRule, function(){
           //console.log('rtjjjj3')
           persisting=false;
           persistUsage();
+          usageSchedule = true;
 
 
         }
         return m;
       })
-      usageSchedule = true;
-      console.log("#############################schedule log end")
+      
+     // console.log("#############################schedule log end")
 
     }
   },err=>{
     console.log(err)
     console.log("usage schedule error")
-    console.log("#############################schedule log end")
+    //console.log("#############################schedule log end")
 
   })
 });
@@ -867,6 +868,7 @@ async function persistUsage(){
    })
   }else{
     if(usageSchedule){
+      console.log("day>>>>>>>>>>>>>>>>>",moment.getDay())
       usageSchedule = false;
       repo.switchRepo.getStats().then(res => {
         payload.switches = res;
@@ -893,6 +895,9 @@ async function persistUsage(){
 
         })
         socket.emit('sendMail',payload);
+        //get on stats 
+        //delete stats 
+        //persist on stats
       }, error => {
         payload.error = 'error sending weekly mail'
         socket.emit('usage', payload)
