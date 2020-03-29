@@ -64,7 +64,7 @@ var j = schedule.scheduleJob(statsRule, function(){
 
           stats[m.board][m.switch]={};
           handleOnForTracking(m.board,m.switch,m.lastOnTime)
-          //console.log('rtjjjj1')
+          console.log('rtjjjj1')
           handleOffForTracking(m.board,m.switch,moment(new Date()).format())
           //console.log('rtjjjj2')
 
@@ -82,6 +82,7 @@ var j = schedule.scheduleJob(statsRule, function(){
      // console.log("#############################schedule log end")
 
     }else{
+      console('calling mailer')
       mailer()
     }
   },err=>{
@@ -870,12 +871,13 @@ async function persistUsage(){
    })
   }else{
     if(usageSchedule){
+      usageSchedule = false;
+
      mailer()
     }
   }
 }
 function mailer(){
-  usageSchedule = false;
 
   console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
   if(moment(new Date()).day()==0){
