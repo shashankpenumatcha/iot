@@ -46,12 +46,13 @@ function error(error){
 }
 
 var statsRule = new schedule.RecurrenceRule();
-//statsRule.hour = 17;
-statsRule.minute = new schedule.Range(0, 59)
- 
+//statsRule.minute = new schedule.Range(0, 59)
+statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
+statsRule.hour = 23;
+statsRule.minute = 59;
+statsRule.second = 0;
 var j = schedule.scheduleJob(statsRule, function(){
   repo.switchRepo.getOnStats().then(res=>{
-    let currentTime = moment(new Date())
     if(res&&res.length){
       res.map(m=>{
         if(m.lastOnTime){
@@ -61,13 +62,19 @@ var j = schedule.scheduleJob(statsRule, function(){
           }
           persisting = true;
           stats[m.board][m.switch]={};
-       
-          /* handleOnForTracking(m.board,m.switch,m.lastOnTime)
-          handleOffForTracking(m.board,m.switch,moment(new Date()).format())
-          handleOnForTracking(m.board,m.switch) */
-          handleOnForTracking(m.board,m.switch,one)
+          let date =  moment();
+          if(date.hours()!=23&&(date.hours()==0||date.hours()==00||date.hours()==24)){
+            date = date.subtract(1, "days");
+          }
+          date = date.set({h:23,m:59})
+          handleOnForTracking(m.board,m.switch,m.lastOnTime)
+          handleOffForTracking(m.board,m.switch,date.format())
+          date = date.add(1,'days');
+          date = date.set({h:00,m:00})
+          handleOnForTracking(m.board,m.switch,date.format())
+        /*   handleOnForTracking(m.board,m.switch,one)
           handleOffForTracking(m.board,m.switch,two)
-          handleOnForTracking(m.board,m.switch,three)
+          handleOnForTracking(m.board,m.switch,three) */
           persisting=false;
           persistUsage(true);
         }
@@ -1057,9 +1064,9 @@ function initDevice(reinit){
           console.log('>>>>>>>>>>>>>>>>>>check this',state)
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
-/*             handleOffForTracking(board,$switch,null)
- */         
-            handleOffForTracking(board,$switch,'2020-03-31T05:00:10+05:30')
+            handleOffForTracking(board,$switch,null)
+         
+            //handleOffForTracking(board,$switch,'2020-03-31T05:00:10+05:30')
 
           }else{
             console.log('bad request - board or switch not found')
@@ -1076,9 +1083,9 @@ function initDevice(reinit){
           let $switch = msg.s;
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
-/*             handleOnForTracking(board,$switch,null)
- */
-            handleOnForTracking(board,$switch,'2020-03-31T00:15:10+05:30')
+            handleOnForTracking(board,$switch,null)
+
+            //handleOnForTracking(board,$switch,'2020-03-31T00:15:10+05:30')
           }else{
             console.log('bad request - board or switch not found')
           }
