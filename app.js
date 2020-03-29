@@ -762,7 +762,7 @@ async function persistUsage(){
     console.log("got by address - persistUsage()")  
     //console.log(res)  
     let s = null;
-    if(!s){
+
       try{
         s = await repo.switchRepo.getSwitchByAddress(current.b,current.s)
       }catch (e){
@@ -770,7 +770,7 @@ async function persistUsage(){
         console.log(e)
       }
 
-    }
+    
     
     if(!s){
       console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
@@ -811,9 +811,9 @@ async function persistUsage(){
         let currentWeek = moment(current.on).week()
        
         days.map(m=>{
-          if(lastWeek!=currentWeek){
+          /* if(lastWeek!=currentWeek){
             ob[m] = null;
-          }else if(!ob[m]){
+          }else */ if(!ob[m]){
             ob[m] = null;
           }
           return m;
