@@ -67,7 +67,7 @@ var j = schedule.scheduleJob(statsRule, function(){
           handleOnForTracking(m.board,m.switch) */
           handleOnForTracking(m.board,m.switch,one)
           handleOffForTracking(m.board,m.switch,two)
-          handleOnForTracking(m.board,three)
+          handleOnForTracking(m.board,m.switch,three)
           persisting=false;
           persistUsage(true);
         }
