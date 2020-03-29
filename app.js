@@ -811,9 +811,9 @@ async function persistUsage(){
         let currentWeek = moment(current.on).week()
        
         days.map(m=>{
-          /* if(lastWeek!=currentWeek){
+          if(lastWeek!=currentWeek){
             ob[m] = null;
-          }else */ if(!ob[m]){
+          }else if(!ob[m]){
             ob[m] = null;
           }
           return m;
