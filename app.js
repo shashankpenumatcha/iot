@@ -82,7 +82,7 @@ var j = schedule.scheduleJob(statsRule, function(){
      // console.log("#############################schedule log end")
 
     }else{
-      console('calling mailer')
+      console.log('calling mailer')
       mailer()
     }
   },err=>{
