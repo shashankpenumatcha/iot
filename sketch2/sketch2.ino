@@ -30,8 +30,8 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
-String id = "5e7e30efbc18ae2b38ff58d3";
-int pins[] = {BUILTIN_LED};
+String id = "5e886620ac891400f8e994bb";
+int pins[] = {BUILTIN_LED,5,4,12,13,14};
 StaticJsonDocument<200> doc;
 StaticJsonDocument<200> con;
 
@@ -108,10 +108,16 @@ void handleForm() {
 // the setup function runs once when you press reset or power the board
 void setup() {
  
-pinMode(0, INPUT_PULLUP);
+  pinMode(0, INPUT_PULLUP);
+  pinMode(BUILTIN_LED, OUTPUT);    
+  pinMode(5, OUTPUT);
+  pinMode(4, OUTPUT);     
+  pinMode(2, OUTPUT);  
+  pinMode(12, OUTPUT);     
+  pinMode(13, OUTPUT);     
+  pinMode(14, OUTPUT);     
 
-  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
-         digitalWrite(BUILTIN_LED, LOW);
+  digitalWrite(BUILTIN_LED, LOW);
 
   Serial.begin(9600);
   Serial.println("Setting up...");
@@ -131,9 +137,14 @@ pinMode(0, INPUT_PULLUP);
   };
   JsonArray switches = doc.createNestedArray("switches");
   switches.add(true);
-  if(NULL!=mqtt_server){
-           digitalWrite(BUILTIN_LED, HIGH);
+  switches.add(true);
+  switches.add(true);
+  switches.add(true);
+  switches.add(true);
+  switches.add(true);
 
+  if(NULL!=mqtt_server){
+    digitalWrite(BUILTIN_LED, HIGH);
     setup_wifi();
     setup_mqtt();
   }else{
@@ -231,6 +242,9 @@ void setup_wifi() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
+    if(digitalRead(0)==0){
+     reset();
+    }
   }
  
   Serial.println("");
