@@ -121,14 +121,14 @@ socket.on('update_wifi', function(msg){
   console.log(state.boards);
   if(state.boards){
     let _boards = Object.keys(state.boards);
-   /*  _boards.map(b=>{
+    _boards.map(b=>{
       console.log(b)
-      console.log(msg) */
-      //client.publish("penumats/"+"5e886620ac891400f8e994bb"+"/wifi",JSON.stringify(msg));
-      client.publish('penumats/handshake/reinitiate',"hiiiiii")
+      console.log(msg)
+      client.publish("penumats/"+b+"/switch/on",JSON.stringify({switch:0,state:true}));
+     // client.publish('penumats/handshake/reinitiate',"hiiiiii")
 
       //return b
-/*     }) */
+    }) 
   }
 
 });
