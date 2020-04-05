@@ -109,6 +109,21 @@ function auth(req,res,next){
 }
 
 
+
+socket.on('update_wifi', function(msg){
+  console.log("update wifi request received");
+  if(!msg||!msg.name||!msg.pass||!msg.socketId){
+    console.log('update wifi bad request')
+  }
+  const socketId = msg.socketId;
+  delete msg.socketId;
+  delete msg.device;
+  console.log('boards')
+  console.log(state.boards);
+  //client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
+
+});
+
   socket.on('connect', function(){
     console.log("connected to web sockets");
     if(client){

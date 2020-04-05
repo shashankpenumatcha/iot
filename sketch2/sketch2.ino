@@ -96,7 +96,7 @@ void handleForm() {
     
         setup_wifi();
         setup_mqtt();
-                digitalWrite(BUILTIN_LED, HIGH);
+        digitalWrite(BUILTIN_LED, HIGH);
 
     server.send(200, "text/plain", message);
     Serial.println("post 200 ok");
