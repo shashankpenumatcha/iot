@@ -120,7 +120,13 @@ socket.on('update_wifi', function(msg){
   delete msg.device;
   console.log('boards')
   console.log(state.boards);
-  //client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
+  if(state.boards){
+    let _boards = Object.keys(state.boards);
+    _boards.map(b=>{
+      client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
+      return b
+    })
+  }
 
 });
 
