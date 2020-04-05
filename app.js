@@ -117,7 +117,6 @@ socket.on('update_wifi', function(msg){
   }
   const socketId = msg.socketId;
   delete msg.socketId;
-  delete msg.device;
   console.log('boards')
   console.log(state.boards);
   if(state.boards){
