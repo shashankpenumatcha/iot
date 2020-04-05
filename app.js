@@ -112,7 +112,7 @@ function auth(req,res,next){
 
 socket.on('update_wifi', function(msg){
   console.log("update wifi request received");
-  if(!msg||!msg.name||!msg.pass||!msg.socketId){
+  if(!msg||!msg.name||!msg.password||!msg.socketId){
     console.log('update wifi bad request')
   }
   const socketId = msg.socketId;
