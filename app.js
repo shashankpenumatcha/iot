@@ -124,7 +124,9 @@ socket.on('update_wifi', function(msg){
    /*  _boards.map(b=>{
       console.log(b)
       console.log(msg) */
-      client.publish("penumats/"+"5e886620ac891400f8e994bb"+"/wifi",JSON.stringify(msg));
+      //client.publish("penumats/"+"5e886620ac891400f8e994bb"+"/wifi",JSON.stringify(msg));
+      client.publish('penumats/handshake/reinitiate',"hiiiiii")
+
       //return b
 /*     }) */
   }
