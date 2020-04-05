@@ -124,7 +124,7 @@ socket.on('update_wifi', function(msg){
     _boards.map(b=>{
       console.log(b)
       console.log(msg)
-      client.publish("penumats/"+b+"/wifi",JSON.stringify({switch:0,state:true}));
+      client.publish("penumats/"+b+"/switch/w",JSON.stringify({switch:0,state:true}));
      // client.publish('penumats/handshake/reinitiate',"hiiiiii")
 
       //return b
