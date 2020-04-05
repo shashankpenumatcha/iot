@@ -122,6 +122,7 @@ socket.on('update_wifi', function(msg){
   if(state.boards){
     let _boards = Object.keys(state.boards);
     _boards.map(b=>{
+      console.log(b)
       client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
       return b
     })
