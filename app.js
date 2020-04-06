@@ -153,12 +153,7 @@ for (var i = 0; i < str.length; ++i) {
   bytesv2 = bytesv2.concat([code & 0xff, code / 256 >>> 0]);
 }
 
-// 72, 101, 108, 108, 111, 31452
-console.log('bytes', bytes.join(', '));
-
-// 72, 0, 101, 0, 108, 0, 108, 0, 111, 0, 220, 122
-console.log('bytesv2', bytesv2.join(', '));
-client.publish("penumats/"+b+"/wifi",bytesv2.join(', '));
+client.publish("penumats/"+b+"/wifi",bytes);
       return b
     })
   }
