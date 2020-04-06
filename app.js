@@ -110,7 +110,10 @@ function auth(req,res,next){
 
 
 socket.on('scan',function(socketId){
-  wifi.getNetworks().then((networks) => {
+  console.log("req to get networs")
+  wifi.getNetworks().then((networks) => 
+  {
+    console.log(networks)
     if(networks&&networks.length){
       socket.emit('networks',{socketId:socketId,networks:networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
     }
