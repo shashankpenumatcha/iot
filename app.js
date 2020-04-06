@@ -109,6 +109,16 @@ function auth(req,res,next){
 }
 
 
+socket.on('scan',function(socketId){
+  wifi.getNetworks().then((networks) => {
+    if(networks&&networks.length){
+      socket.emit('networks',{socketId:socketId,networks:networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
+    }
+  },err=>{
+    socket.emit('networks',{socketId:socketId,error:'error while scanning netowrks'})
+  });
+})
+
 
 socket.on('update_wifi', function(msg){
   console.log("update wifi request received");
