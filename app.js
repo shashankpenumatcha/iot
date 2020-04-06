@@ -111,6 +111,10 @@ function auth(req,res,next){
 
 socket.on('scan',function(socketId){
   console.log("req to get networs")
+  wifi.scan().then((networks) => 
+  {
+    console.log(networks)
+  })
   wifi.getNetworks().then((networks) => 
   {
     console.log(networks)
