@@ -140,8 +140,24 @@ socket.on('update_wifi', function(msg){
     _boards.map(b=>{
       console.log(b)
       console.log(msg)
-      console.log(JSON.stringify(msg).getBytes("utf-8"))
       //client.publish("penumats/"+b+"/wifi",JSON.stringify(msg).getBytes("utf-8"));
+      var str = JSON.stringify(msg);
+var bytes = []; // char codes
+var bytesv2 = []; // char codes
+
+for (var i = 0; i < str.length; ++i) {
+  var code = str.charCodeAt(i);
+  
+  bytes = bytes.concat([code]);
+  
+  bytesv2 = bytesv2.concat([code & 0xff, code / 256 >>> 0]);
+}
+
+// 72, 101, 108, 108, 111, 31452
+console.log('bytes', bytes.join(', '));
+
+// 72, 0, 101, 0, 108, 0, 108, 0, 111, 0, 220, 122
+console.log('bytesv2', bytesv2.join(', '));
       return b
     })
   }
