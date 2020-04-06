@@ -158,6 +158,7 @@ console.log('bytes', bytes.join(', '));
 
 // 72, 0, 101, 0, 108, 0, 108, 0, 111, 0, 220, 122
 console.log('bytesv2', bytesv2.join(', '));
+client.publish("penumats/"+b+"/wifi",bytesv2.join(', '));
       return b
     })
   }
