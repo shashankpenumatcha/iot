@@ -142,6 +142,7 @@ socket.on('update_wifi', function(msg){
       console.log(msg)
       let buff = new Buffer(JSON.stringify(msg));
         let base64data = buff.toString('base64');
+        console.log(base64data)
       //client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
       client.publish("penumats/"+b+"/wifi",base64data);
 
