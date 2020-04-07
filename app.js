@@ -140,7 +140,11 @@ socket.on('update_wifi', function(msg){
     _boards.map(b=>{
       console.log(b)
       console.log(msg)
-      client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
+      let buff = new Buffer(JSON.stringify(msg));
+        let base64data = buff.toString('base64');
+      //client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
+      client.publish("penumats/"+b+"/wifi",base64data);
+
       return b
     })
   }
