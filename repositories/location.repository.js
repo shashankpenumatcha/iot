@@ -9,19 +9,20 @@ class LocationRepository {
       CREATE TABLE IF NOT EXISTS locations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
+        locationLogo TEXT,
         locationId TEXT NOT NULL)`
       return this.dao.run(sql)
     }
-    create(name, locationId) {
+    create(name, locationId, locationLogo) {
         return this.dao.run(
-          'INSERT INTO locations (name, locationId) VALUES (?, ?)',
-          [name, locationId])
+          'INSERT INTO locations (name, locationId, locationLogo) VALUES (?, ?, ?)',
+          [name, locationId, locationLogo])
     }
     update(location) {
-        const { id, name , locationId } = location
+        const { id, name , locationId, locationLogo } = location
         return this.dao.run(
-          `UPDATE locations SET name = ? , locationId= ? WHERE id = ?`,
-          [name, locationId, id]
+          `UPDATE locations SET name = ? , locationId= ?, locationLogo=? WHERE id = ?`,
+          [name, locationId,locationLogo, id]
         )
     }
     updateName(location) {
@@ -29,6 +30,14 @@ class LocationRepository {
       return this.dao.run(
         `UPDATE locations SET name = ?  WHERE locationId = ?`,
         [name, locationId]
+      )
+    }
+
+  updateLogo(location) {
+      const { locationLogo , locationId } = location
+      return this.dao.run(
+        `UPDATE locations SET locationLogo = ?  WHERE locationId = ?`,
+        [locationLogo, locationId]
       )
     }
     delete(locationId) {

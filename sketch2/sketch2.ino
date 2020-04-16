@@ -240,7 +240,7 @@ void setup_wifi() {
   WiFi.begin(wifiName, wifiPass);
  
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(5000);
     Serial.print(".");
     if(digitalRead(0)==0){
      reset();
@@ -298,15 +298,49 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println();
     int s = docx.getMember(String("switch"));
     int pin = pins[s];
+           char buffer[512];
+
     if(NULL!=pin){
        Serial.println("turning on switch");
        digitalWrite(pin, LOW);
        doc.getMember(String("switches"))[s]=true;
-       char buffer[512];
        size_t n = serializeJson(doc, buffer);
        client.publish("penumats/update",buffer,n);
        
      }
+  }
+
+   if(String(topic) == "penumats/"+id+"/wifi"){
+    StaticJsonDocument<256> docx;
+    deserializeJson(docx, payload, length);
+    String d = docx.getMember(String("device"));
+    String n = docx.getMember(String("name"));
+    String pass = docx.getMember(String("password"));
+    Serial.println("got wifi req");
+
+
+ /*    int pin = pins[s];
+    if(NULL!=pin){
+       Serial.println("turning on switch");
+       digitalWrite(pin, LOW);
+       doc.getMember(String("switches"))[s]=true;
+       size_t n = serializeJson(doc, buffer);
+       client.publish("penumats/update",buffer,n);
+       
+     } */
+
+        if(saveConfig(d,n,pass)){
+          Serial.println("saved config");
+         };
+        if(loadConfig()){
+        Serial.println("loaded config");
+    
+              delay(100);
+                 WiFi.disconnect(true);
+
+        setup_wifi();
+        setup_mqtt();
+        }
   }
   
   if(String(topic) == "penumats/"+id+"/switch/off"){
@@ -336,22 +370,35 @@ void reconnect() {
      Serial.println(id.c_str());
 
     Serial.print("Attempting MQTT connection...");
+      delay(5000);
+      if(digitalRead(0)==0){
+                      Serial.println("mqtt before  click");
+
+       reset();
+      }
     if (client.connect(id.c_str())) {
       Serial.println("connected");
       client.subscribe("penumats/handshake/reinitiate");
       client.subscribe(("penumats/"+id+"/switch/on").c_str());
       client.subscribe(("penumats/"+id+"/switch/off").c_str());
+            client.subscribe(("penumats/"+id+"/wifi").c_str());
+
       char buffer[512];
     size_t n = serializeJson(doc, buffer);
     client.publish("penumats/handshake/connect", buffer, n);
     client.publish("penumats/register", id.c_str());
     } else {
-      Serial.println();
+      Serial.println("before");
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
+      if(digitalRead(0)==0){
+              Serial.println("mqtt fail click");
+
+       reset();
+      }
     }
   }
 }

@@ -68,7 +68,7 @@ class SwitchRepository {
     }
     
     getLocations() {
-      return this.dao.all(`select switches.id,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationId`)
+      return this.dao.all(`select switches.id,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId, locations.locationLogo from switches join locations on locations.id = switches.locationId`)
     }
 
     getStats() {

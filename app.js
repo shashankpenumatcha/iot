@@ -353,7 +353,7 @@ socket.on('update_wifi', function(msg){
           });
       }
     }
-    repo.locationRepo.create(location.name, location.locationId).then(res=>{
+    repo.locationRepo.create(location.name, location.locationId,location.locationLogo).then(res=>{
       console.log(`Room  created with id #${res.id}`);
       if(switchesArray.length){
         Promise.all(switchesArray.map((s) => {
