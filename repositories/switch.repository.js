@@ -9,6 +9,7 @@ class SwitchRepository {
       CREATE TABLE IF NOT EXISTS switches (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
+        switchLogo TEXT,
         board TEXT NOT NULL,
         switch INTEGER NOT NULL,
         locationId INTEGER,
@@ -16,22 +17,23 @@ class SwitchRepository {
           REFERENCES locations(id) ON UPDATE CASCADE ON DELETE CASCADE)`
       return this.dao.run(sql)
     }
-    create(name, board, swtch, locationId) {
+    create(name, board, swtch, locationId,switchLogo) {
         return this.dao.run(
-          `INSERT INTO switches (name, board, switch, locationId)
+          `INSERT INTO switches (name, board, switch, switchLogo, locationId)
             VALUES (?, ?, ?, ?)`,
-          [name, board, swtch, locationId])
+          [name, board, swtch,switchLogo, locationId])
     }
     update(swtch) {
-        const { id, name, board, sw, locationId } = swtch
+        const { id, name, board, sw, locationId, switchLogo } = swtch
         return this.dao.run(
           `UPDATE switches
           SET name = ?,
             board = ?,
             swtch = ?,
-            locationId = ?
+            locationId = ?,
+            switchLogo ?
           WHERE id = ?`,
-          [name, board, sw, locationId, id]
+          [name, board, sw, locationId,switchLogo, id]
         )
     }
     updateName(swtch) {
@@ -42,6 +44,14 @@ class SwitchRepository {
         [name,id]
       )
   }
+  updateLogo(swtch) {
+    const { id, switchLogo } = swtch
+    return this.dao.run(
+      `UPDATE switchLogo
+      SET switchLogo = ? WHERE id = ?`,
+      [switchLogo,id]
+    )
+}
     delete(id) {
         return this.dao.run(
           `DELETE FROM switches WHERE id = ?`,
@@ -68,7 +78,7 @@ class SwitchRepository {
     }
     
     getLocations() {
-      return this.dao.all(`select switches.id,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId, locations.locationLogo from switches join locations on locations.id = switches.locationId`)
+      return this.dao.all(`select switches.id,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId, locations.locationLogo, switches.switchLogo from switches join locations on locations.id = switches.locationId`)
     }
 
     getStats() {

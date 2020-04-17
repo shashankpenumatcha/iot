@@ -231,6 +231,23 @@ socket.on('update_wifi', function(msg){
     })
   });
 
+  socket.on('editSwitchLogo',function(msg){
+    console.log('editSwitch Logo request')
+    if(!msg || !msg.switch || !msg.switch.switchLogo || !msg.switch.id){
+      console.log('bad request from device')
+      return socket.emit('editSwitch',{error:'bad request from editswitchLogo device',socket:msg.socket});
+    }
+    repo.switchRepo.updateLogo(msg.switch).then(res=>{
+      console.log(`switchLogo updated`);
+      socket.emit('editedSwitchLogo',{switch:msg.switch, socket:msg.socket});
+    },err=>{
+      console.log('error while editing switchLogo')
+      console.log(err);
+      socket.emit('editedSwitchLogo',{error:'error while editing switchLogo',socket:msg.socket});
+
+    })
+  });
+
   socket.on('editLocationName',function(msg){
     console.log('edit location name request')
     if(!msg || !msg.location || !msg.location.name){
@@ -377,7 +394,7 @@ socket.on('update_wifi', function(msg){
         Promise.all(switchesArray.map((s) => {
          // console.log(s)
           
-          return repo.switchRepo.create(s.label, s.b, s.i, res.id)
+          return repo.switchRepo.create(s.label, s.b, s.i, res.id,s.switchLogo)
         })).then( r=> {
           socket.emit('locationAdded', {deviceId: deviceId, name: location.name, socketId: location.socketId})
         }, e => {
