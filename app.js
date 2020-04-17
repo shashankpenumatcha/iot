@@ -248,6 +248,23 @@ socket.on('update_wifi', function(msg){
     })
   });
 
+  socket.on('editLocationLogo',function(msg){
+    console.log('edit location logo request')
+    if(!msg || !msg.location || !msg.location.locationLogo){
+      console.log('bad request from device')
+      socket.emit('editedLocationLogo',{error:'bad request from device',socket:msg.socket});
+    }
+    repo.locationRepo.updateLogo(msg.location).then(res=>{
+      console.log(`location Logo updated`);
+      socket.emit('editedLocationLogo',{locationLogo:msg.location.locationLogo,socket:msg.socket});
+    },err=>{
+      console.log('error while editing location Logo')
+      console.log(err);
+      socket.emit('editedLocationLogo',{error:'error while editing location Logo',socket:msg.socket});
+
+    })
+  });
+
   socket.on('deleteSwitch',function(msg){
     console.log('delete switch request')
     if(!msg || !msg.switch || !msg.switch.id){
