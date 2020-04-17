@@ -251,7 +251,7 @@ socket.on('update_wifi', function(msg){
   socket.on('editLocationLogo',function(msg){
     console.log('edit location logo request')
     console.log(msg)
-    if(!msg || !msg.location || !msg.location.locationLogo){
+    if(!msg || !msg.location || msg.location.locationLogo == undefined){
       console.log('bad request from device')
       return socket.emit('editedLocationLogo',{error:'bad request from device',socket:msg.socket});
     }
