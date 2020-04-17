@@ -218,7 +218,7 @@ socket.on('update_wifi', function(msg){
     console.log('editSwitch name request')
     if(!msg || !msg.switch || !msg.switch.name || !msg.switch.id){
       console.log('bad request from device')
-      socket.emit('editSwitch',{error:'bad request from editSwitch device',socket:msg.socket});
+      return socket.emit('editSwitch',{error:'bad request from editSwitch device',socket:msg.socket});
     }
     repo.switchRepo.updateName(msg.switch).then(res=>{
       console.log(`switch name updated`);
@@ -235,7 +235,7 @@ socket.on('update_wifi', function(msg){
     console.log('edit location name request')
     if(!msg || !msg.location || !msg.location.name){
       console.log('bad request from device')
-      socket.emit('editedLocationName',{error:'bad request from device',socket:msg.socket});
+      return socket.emit('editedLocationName',{error:'bad request from device',socket:msg.socket});
     }
     repo.locationRepo.updateName(msg.location).then(res=>{
       console.log(`location name updated`);
@@ -250,9 +250,10 @@ socket.on('update_wifi', function(msg){
 
   socket.on('editLocationLogo',function(msg){
     console.log('edit location logo request')
+    console.log(msg)
     if(!msg || !msg.location || !msg.location.locationLogo){
       console.log('bad request from device')
-      socket.emit('editedLocationLogo',{error:'bad request from device',socket:msg.socket});
+      return socket.emit('editedLocationLogo',{error:'bad request from device',socket:msg.socket});
     }
     repo.locationRepo.updateLogo(msg.location).then(res=>{
       console.log(`location Logo updated`);
