@@ -20,7 +20,7 @@ class SwitchRepository {
     create(name, board, swtch, locationId,switchLogo) {
         return this.dao.run(
           `INSERT INTO switches (name, board, switch, switchLogo, locationId)
-            VALUES (?, ?, ?, ?)`,
+            VALUES (?, ?, ?, ?,?)`,
           [name, board, swtch,switchLogo, locationId])
     }
     update(swtch) {
