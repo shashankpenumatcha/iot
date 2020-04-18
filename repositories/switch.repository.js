@@ -47,7 +47,7 @@ class SwitchRepository {
   updateLogo(swtch) {
     const { id, switchLogo } = swtch
     return this.dao.run(
-      `UPDATE switchLogo
+      `UPDATE switches
       SET switchLogo = ? WHERE id = ?`,
       [switchLogo,id]
     )
