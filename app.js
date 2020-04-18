@@ -335,7 +335,7 @@ socket.on('update_wifi', function(msg){
             if(switches && switches.length){
               console.log('switches loop to create promise')
               switches.map(s => {
-                let swtch = {i:s , b: m, label: msg.boards[m][s].label}
+                let swtch = {i:s , b: m, label: msg.boards[m][s].label, switchLogo:msg.switchLogo}
                 switchesArray.push(swtch);
                 return swtch
               })
@@ -350,7 +350,7 @@ socket.on('update_wifi', function(msg){
         Promise.all(switchesArray.map((s) => {
          // console.log(s)
           
-          return repo.switchRepo.create(s.label, s.b, s.i, res.id)
+          return repo.switchRepo.create(s.label, s.b, s.i, res.id, s.switchLogo)
         })).then( r=> {
           socket.emit('switchesAdded', {deviceId: deviceId, name: msg.name, socketId: msg.socketId, location:msg.location})
         }, e => {
