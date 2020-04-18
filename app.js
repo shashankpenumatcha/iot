@@ -46,10 +46,10 @@ function error(error){
 }
 
 var statsRule = new schedule.RecurrenceRule();
-statsRule.minute = new schedule.Range(0, 59)
-/* statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
+//statsRule.minute = new schedule.Range(0, 59)
+statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
 statsRule.hour = 23;
-statsRule.minute = 59; */
+statsRule.minute = 59;
 statsRule.second = 0;
 var j = schedule.scheduleJob(statsRule, function(){
   repo.switchRepo.getOnStats().then(res=>{
@@ -842,13 +842,13 @@ async function persistUsage(us){
     console.log(e)
   }
   if(!s){
-   // console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
+    console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
     return persistUsage(us)
   }
     if(!res){
-    //  console.log(">>>>>>>>>>>>>>>>>>>>>","no usage persistUsage()")
+      console.log(">>>>>>>>>>>>>>>>>>>>>","no usage persistUsage()")
       if(!current.off){
-    //    console.log(">>>>>>>>>>>>>>>>>>>>>","no usage no off persistUsage()")
+        console.log(">>>>>>>>>>>>>>>>>>>>>","no usage no off persistUsage()")
 
         try{
           console.log('creating usage from switch')
@@ -865,7 +865,7 @@ async function persistUsage(us){
         }
       }
     }else{
-     // console.log(">>>>>>>>>>>>>>>>>>>>>","got usage persistUsage()")
+      console.log(">>>>>>>>>>>>>>>>>>>>>","got usage persistUsage()")
 
       let ob = res
 
@@ -927,13 +927,11 @@ async function persistUsage(us){
 
     persisting =false;
   if(pendingStats.length){
-    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
    setTimeout(function(){
     persistUsage(us)
    })
   }else{
     if(us){
-      console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
       usageSchedule = false;
 
      mailer()
@@ -945,8 +943,7 @@ async function persistUsage(us){
 
 function mailer(){
   console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
-  
-  if(moment(new Date()).day()==0){
+  if(moment(new Date()).day()==1){
     repo.switchRepo.getStats().then(res => {
       let payload = {};
       payload.switches = res;
