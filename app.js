@@ -842,13 +842,13 @@ async function persistUsage(us){
     console.log(e)
   }
   if(!s){
-    console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
+   // console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
     return persistUsage(us)
   }
     if(!res){
-      console.log(">>>>>>>>>>>>>>>>>>>>>","no usage persistUsage()")
+    //  console.log(">>>>>>>>>>>>>>>>>>>>>","no usage persistUsage()")
       if(!current.off){
-        console.log(">>>>>>>>>>>>>>>>>>>>>","no usage no off persistUsage()")
+    //    console.log(">>>>>>>>>>>>>>>>>>>>>","no usage no off persistUsage()")
 
         try{
           console.log('creating usage from switch')
@@ -865,7 +865,7 @@ async function persistUsage(us){
         }
       }
     }else{
-      console.log(">>>>>>>>>>>>>>>>>>>>>","got usage persistUsage()")
+     // console.log(">>>>>>>>>>>>>>>>>>>>>","got usage persistUsage()")
 
       let ob = res
 
@@ -927,11 +927,13 @@ async function persistUsage(us){
 
     persisting =false;
   if(pendingStats.length){
+    console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
    setTimeout(function(){
     persistUsage(us)
    })
   }else{
     if(us){
+      console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
       usageSchedule = false;
 
      mailer()
