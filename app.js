@@ -46,10 +46,10 @@ function error(error){
 }
 
 var statsRule = new schedule.RecurrenceRule();
-//statsRule.minute = new schedule.Range(0, 59)
-statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
+statsRule.minute = new schedule.Range(0, 59)
+/* statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
 statsRule.hour = 23;
-statsRule.minute = 59;
+statsRule.minute = 59; */
 statsRule.second = 0;
 var j = schedule.scheduleJob(statsRule, function(){
   repo.switchRepo.getOnStats().then(res=>{
