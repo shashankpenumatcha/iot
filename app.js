@@ -945,7 +945,8 @@ async function persistUsage(us){
 
 function mailer(){
   console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
-  if(moment(new Date()).day()==1){
+  
+  if(moment(new Date()).day()==0){
     repo.switchRepo.getStats().then(res => {
       let payload = {};
       payload.switches = res;
