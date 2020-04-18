@@ -335,7 +335,7 @@ socket.on('update_wifi', function(msg){
             if(switches && switches.length){
               console.log('switches loop to create promise')
               switches.map(s => {
-                let swtch = {i:s , b: m, label: msg.boards[m][s].label, switchLogo:msg.switchLogo}
+                let swtch = {i:s , b: m, label: msg.boards[m][s].label, switchLogo: msg.boards[m][s].switchLogo}
                 switchesArray.push(swtch);
                 return swtch
               })
