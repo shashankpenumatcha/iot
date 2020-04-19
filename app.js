@@ -874,7 +874,7 @@ async function persistUsage(us){
           if(currentWeekusage&&currentWeekusage.length){
             let ob = currentWeekusage[0];
             ob.lastOnTime=current.on;
-            ob.switchId = parseInt(res.switchId);
+            ob.switchId = parseInt(ob.switchId);
             ob.week = current.onweek.toString();
             try{
               let updatedUsage = await repo.usageRepository.update(ob);
@@ -914,7 +914,7 @@ async function persistUsage(us){
             }else {
               ob[days[day]] = (moment.duration(ob[days[day]]).add(moment.duration(currentDifference))).toJSON();
             }
-            ob.switchId = parseInt(res.switchId);
+            ob.switchId = parseInt(ob.switchId);
             ob.lastOnTime = null;
             ob.week = current.onweek.toString();
             console.log("@@@@@@@@@@@@@@@@@@@@@")
