@@ -868,8 +868,6 @@ async function persistUsage(us){
         }  */
       //on unexpected power off usage will be lost, because we're replacing on time
       if(!current.off){
-        console.log('$$$$$$$$$$$$$$$$')
-        console.log(res)
           let currentWeekusage = res.filter(f=>f.week == current.onweek);
           if(currentWeekusage&&currentWeekusage.length){
             let ob = currentWeekusage[0];
@@ -896,14 +894,8 @@ async function persistUsage(us){
           }
         
       }else{
-        console.log(">>>>>>>>>>>>>>>current off with existing usage")
         if(current.offweek==current.onweek){
-          console.log(">>>>>>>>>>>>>>>current off with existing usage off week same as on week")
-
           let currentWeekusage = res.filter(f=>f.week == current.onweek);
-          console.log(">>>>>>>>>>>>>>>current week usage")
-          console.log(currentWeekusage)
-
           if(currentWeekusage&&currentWeekusage.length){
             let ob = currentWeekusage[0];
             var duration = moment.duration(moment(current.off).diff(moment(current.on)));
@@ -917,8 +909,6 @@ async function persistUsage(us){
             ob.switchId = parseInt(ob.switchId);
             ob.lastOnTime = null;
             ob.week = current.onweek.toString();
-            console.log("@@@@@@@@@@@@@@@@@@@@@")
-            console.log(ob)
             try{
               let updatedUsage = await repo.usageRepository.update(ob);
             }catch(e){
