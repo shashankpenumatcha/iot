@@ -88,7 +88,7 @@ class SwitchRepository {
 
     getOnStats(week) {
       return this.dao.all(`select u.id, u.lastOnTime, u.switchId,u.monday,u.tuesday,u.wednesday,u.thursday,u.friday,u.saturday,u.sunday,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationId
-       join usage u on u.switchId = switches.id where u.lastOnTime IS NOT NULL AND week = ?`,[week])
+       join usage u on u.switchId = switches.id where u.lastOnTime IS NOT NULL AND u.week = ?`,[week])
     }
   }
   
