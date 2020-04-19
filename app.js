@@ -917,6 +917,8 @@ async function persistUsage(us){
             ob.switchId = parseInt(res.switchId);
             ob.lastOnTime = null;
             ob.week = current.onweek
+            console.log("@@@@@@@@@@@@@@@@@@@@@")
+            console.log(ob)
             try{
               let updatedUsage = await repo.usageRepository.update(ob);
             }catch(e){
