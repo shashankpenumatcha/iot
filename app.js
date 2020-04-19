@@ -845,7 +845,7 @@ async function persistUsage(us){
           let ob={}
           ob.lastOnTime = current.on;
           ob.switchId = s.id;
-          ob.week = current.onweek;
+          ob.week = current.onweek.toString();
           let usage = await repo.usageRepository.create(ob)
         }catch (e){
           console.log('error while creating usage')
@@ -875,7 +875,7 @@ async function persistUsage(us){
             let ob = currentWeekusage[0];
             ob.lastOnTime=current.on;
             ob.switchId = parseInt(res.switchId);
-            ob.week = current.onweek;
+            ob.week = current.onweek.toString();
             try{
               let updatedUsage = await repo.usageRepository.update(ob);
             }catch(e){
@@ -916,7 +916,7 @@ async function persistUsage(us){
             }
             ob.switchId = parseInt(res.switchId);
             ob.lastOnTime = null;
-            ob.week = current.onweek
+            ob.week = current.onweek.toString();
             console.log("@@@@@@@@@@@@@@@@@@@@@")
             console.log(ob)
             try{
