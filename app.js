@@ -44,15 +44,18 @@ let three =  '2020-03-31T00:00:10+05:30';
 function error(error){
   return {"error":error};
 }
-
 var statsRule = new schedule.RecurrenceRule();
 //statsRule.minute = new schedule.Range(0, 59)
 statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
-statsRule.hour = 23;
-statsRule.minute = 59;
+statsRule.hour = 0;
+statsRule.minute = 10;
 statsRule.second = 0;
-/* var j = schedule.scheduleJob(statsRule, function(){
-  repo.switchRepo.getOnStats().then(res=>{
+let usageScheduleDate =  moment();
+usageScheduleDate = usageScheduleDate.subtract(1, "days");
+usageScheduleDate = usageScheduleDate.set({h:23,m:59})
+let usageScheduleWeek = usageScheduleDate.week();
+var j = schedule.scheduleJob(statsRule, function(){
+  repo.switchRepo.getOnStats(usageScheduleWeek).then(res=>{
     if(res&&res.length){
       res.map(m=>{
         if(m.lastOnTime){
@@ -62,30 +65,23 @@ statsRule.second = 0;
           }
           persisting = true;
           stats[m.board][m.switch]={};
-          let date =  moment();
-          if(date.hours()!=23&&(date.hours()==0||date.hours()==00||date.hours()==24)){
-            date = date.subtract(1, "days");
-          }
-          date = date.set({h:23,m:59})
           handleOnForTracking(m.board,m.switch,m.lastOnTime)
-          handleOffForTracking(m.board,m.switch,date.format())
-          date = date.add(1,'days');
-          date = date.set({h:00,m:00})
-          handleOnForTracking(m.board,m.switch,date.format())
+          handleOffForTracking(m.board,m.switch,usageScheduleDate.format())
+          usageScheduleDate = usageScheduleDate.add(1,'days');
+          usageScheduleDate = usageScheduleDate.set({h:00,m:00})
+          handleOnForTracking(m.board,m.switch,usageScheduleDate.format())
           persisting=false;
           persistUsage(true);
         }
         return m;
       })
-    }else{
-      console.log('calling mailer')
-      mailer()
     }
+    
   },err=>{
     console.log(err)
     console.log("usage schedule error")
   })
-}); */
+});
 
 
 
