@@ -47,12 +47,14 @@ function error(error){
 var statsRule = new schedule.RecurrenceRule();
 //statsRule.minute = new schedule.Range(0, 59)
 statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
-statsRule.hour = 0;
-statsRule.minute = 58;
+statsRule.hour = 1;
+statsRule.minute = 8;
 statsRule.second = 0;
 let usageScheduleDate =  moment();
 usageScheduleDate = usageScheduleDate.subtract(1, "days");
 usageScheduleDate = usageScheduleDate.set({h:23,m:59})
+usageScheduleDatenext = usageScheduleDate.add(1,'days');
+usageScheduleDatenext = usageScheduleDate.set({h:00,m:00})
 let usageScheduleWeek = usageScheduleDate.week();
 var j = schedule.scheduleJob(statsRule, function(){
   console.log(":::::::::::::::::::::::usage schedule rule every night")
@@ -70,14 +72,13 @@ var j = schedule.scheduleJob(statsRule, function(){
           stats[m.board][m.switch]={};
           handleOnForTracking(m.board,m.switch,m.lastOnTime)
           handleOffForTracking(m.board,m.switch,usageScheduleDate.format())
-          usageScheduleDate = usageScheduleDate.add(1,'days');
-          usageScheduleDate = usageScheduleDate.set({h:00,m:00})
-          handleOnForTracking(m.board,m.switch,usageScheduleDate.format())
+          handleOnForTracking(m.board,m.switch,usageScheduleDatenext.format())
           persisting=false;
-          persistUsage(true);
+       
         }
         return m;
       })
+      persistUsage(true);
     }
     
   },err=>{
