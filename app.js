@@ -868,6 +868,8 @@ async function persistUsage(us){
         }  */
       //on unexpected power off usage will be lost, because we're replacing on time
       if(!current.off){
+        console.log($$$$$$$$$$$$$$$$)
+        console.log(res)
           let currentWeekusage = res.filter(f=>f.week == current.onweek);
           if(currentWeekusage&&currentWeekusage.length){
             let ob = currentWeekusage[0];
