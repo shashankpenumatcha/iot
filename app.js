@@ -55,8 +55,11 @@ usageScheduleDate = usageScheduleDate.subtract(1, "days");
 usageScheduleDate = usageScheduleDate.set({h:23,m:59})
 let usageScheduleWeek = usageScheduleDate.week();
 var j = schedule.scheduleJob(statsRule, function(){
+  console.log(":::::::::::::::::::::::usage schedule rule every night")
   repo.switchRepo.getOnStats(usageScheduleWeek).then(res=>{
     if(res&&res.length){
+      console.log(":::::::::::::::::::::::usage schedule rule every night switch count:"+res.length)
+
       res.map(m=>{
         if(m.lastOnTime){
           usageSchedule = true;
