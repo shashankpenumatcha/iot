@@ -17,18 +17,19 @@ class UsageRepository {
         sunday TEXT,
         lastOnTime TEXT,
         switchId TEXT NOT NULL,
+        week TEXT NOT NULL,
         CONSTRAINT usage_switch_fk_switchId FOREIGN KEY (switchId)
         REFERENCES switches(id) ON UPDATE CASCADE ON DELETE CASCADE)`
       return this.dao.run(sql)
     }
     create(usage) {
-      const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId} = usage;
+      const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,week} = usage;
         return this.dao.run(
-          'INSERT INTO usage (monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId) VALUES (?, ?,?,?,?,?,?,?,?)',
-          [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId])
+          'INSERT INTO usage (monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,week) VALUES (?, ?,?,?,?,?,?,?,?,?)',
+          [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,week])
     }
     update(usage) {
-      const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId} = usage;
+      const {monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,week} = usage;
         return this.dao.run(
           `UPDATE usage SET monday =? , 
           tuesday =?, 
@@ -38,8 +39,8 @@ class UsageRepository {
           saturday = ?,
           sunday = ?,
           lastOnTime = ? 
-           WHERE switchId = ?`,
-          [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId])
+           WHERE switchId = ? AND week = ?`,
+          [monday,tuesday,wednesday,thursday,friday,saturday,sunday,lastOnTime,switchId,week])
     }
     patch(usage,id) {
       let keys = Object.keys(usage);

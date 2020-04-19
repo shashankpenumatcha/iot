@@ -51,7 +51,7 @@ statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
 statsRule.hour = 23;
 statsRule.minute = 59;
 statsRule.second = 0;
-var j = schedule.scheduleJob(statsRule, function(){
+/* var j = schedule.scheduleJob(statsRule, function(){
   repo.switchRepo.getOnStats().then(res=>{
     if(res&&res.length){
       res.map(m=>{
@@ -72,9 +72,6 @@ var j = schedule.scheduleJob(statsRule, function(){
           date = date.add(1,'days');
           date = date.set({h:00,m:00})
           handleOnForTracking(m.board,m.switch,date.format())
-        /*   handleOnForTracking(m.board,m.switch,one)
-          handleOffForTracking(m.board,m.switch,two)
-          handleOnForTracking(m.board,m.switch,three) */
           persisting=false;
           persistUsage(true);
         }
@@ -88,7 +85,7 @@ var j = schedule.scheduleJob(statsRule, function(){
     console.log(err)
     console.log("usage schedule error")
   })
-});
+}); */
 
 
 
@@ -773,7 +770,6 @@ function processSchedules(schedules) {
                   endRule.second = parseInt(s.end.split(":")[2]);
                   if(s.days){
                     endRule.dayOfWeek =  s.days.split(',').map(m=>parseInt(m));
-          
                   }
                   activeSchedules[sk][swk].off  = schedule.scheduleJob(endRule, function(){
                     console.log('rule off');
@@ -833,7 +829,6 @@ async function persistUsage(us){
     console.log(e)
    return  persistUsage(us)
   }
-  console.log("got by address - persistUsage()")  
   let s = null;
   try{
     s = await repo.switchRepo.getSwitchByAddress(current.b,current.s)
@@ -842,101 +837,100 @@ async function persistUsage(us){
     console.log(e)
   }
   if(!s){
-    console.log(">>>>>>>>>>>>>>>>>>>>>","no switch persistUsage()")
     return persistUsage(us)
   }
     if(!res){
-      console.log(">>>>>>>>>>>>>>>>>>>>>","no usage persistUsage()")
       if(!current.off){
-        console.log(">>>>>>>>>>>>>>>>>>>>>","no usage no off persistUsage()")
-
         try{
-          console.log('creating usage from switch')
-        //  console.log(s)
           let ob={}
           ob.lastOnTime = current.on;
           ob.switchId = s.id;
+          ob.week = current.onweek;
           let usage = await repo.usageRepository.create(ob)
-          console.log('created usage')
-         // console.log(usage)
         }catch (e){
           console.log('error while creating usage')
           console.log(e)
         }
       }
     }else{
-      console.log(">>>>>>>>>>>>>>>>>>>>>","got usage persistUsage()")
-
-      let ob = res
-
-     if(res.lastOnTime){
-        let lastWeek = moment(res.lastOnTime).week()
-        let currentWeek = moment(current.on).week()
-        days.map(m=>{
-          if(lastWeek!=currentWeek && !us){
-            ob[m] = null;
-          }else if(!ob[m]){
-            ob[m] = null;
-          }
-          return m;
-        });
-
-      } 
-
-
+      /*let ob = res
+      if(res.lastOnTime){
+          let lastWeek = moment(res.lastOnTime).week()
+          let currentWeek = moment(current.on).week()
+          days.map(m=>{
+            if(lastWeek!=currentWeek && !us){
+              ob[m] = null;
+            }else if(!ob[m]){
+              ob[m] = null;
+            }
+            return m;
+          });
+        }  */
+      //on unexpected power off usage will be lost, because we're replacing on time
       if(!current.off){
-        console.log("no off time in current")
-     
-          ob.lastOnTime=current.on;
-          ob.switchId = parseInt(res.switchId);
-
-          try{
-            console.log('persisting usage -update- no off in current')
-            let updatedUsage = await repo.usageRepository.update(ob);
-           // console.log(updatedUsage)
-          }catch(e){
-            console.log('error while - persisting usage -update- no off in current')
-            console.log(e)
+          let currentWeekusage = res.filter(f=>f.week == current.onweek);
+          if(currentWeekusage&&currentWeekusage.length){
+            let ob = currentWeekusage[0];
+            ob.lastOnTime=current.on;
+            ob.switchId = parseInt(res.switchId);
+            ob.week = current.onweek;
+            try{
+              let updatedUsage = await repo.usageRepository.update(ob);
+            }catch(e){
+              console.log('error while - persisting usage -update- no off in current')
+              console.log(e)
+            }
+          }else{
+            try{
+              let ob={}
+              ob.lastOnTime = current.on;
+              ob.switchId = s.id;
+              ob.week = current.onweek;
+              let usage = await repo.usageRepository.create(ob)
+            }catch (e){
+              console.log('error while creating usage')
+              console.log(e)
+            }
           }
         
       }else{
-        console.log("off time present in current")
-        var duration = moment.duration(moment(current.off).diff(moment(current.on)));
-        let currentDifference = duration.toJSON();
-        let day = moment(current.on).day();
-       // console.log(day)
-       // console.log(days[day])
-        if(!ob[days[day]]){
-          ob[days[day]] = currentDifference;
-        }else {
-          ob[days[day]] = (moment.duration(ob[days[day]]).add(moment.duration(currentDifference))).toJSON();
-        }
-        ob.switchId = parseInt(res.switchId);
-        ob.lastOnTime = null;
-        try{
-          console.log('persisting usage -update-  off in current')
-          let updatedUsage = await repo.usageRepository.update(ob);
-         // console.log(updatedUsage)
-        }catch(e){
-          console.log('error while - persisting usage -update-  off in current')
-          console.log(e)
+        if(current.offweek==current.onweek){
+          let currentWeekusage = res.filter(f=>f.week == current.onweek);
+          if(currentWeekusage&&currentWeekusage.length){
+            let ob = currentWeekusage[0];
+            var duration = moment.duration(moment(current.off).diff(moment(current.on)));
+            let currentDifference = duration.toJSON();
+            let day = moment(current.on).day();
+            if(!ob[days[day]]){
+              ob[days[day]] = currentDifference;
+            }else {
+              ob[days[day]] = (moment.duration(ob[days[day]]).add(moment.duration(currentDifference))).toJSON();
+            }
+            ob.switchId = parseInt(res.switchId);
+            ob.lastOnTime = null;
+            ob.week = current.onweek
+            try{
+              let updatedUsage = await repo.usageRepository.update(ob);
+            }catch(e){
+              console.log('error while - persisting usage -update-  off in current')
+              console.log(e)
+            }
+          }
         }
       }
-
     }
-
     persisting =false;
-  if(pendingStats.length){
-   setTimeout(function(){
-    persistUsage(us)
-   })
-  }else{
-    if(us){
-      usageSchedule = false;
+    if(pendingStats.length){
+    setTimeout(function(){
+      persistUsage(us)
+    })
+    }/* else{
+      if(us){
+        usageSchedule = false;
 
-     mailer()
-    }
-  }
+      mailer()
+      }
+    } */
 }
 
 
@@ -1004,12 +998,13 @@ function mailer(){
 }
 
 function handleOnForTracking(b,s,on) {
-  console.log(">>>>>>>>>>>>>>>>>>>came here","on for tracking")
   initStats(b,s);
   let current = stats[b][s].current;
   let pending = stats[b][s].pending;
   current.on = on?on:moment().format();
   current.off = null;
+  current.onweek = new moment(current.on).week();
+  current.offweek = null;
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   if(pendingStats.length&&!persisting){
     persistUsage(false)
@@ -1024,9 +1019,12 @@ function handleOffForTracking(b,s,off) {
     return
   }
   current.off = off?off:moment().format();
+  current.offweek = new moment(current.off).week();
   pendingStats.push(JSON.parse(JSON.stringify(current)));
   current.on=null;
   current.off=null;
+  current.onweek = null;
+  current.offweek = null;
   if(pendingStats.length && !persisting){
     persistUsage(false)
   }
@@ -1139,13 +1137,9 @@ function initDevice(reinit){
         }else{
           let board = msg.b;
           let $switch = msg.s;
-          console.log('>>>>>>>>>>>>>>>>>>check this',state)
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/off",JSON.stringify({switch:parseInt($switch),state:false}));
             handleOffForTracking(board,$switch,null)
-         
-            //handleOffForTracking(board,$switch,'2020-03-31T05:00:10+05:30')
-
           }else{
             console.log('bad request - board or switch not found')
           }
@@ -1155,15 +1149,11 @@ function initDevice(reinit){
         if(!msg||!msg.b||msg.s==undefined||msg.s==null){
           console.log('bad request')
         }else{
-          console.log('>>>>>>>>>>>>>>>>>>check this',state)
-
           let board = msg.b;
           let $switch = msg.s;
           if(state.boards[board]&&state.boards[board].switches!=undefined&&state.boards[board].switches[$switch]!=undefined){
             client.publish("penumats/"+board+"/switch/on",JSON.stringify({switch:parseInt($switch),state:true}));
             handleOnForTracking(board,$switch,null)
-
-            //handleOnForTracking(board,$switch,'2020-03-31T00:15:10+05:30')
           }else{
             console.log('bad request - board or switch not found')
           }
