@@ -894,8 +894,14 @@ async function persistUsage(us){
           }
         
       }else{
+        console.log(">>>>>>>>>>>>>>>current off with existing usage")
         if(current.offweek==current.onweek){
+          console.log(">>>>>>>>>>>>>>>current off with existing usage off week same as on week")
+
           let currentWeekusage = res.filter(f=>f.week == current.onweek);
+          console.log(">>>>>>>>>>>>>>>current week usage")
+          console.log(currentWeekusage)
+
           if(currentWeekusage&&currentWeekusage.length){
             let ob = currentWeekusage[0];
             var duration = moment.duration(moment(current.off).diff(moment(current.on)));
