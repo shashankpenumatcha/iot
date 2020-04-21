@@ -47,8 +47,8 @@ function error(error){
 var statsRule = new schedule.RecurrenceRule();
 //statsRule.minute = new schedule.Range(0, 59)
 statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
-statsRule.hour = 1;
-statsRule.minute = 8;
+statsRule.hour = 0;
+statsRule.minute = 1;
 statsRule.second = 0;
 let usageScheduleDate =  moment();
 usageScheduleDate = usageScheduleDate.subtract(1, "days");
@@ -88,6 +88,15 @@ var j = schedule.scheduleJob(statsRule, function(){
 });
 
 
+var usageMailRule = new schedule.RecurrenceRule();
+usageMailRule.minute = new schedule.Range(0, 59)
+usageMailRule.dayOfWeek = [0, new schedule.Range(1, 6)];
+usageMailRule.hour = 0;
+//usageMailRule.minute = 15;
+usageMailRule.second = 0;
+var j = schedule.scheduleJob(statsRule, function(){
+  mailer();
+});
 
 //auth middleware
 function auth(req,res,next){  
@@ -936,38 +945,45 @@ async function persistUsage(us){
 
 
 function mailer(){
-  console.log("day>>>>>>>>>>>>>>>>>",moment(new Date()).day())
-  if(moment(new Date()).day()==1){
-    repo.switchRepo.getStats().then(res => {
-      let payload = {};
-      payload.switches = res;
-      payload.switches = payload.switches.map(m=>{
+  let currentWeek = moment(new Date()).week()
+  repo.switchRepo.getOldStats(currentWeek).then(res => {
+    let weeks ={}
+    if(res&&res.length){
+      res.map(s=>{
+        if(!weeks[s.week]){
+          weeks[s.week]={};
+          weeks[s.week].payload = {};
+          weeks[s.week].payload.week={};
+          weeks[s.week].payload.switches =[];
+        }
         let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
         let duration = null;
         days.map(d => {
-            if(m[d]){
+            if(s[d]){
               if(!duration){
-                duration = moment.duration(m[d]);
+                duration = moment.duration(s[d]);
               }else{
-                duration.add(moment.duration(m[d]))
+                duration.add(moment.duration(s[d]))
               }
-              m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minutes()}:${moment.duration(m[d]).seconds()}`
+              s[d] = `${moment.duration(s[d]).hours()}:${moment.duration(s[d]).minutes()}:${moment.duration(s[d]).seconds()}`
             }
           return d
         })
         if(duration){
-          m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
+          s.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
         }
-        return m;
-      })
-      console.log('###################payload',payload)
-      socket.emit('sendMail',payload);
+        weeks[s.week].payload.switches.push(s);
+        return s
+      });
+      
+      console.log('################### usages for mail ##############',weeks)
+      /* socket.emit('sendMail',payload);
       repo.switchRepo.getOnStats().then(res => {
         let onStats = null;
 
         if(res.length){
           console.log('###################on stats are present',res)
-           onStats = res;
+            onStats = res;
         }
         repo.usageRepository.clearUsage().then(resp=>{
           console.log("deleteeeed",res)
@@ -988,13 +1004,13 @@ function mailer(){
             })
           }
         })
-      })
-    }, error => {
-      payload.error = 'error sending weekly mail'
-      socket.emit('usage', payload)
-    })
-    console.log('send usage schedule mail')
-  }
+      }) */
+         
+    }
+  }, error => {
+    payload.error = 'error sending weekly mail'
+  })
+  console.log('send usage schedule mail');
 }
 
 function handleOnForTracking(b,s,on) {
