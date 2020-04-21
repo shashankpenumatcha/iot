@@ -980,8 +980,8 @@ function mailer(){
       let weekKeys = Object.keys(weeks);
       if(weekKeys&&weekKeys.length){
         weekKeys.map(k=>{
-          let payload = k.payload;
-          k.payload.device = deviceId;
+          let payload = weeks[k].payload;
+         payload.device = deviceId;
           socket.emit('sendMail',payload);
        /*    repo.switchRepo.getOnStats().then(res => {
             let onStats = null;
