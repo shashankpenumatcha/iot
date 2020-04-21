@@ -947,7 +947,9 @@ async function persistUsage(us){
 
 function mailer(){
   let currentWeek = moment(new Date()).week()
+  console.log("week"+currentWeek)
   repo.switchRepo.getOldStats(currentWeek).then(res => {
+    console.log(res)
     let weeks ={}
     if(res&&res.length){
       res.map(s=>{
