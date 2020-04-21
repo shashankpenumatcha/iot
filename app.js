@@ -94,7 +94,7 @@ usageMailRule.minute = new schedule.Range(0, 59)
 usageMailRule.hour = 1;
 //usageMailRule.minute = 15;
 usageMailRule.second = 0;
-var ja = schedule.scheduleJob(statsRule, function(){
+var ja = schedule.scheduleJob(usageMailRule, function(){
   console.log("mailer schedule")
   mailer();
 });
