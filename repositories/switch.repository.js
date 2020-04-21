@@ -87,7 +87,7 @@ class SwitchRepository {
     }
     getOldStats(w) {
       return this.dao.all(`select u.id, u.switchId,u.monday,u.tuesday,u.wednesday,u.thursday,u.friday,u.saturday,u.sunday,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationId
-       join usage u on u.switchId = switches.id AND u.week != w`)
+       join usage u on u.switchId = switches.id AND u.week != ?`,[w])
     }
 
     getOnStats(week) {

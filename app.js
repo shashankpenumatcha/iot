@@ -1009,7 +1009,7 @@ function mailer(){
          
     }
   }, error => {
-    payload.error = 'error sending weekly mail'
+    //payload.error = 'error sending weekly mail'
   })
   console.log('send usage schedule mail');
 }
