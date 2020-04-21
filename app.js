@@ -982,6 +982,9 @@ function mailer(){
         weekKeys.map(k=>{
           let payload = weeks[k].payload;
          payload.device = deviceId;
+         let days = [1, 2, 3, 4, 5, 6, 7]
+         .map(d => moment('2020-'+k+'-' + d, 'YYYY-W-E').format());
+         payload.days = days;
           socket.emit('sendMail',payload);
        /*    repo.switchRepo.getOnStats().then(res => {
             let onStats = null;
