@@ -949,14 +949,13 @@ function mailer(){
   let currentWeek = moment(new Date()).week()
   console.log("week"+currentWeek)
   repo.switchRepo.getOldStats(currentWeek).then(res => {
-    console.log(res)
     let weeks ={}
     if(res&&res.length){
       res.map(s=>{
         if(!weeks[s.week]){
           weeks[s.week]={};
           weeks[s.week].payload = {};
-          weeks[s.week].payload.week={};
+          weeks[s.week].payload.week=s.week;
           weeks[s.week].payload.switches =[];
         }
         let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
@@ -978,7 +977,42 @@ function mailer(){
         weeks[s.week].payload.switches.push(s);
         return s
       });
-      
+      let weekKeys = Object.keys(weeks);
+      if(weekKeys&&weekKeys.length){
+        weekKeys.map(k=>{
+          let payload = k.payload;
+          k.payload.device = deviceId;
+          socket.emit('sendMail',payload);
+       /*    repo.switchRepo.getOnStats().then(res => {
+            let onStats = null;
+    
+            if(res.length){
+              console.log('###################on stats are present',res)
+                onStats = res;
+            }
+            repo.usageRepository.clearUsage().then(resp=>{
+              console.log("deleteeeed",res)
+              console.log('###################on stats ',onStats)
+              if(onStats&&onStats.length){
+                onStats.map(m=>{
+                  if(m.lastOnTime){
+                    if(!stats[m.board]){
+                      stats[m.board] = {};
+                    }
+                    persisting = true;
+                    stats[m.board][m.switch]={};
+                    handleOnForTracking(m.board,m.switch,m.lastOnTime)
+                    persisting=false;
+                    persistUsage(false);
+                  }
+                  return m;
+                })
+              }
+            })
+          }) */
+          return k
+        })
+      }
       console.log('################### usages for mail ##############',weeks)
       /* socket.emit('sendMail',payload);
       repo.switchRepo.getOnStats().then(res => {
