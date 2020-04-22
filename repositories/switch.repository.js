@@ -81,9 +81,9 @@ class SwitchRepository {
       return this.dao.all(`select switches.id,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId, locations.locationLogo, switches.switchLogo from switches join locations on locations.id = switches.locationId`)
     }
 
-    getStats() {
+    getStats(week) {
       return this.dao.all(`select u.id, u.switchId,u.monday,u.tuesday,u.wednesday,u.thursday,u.friday,u.saturday,u.sunday,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationId
-       join usage u on u.switchId = switches.id`)
+       join usage u on u.switchId = switches.id where u.week =?`,[week])
     }
     getOldStats(w) {
       return this.dao.all(`select u.week,u.id, u.switchId,u.monday,u.tuesday,u.wednesday,u.thursday,u.friday,u.saturday,u.sunday,switches.name,switches.board,switches.switch,locations.name as locationName, locations.locationId from switches join locations on locations.id = switches.locationId

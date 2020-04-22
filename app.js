@@ -527,7 +527,8 @@ socket.on('deleteSchedule',function(scheduleId){
       let payload = {};
       payload.socketId = msg.socketId;
       payload.deviceId = deviceId;
-      repo.switchRepo.getStats().then(res => {
+      let week = new moment(new Date()).week()
+      repo.switchRepo.getStats(week).then(res => {
         payload.switches = res;
         payload.switches = payload.switches.map(m=>{
           let days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
@@ -986,14 +987,14 @@ function mailer(){
          .map(d => moment('2020-'+k+'-' + d, 'YYYY-W-E').format());
          payload.days = days;
           socket.emit('sendMail',payload);
-       /*    repo.switchRepo.getOnStats().then(res => {
+          repo.switchRepo.getOnStats(k).then(res => {
             let onStats = null;
     
             if(res.length){
               console.log('###################on stats are present',res)
                 onStats = res;
             }
-            repo.usageRepository.clearUsage().then(resp=>{
+            repo.usageRepository.clearUsage(k).then(resp=>{
               console.log("deleteeeed",res)
               console.log('###################on stats ',onStats)
               if(onStats&&onStats.length){
@@ -1012,39 +1013,12 @@ function mailer(){
                 })
               }
             })
-          }) */
+          })
           return k
         })
       }
       console.log('################### usages for mail ##############',weeks)
-      /* socket.emit('sendMail',payload);
-      repo.switchRepo.getOnStats().then(res => {
-        let onStats = null;
-
-        if(res.length){
-          console.log('###################on stats are present',res)
-            onStats = res;
-        }
-        repo.usageRepository.clearUsage().then(resp=>{
-          console.log("deleteeeed",res)
-          console.log('###################on stats ',onStats)
-          if(onStats&&onStats.length){
-            onStats.map(m=>{
-              if(m.lastOnTime){
-                if(!stats[m.board]){
-                  stats[m.board] = {};
-                }
-                persisting = true;
-                stats[m.board][m.switch]={};
-                handleOnForTracking(m.board,m.switch,m.lastOnTime)
-                persisting=false;
-                persistUsage(false);
-              }
-              return m;
-            })
-          }
-        })
-      }) */
+    
          
     }
   }, error => {
