@@ -1101,6 +1101,10 @@ function initDevice(reinit){
   });
    
   client.on('message', function (topic, message,packet) {
+    if(topic=="lwt"){
+      console.log("last will received from "+ message);
+
+    }
     if(topic=="penumats/handshake/connect"&&!packet.retain){
       console.log("new nmcu handshake initiated");
       let id = JSON.parse(message.toString()).id;
