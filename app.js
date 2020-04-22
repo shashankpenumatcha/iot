@@ -1098,6 +1098,7 @@ function initDevice(reinit){
     });
     client.subscribe("penumats/update");
     client.subscribe("penumats/register");
+    client.subscribe("lwt");
   });
    
   client.on('message', function (topic, message,packet) {
