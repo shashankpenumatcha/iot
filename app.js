@@ -1104,6 +1104,11 @@ function initDevice(reinit){
   client.on('message', function (topic, message,packet) {
     if(topic=="lwt"){
       console.log("last will received from "+ message);
+      if(state.boards&&state.boards[message]){
+        delete state.boards[message];
+        let msg = {deviceId:deviceId,boards:state.boards}
+        socket.emit("boards",msg);
+      }
 
     }
     if(topic=="penumats/handshake/connect"&&!packet.retain){

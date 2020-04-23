@@ -31,6 +31,7 @@ long lastMsg = 0;
 char msg[50];
 int value = 0;
 String id = "5e886620ac891400f8e994bb";
+String lwt = "lwt";
 int pins[] = {BUILTIN_LED,5,4,12,13,14};
 StaticJsonDocument<200> doc;
 StaticJsonDocument<200> con;
@@ -376,7 +377,23 @@ void reconnect() {
 
        reset();
       }
-    if (client.connect(id.c_str())) {
+
+      
+    // Length (with one extra character for the null terminator)
+    int str_len = id.length() + 1; 
+    // Prepare the character array (the buffer) 
+    char char_array[str_len];
+    // Copy it over 
+    id.toCharArray(char_array, str_len);
+    
+    
+    int str_len_lwt = lwt.length() + 1; 
+    char char_array_lwt[str_len_lwt];
+    lwt.toCharArray(char_array_lwt,str_len_lwt);
+
+    if (client.connect(id.c_str(),char_array_lwt,1,0,char_array)) {
+      client.publish(char_array_lwt, "connected", true);
+
       Serial.println("connected");
       client.subscribe("penumats/handshake/reinitiate");
       client.subscribe(("penumats/"+id+"/switch/on").c_str());
