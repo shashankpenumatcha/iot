@@ -156,6 +156,20 @@ socket.on('update_wifi', function(msg){
       return b
     })
   }
+  var conn_info ={
+    wifi_ssid:req.msg.name,
+    wifi_passcode:msg.password?msg.password:null
+  }
+  
+  // TODO: If wifi did not come up correctly, it should fail
+  // currently we ignore ifup failures.
+  wifiUtil._enable_wifi_mode(conn_info, function(err) {
+    if (err) {
+     console.log('error connecting to wifi')
+    }
+    console.log("Wifi Enabled");
+    //process.exit(0);
+  });
 
 });
 
