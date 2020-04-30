@@ -1,6 +1,6 @@
 var fs = require("fs");
 const bcrypt = require('bcrypt');
-let localusers  = require('./local-users.js')();
+let localusers  = require('../local-users.js')();
 
 function login(username,password){
     var promise = new Promise(function(resolve, reject) { 
