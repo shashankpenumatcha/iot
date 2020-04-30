@@ -4,7 +4,7 @@ var shell = require('shelljs');
 var piWifi = require('pi-wifi');
 var schedule = require('node-schedule');
 var moment = require('moment');
-
+var cors = require('cors');
 var bodyParser = require('body-parser');
 var Wifi = require('rpi-wifi-connection');
 
@@ -24,6 +24,7 @@ var registrationService = require('./services/registration.service');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cors());
 var currentBoard={};
 var device = null; //registered device from server
 var boards = []; //registered boards from server
