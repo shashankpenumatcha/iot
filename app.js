@@ -1231,15 +1231,21 @@ function initDevice(reinit){
     })
   
     app.post('/api/login',function(req,res){
+      console.log("request to login")
       if(!req.body||!req.body.username||!req.body.password){
+        console.log("error 1")
+
         return res.status(400).send({'error':'username and password are required'});
       }
       registrationService.login(req.body.username,req.body.password).then(function(user){
           if(user.error){
+            console.log("error 2")
+
             return res.status(400).send({"error":"Bad Credentials"})
           }
           return res.status(200).send(user);
         },function(err){
+          console.log("error 3")
           return res.sendStatus(401)
         })
     })
@@ -1302,6 +1308,24 @@ function initDevice(reinit){
       //check for without passowrd
       if(!req.body||!req.body.ssid){
         res.sendStatus(400);
+      }
+      let msg = {
+        name:req.body.ssid,
+        password:req.body.password?req.body.password:null
+      }
+      if(state.boards){
+        let _boards = Object.keys(state.boards);
+        _boards.map(b=>{
+          console.log(b)
+          console.log(msg)
+          let buff = new Buffer(JSON.stringify(msg));
+            let base64data = buff.toString('base64');
+            console.log(base64data)
+          //client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
+          client.publish("penumats/"+b+"/wifi",base64data);
+    
+          return b
+        })
       }
       var conn_info ={
         wifi_ssid:req.body.ssid,
