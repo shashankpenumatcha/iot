@@ -1141,6 +1141,7 @@ function initDevice(reinit){
         }
 
       }else if(id){
+        console.log(boards)
         console.log('rouge board detected ' + id);
       }else{
         console.log('bad handshake, id not found');
