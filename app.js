@@ -1247,6 +1247,7 @@ function initDevice(reinit){
           return res.status(200).send(user);
         },function(err){
           console.log("error 3")
+          console.log(err)
           return res.sendStatus(401)
         })
     })
