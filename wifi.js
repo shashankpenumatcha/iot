@@ -53,6 +53,8 @@ _reboot_wireless_network = function(wlan_iface, callback) {
 
     // Disables AP mode and reverts to wifi connection
     _enable_wifi_mode = function(connection_info, callback) {
+        console.log("connectionInfo")
+        console.log(connection_info)
         if(!connection_info.passcode){
             async.series([
                 //Add new network

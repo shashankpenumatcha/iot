@@ -1326,11 +1326,9 @@ function initDevice(reinit){
         _boards.map(b=>{
           console.log(b)
           console.log(msg)
-          let buff = new Buffer(JSON.stringify(msg));
-            let base64data = buff.toString('base64');
-            console.log(base64data)
-          //client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
-          client.publish("penumats/"+b+"/wifi",base64data);
+
+          client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
+         // client.publish("penumats/"+b+"/wifi",base64data);
     
           return b
         })
@@ -1339,7 +1337,8 @@ function initDevice(reinit){
         wifi_ssid:req.body.ssid,
         wifi_passcode:req.body.password?req.body.password:null
       }
-      
+      console.log("cinfo")
+      console.log(conn_info)
       // TODO: If wifi did not come up correctly, it should fail
       // currently we ignore ifup failures.
       wifiUtil._enable_wifi_mode(conn_info, function(err) {
