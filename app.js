@@ -1294,6 +1294,7 @@ function initDevice(reinit){
       })
 
     });
+    
   
     app.get('/api/wifi/status',auth,function(req,res){
       
