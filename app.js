@@ -1279,17 +1279,21 @@ function initDevice(reinit){
   
   
     app.get('/api/wifi/scan',auth,function(req,res){    
-      wifi.getNetworks().then((networks) => {
+
+
+      wifi.scan().then((networks) => 
+      {
+        console.log(networks)
         if(networks&&networks.length){
+          console.log('networks length')
+    
           return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
-  
         }
-        return res.status(200).send({"networks":[]});
       },err=>{
         res.status(500).send({'error':[]})
-      });
-    
-    })
+      })
+
+    });
   
     app.get('/api/wifi/status',auth,function(req,res){
       
