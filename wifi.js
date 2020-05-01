@@ -55,7 +55,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
     _enable_wifi_mode = function(connection_info, callback) {
         console.log("connectionInfo")
         console.log(connection_info)
-        if(!connection_info.passcode){
+        if(!connection_info.wifi_passcode){
             async.series([
                 //Add new network
                 function update_wpa_supplicant(next_step) {
