@@ -148,11 +148,8 @@ socket.on('update_wifi', function(msg){
     _boards.map(b=>{
       console.log(b)
       console.log(msg)
-      let buff = new Buffer(JSON.stringify(msg));
-        let base64data = buff.toString('base64');
-        console.log(base64data)
+
       //client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
-      client.publish("penumats/"+b+"/wifi",base64data);
 
       return b
     })
@@ -1319,7 +1316,8 @@ function initDevice(reinit){
       }
       let msg = {
         name:req.body.ssid,
-        password:req.body.password?req.body.password:null
+        password:req.body.password?req.body.password:null,
+        device:deviceId
       }
       if(state.boards){
         let _boards = Object.keys(state.boards);
