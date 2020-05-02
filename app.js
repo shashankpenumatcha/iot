@@ -148,8 +148,8 @@ socket.on('update_wifi', function(msg){
     _boards.map(b=>{
       console.log(b)
       console.log(msg)
-
-      //client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
+      msg.device = deviceId;
+      client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
 
       return b
     })
