@@ -44,6 +44,7 @@ _reboot_wireless_network = function(wlan_iface, callback) {
       function restart(next_step) {
           exec("sudo wpa_cli -i wlan0 reconfigure", function(err, stdout, stderr) {
               if (!err) console.log("wifi reset done");
+              process.exit(1);
               next_step();
           });
       }
