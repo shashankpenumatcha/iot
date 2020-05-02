@@ -155,7 +155,7 @@ socket.on('update_wifi', function(msg){
     })
   }
   var conn_info ={
-    wifi_ssid:req.msg.name,
+    wifi_ssid:msg.name,
     wifi_passcode:msg.password?msg.password:null
   }
   
