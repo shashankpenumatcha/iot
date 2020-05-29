@@ -87,7 +87,7 @@ class ScheduleRepository {
           [id])
     }
     getAll() {
-        return this.dao.all(`SELECT s.*, l.name,l.locationLogo, sw.switchLogo, sw.id as sw_id,sw.name as sw_name,sw.board,sw.locationId, sw.switch FROM schedules s INNER JOIN
+        return this.dao.all(`SELECT s.*, l.name as location_name,l.locationLogo, sw.switchLogo, sw.id as sw_id,sw.name as sw_name,sw.board,sw.locationId, sw.switch FROM schedules s INNER JOIN
         schedules_switch_mapping ssm on ssm.scheduleid = s.id INNER JOIN
          switches sw on sw.id = ssm.switchid INNER JOIN 
          locations l on l.id = sw.locationId `)
