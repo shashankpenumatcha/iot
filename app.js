@@ -496,8 +496,14 @@ socket.on('editSchedule',function(schedule){
                       console.log('switches loop to create promise while creating schedule')
                       switches.map(s => {
                       //  console.log('asasasa')
-                      //  console.log(schedule.boards[m][s])
-                        switchesArray.push(schedule.boards[m][s].id);
+                        console.log(schedule.boards[m][s])
+                        if(schedule.boards[m][s].id!=null&&schedule.boards[m][s].id!=undefined){
+
+                          switchesArray.push(schedule.boards[m][s].id);
+                        }else{
+                          switchesArray.push(schedule.boards[m][s].sw_id);
+
+                        }
                         return s
                       })
                     }
