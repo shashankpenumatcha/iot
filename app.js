@@ -497,11 +497,11 @@ socket.on('editSchedule',function(schedule){
                       switches.map(s => {
                       //  console.log('asasasa')
                         console.log(schedule.boards[m][s])
-                        if(schedule.boards[m][s].id!=null&&schedule.boards[m][s].id!=undefined){
+                        if(schedule.boards[m][s].sw_id!=null&&schedule.boards[m][s].sw_id!=undefined){
 
-                          switchesArray.push(schedule.boards[m][s].id);
-                        }else{
                           switchesArray.push(schedule.boards[m][s].sw_id);
+                        }else{
+                          switchesArray.push(schedule.boards[m][s].id);
 
                         }
                         return s
