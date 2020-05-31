@@ -93,7 +93,7 @@ var usageMailRule = new schedule.RecurrenceRule();
 //usageMailRule.minute = new schedule.Range(0, 59)
 usageMailRule.dayOfWeek = [0, new schedule.Range(1, 6)];
 usageMailRule.hour = 01;
-usageMailRule.minute = 12;
+usageMailRule.minute = 14;
 usageMailRule.second = 0;
 var ja = schedule.scheduleJob(usageMailRule, function(){
   console.log("mailer schedule")
