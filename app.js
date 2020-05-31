@@ -439,17 +439,17 @@ socket.on('editSchedule',function(schedule){
   console.log('edit schedule request')
   if(!schedule.name){
     console.log('error - no name for schedule for edit')
-    return socket.emit('scheduleEdited', {error: `error no schedule name in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+    return socket.emit('scheduleEdited', {error: `error no schedule name in request - device - ${deviceId}`,scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
 
   }
   if(!schedule.schedule){
     console.log('error - no schedule in request for edit')
-    return socket.emit('scheduleEdited', {error: `error no schedule in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+    return socket.emit('scheduleEdited', {error: `error no schedule in request - device - ${deviceId}`,scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
 
   }
   if(!schedule.id){
     console.log('error - no schedule id in request for edit')
-    return socket.emit('scheduleEdited', {error: `error no schedule in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+    return socket.emit('scheduleEdited', {error: `error no schedule in request - device - ${deviceId}`,scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
 
   }
 
@@ -514,11 +514,11 @@ socket.on('editSchedule',function(schedule){
                   
                   return repo.scheduleRepository.addMapping(s,res.id)
                 })).then( r=> {
-                  socket.emit('scheduleEdited', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
+                  socket.emit('scheduleEdited', {scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
                   setScheduleById(schedule.scheduleId)
                 }, e => {
                   console.log(`error - schedule not created on ${deviceId}`)
-                  socket.emit('scheduleEdited', {error: `error while creating/editing schedule in ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+                  socket.emit('scheduleEdited', {error: `error while creating/editing schedule in ${deviceId}`,scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
                 })
               }
             }) 
@@ -548,12 +548,12 @@ socket.on('editSchedule',function(schedule){
     console.log('add schedule request')
     if(!schedule.name){
       console.log('error - no name for schedule')
-      return socket.emit('scheduleAdded', {error: `error no schedule name in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+      return socket.emit('scheduleAdded', {error: `error no schedule name in request - device - ${deviceId}`,scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
 
     }
     if(!schedule.schedule){
       console.log('error - no schedule in request')
-      return socket.emit('scheduleAdded', {error: `error no schedule in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+      return socket.emit('scheduleAdded', {error: `error no schedule in request - device - ${deviceId}`,scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
 
     }
     let switchesArray = [];
@@ -587,11 +587,11 @@ socket.on('editSchedule',function(schedule){
           
           return repo.scheduleRepository.addMapping(s,res.id)
         })).then( r=> {
-          socket.emit('scheduleAdded', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
+          socket.emit('scheduleAdded', {scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
           setScheduleById(schedule.scheduleId)
         }, e => {
           console.log(`error - schedule not created on ${deviceId}`)
-          socket.emit('scheduleAdded', {error: `error while creating schedule in ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+          socket.emit('scheduleAdded', {error: `error while creating schedule in ${deviceId}`,scheduleId:schedule.scheduleId,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
         })
       }
     }) 
