@@ -92,8 +92,8 @@ var j = schedule.scheduleJob(statsRule, function(){
 var usageMailRule = new schedule.RecurrenceRule();
 //usageMailRule.minute = new schedule.Range(0, 59)
 usageMailRule.dayOfWeek = [0, new schedule.Range(1, 6)];
-usageMailRule.hour = 0;
-usageMailRule.minute = 15;
+usageMailRule.hour = 01;
+usageMailRule.minute = 08;
 usageMailRule.second = 0;
 var ja = schedule.scheduleJob(usageMailRule, function(){
   console.log("mailer schedule")
@@ -1115,7 +1115,7 @@ function mailer(){
             repo.usageRepository.clearUsage(k).then(resp=>{
               console.log("deleteeeed",res)
               console.log('###################on stats ',onStats)
-              if(onStats&&onStats.length){
+             /*  if(onStats&&onStats.length){
                 onStats.map(m=>{
                   if(m.lastOnTime){
                     if(!stats[m.board]){
@@ -1125,11 +1125,11 @@ function mailer(){
                     stats[m.board][m.switch]={};
                     handleOnForTracking(m.board,m.switch,m.lastOnTime)
                     persisting=false;
-                    persistUsage(false);
+*                    persistUsage(false);
                   }
                   return m;
                 })
-              }
+              } */
             })
           })
           return k
