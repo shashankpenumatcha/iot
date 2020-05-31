@@ -455,11 +455,11 @@ socket.on('editSchedule',function(schedule){
 
 
   console.log('request to edit/delete schedule');
-  repo.scheduleRepository.getAllById(payload.id).then(res => {
+  repo.scheduleRepository.getAllById(schedule.id).then(res => {
     
     console.log('all schedules by id')
     if(res && res.length){
-      repo.scheduleRepository.deleteById( payload.id).then(r => {
+      repo.scheduleRepository.deleteById( schedule.id).then(r => {
         console.log('eit/deleted schedule by id')
         if(r){
             let id;
