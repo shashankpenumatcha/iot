@@ -435,7 +435,107 @@ socket.on('deleteLocation',function(locationId){
   }
 });
 
-socket.on('deleteSchedule',function(scheduleId){
+socket.on('editSchedule',function(schedule){
+  console.log('edit schedule request')
+  if(!schedule.name){
+    console.log('error - no name for schedule for edit')
+    return socket.emit('scheduleEdited', {error: `error no schedule name in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+
+  }
+  if(!schedule.schedule){
+    console.log('error - no schedule in request for edit')
+    return socket.emit('scheduleEdited', {error: `error no schedule in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+
+  }
+  if(!schedule.id){
+    console.log('error - no schedule id in request for edit')
+    return socket.emit('scheduleEdited', {error: `error no schedule in request - device - ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+
+  }
+
+
+  console.log('request to edit/delete schedule');
+  repo.scheduleRepository.getAllById(payload.id).then(res => {
+    
+    console.log('all schedules by id')
+    if(res && res.length){
+      repo.scheduleRepository.deleteById( payload.id).then(r => {
+        console.log('eit/deleted schedule by id')
+        if(r){
+            let id;
+            res.map(m => {
+              id = m.id;
+              if(activeSchedules&&activeSchedules[m.id]) {
+                if(activeSchedules[m.id][m.sw_id]){
+                  if(activeSchedules[m.id][m.sw_id].on){
+                    activeSchedules[m.id][m.sw_id].on.cancel();
+                  }
+                  if(activeSchedules[m.id][m.sw_id].off){
+                    activeSchedules[m.id][m.sw_id].off.cancel();
+                  }
+                }
+              }
+              return m;
+            })
+            if(id) {
+
+              activeSchedules[id] = null;
+            }
+          
+            //create schedule
+            let switchesArray = [];
+
+            if(schedule.boards){
+              let boards = Object.keys(schedule.boards);
+              if(boards && boards.length){
+                  boards.map(m => {
+                    if(schedule.boards[m]) {
+                      switches = Object.keys(schedule.boards[m]);
+                    } 
+                    if(switches && switches.length){
+                      console.log('switches loop to create promise while creating schedule')
+                      switches.map(s => {
+                      //  console.log('asasasa')
+                      //  console.log(schedule.boards[m][s])
+                        switchesArray.push(schedule.boards[m][s].id);
+                        return s
+                      })
+                    }
+                    return m           
+                  });
+              }
+            }
+            //console.log(schedule)
+            repo.scheduleRepository.create( schedule.scheduleId,schedule.name,1,null,null,null,schedule.schedule.days.toString(),schedule.schedule.start,schedule.schedule.end).then(res=>{
+              console.log(`schedule  created with id #${res.id}`);
+              if(switchesArray.length){
+                Promise.all(switchesArray.map((s) => {
+                //  console.log(s)
+                  
+                  return repo.scheduleRepository.addMapping(s,res.id)
+                })).then( r=> {
+                  socket.emit('scheduleEdited', {deviceId: deviceId, name: schedule.name, socketId: schedule.socketId})
+                  setScheduleById(schedule.scheduleId)
+                }, e => {
+                  console.log(`error - schedule not created on ${deviceId}`)
+                  socket.emit('scheduleEdited', {error: `error while creating/editing schedule in ${deviceId}`,deviceId: deviceId, name: schedule.name, socketId: schedule.socketId, devices: schedule.devices})
+                })
+              }
+            }) 
+         
+        }
+      }, err => {
+        socket.emit('scheduleToggled', payload);
+      })
+    }
+  }, err => {
+    socket.emit('scheduleToggled', payload);
+  })
+
+
+});
+
+/* socket.on('deleteSchedule',function(scheduleId){
   if(scheduleId){
     repo.scheduleRepository.delete(scheduleId).then(res=>{
       console.log('deleted schedule ' + scheduleId )
@@ -443,7 +543,7 @@ socket.on('deleteSchedule',function(scheduleId){
     console.log(e);
     })
   }
-});
+}); */
   socket.on('addSchedule',function(schedule){
     console.log('add schedule request')
     if(!schedule.name){
