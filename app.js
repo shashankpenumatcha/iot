@@ -48,8 +48,8 @@ function error(error){
 var statsRule = new schedule.RecurrenceRule();
 //statsRule.minute = new schedule.Range(0, 59)
 statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
-statsRule.hour = 0;
-statsRule.minute = 1;
+statsRule.hour = 01;
+statsRule.minute = 25;
 statsRule.second = 0;
 let usageScheduleDate =  moment();
 usageScheduleDate = usageScheduleDate.subtract(1, "days");
@@ -92,8 +92,8 @@ var j = schedule.scheduleJob(statsRule, function(){
 var usageMailRule = new schedule.RecurrenceRule();
 //usageMailRule.minute = new schedule.Range(0, 59)
 usageMailRule.dayOfWeek = [0, new schedule.Range(1, 6)];
-usageMailRule.hour = 01;
-usageMailRule.minute = 14;
+usageMailRule.hour = 00;
+usageMailRule.minute = 15;
 usageMailRule.second = 0;
 var ja = schedule.scheduleJob(usageMailRule, function(){
   console.log("mailer schedule")
