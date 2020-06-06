@@ -50,14 +50,15 @@ var statsRule = new schedule.RecurrenceRule();
 statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
 statsRule.hour = 00;
 statsRule.minute = 01;
-statsRule.second = 0;
-let usageScheduleDate =  moment();
-usageScheduleDate = usageScheduleDate.subtract(1, "days");
-usageScheduleDate = usageScheduleDate.set({h:23,m:59})
-usageScheduleDatenext = usageScheduleDate.add(1,'days');
-usageScheduleDatenext = usageScheduleDate.set({h:00,m:00})
-let usageScheduleWeek = usageScheduleDate.week();
+statsRule.second = 00;
 var j = schedule.scheduleJob(statsRule, function(){
+  let usageScheduleDate =  moment();
+  usageScheduleDate.subtract(1, "days");
+  usageScheduleDate.set({h:23,m:59})
+  let usageScheduleDatenext = moment(usageScheduleDate);
+  usageScheduleDatenext.add(1,'days');
+  usageScheduleDatenext.set({h:00,m:00})
+  let usageScheduleWeek = usageScheduleDate.week();
   console.log(":::::::::::::::::::::::usage schedule rule every night")
   repo.switchRepo.getOnStats(usageScheduleWeek).then(res=>{
     if(res&&res.length){
