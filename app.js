@@ -1163,8 +1163,7 @@ function handleOnForTracking(b,s,on) {
 
 function handleOffForTracking(b,s,off) {
   initStats(b,s);
-  console.log(stats)
-  console.log(stats.current)
+  console.log(JSON.stringify(stats))
 
   let current = stats[b][s].current;
   let pending = stats[b][s].pending;
