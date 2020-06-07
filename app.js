@@ -49,7 +49,7 @@ var statsRule = new schedule.RecurrenceRule();
 //statsRule.minute = new schedule.Range(0, 59)
 statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
 statsRule.hour = 00;
-statsRule.minute = 13;
+statsRule.minute = 18;
 statsRule.second = 00;
 var j = schedule.scheduleJob(statsRule, function(){
   let usageScheduleDate =  moment();
@@ -941,6 +941,7 @@ function initStats(b,s) {
 
 }
 async function persistUsage(us){
+  console.log(us)
   persisting = true;
   let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
   if(!pendingStats.length){
