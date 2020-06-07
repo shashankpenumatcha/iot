@@ -941,7 +941,7 @@ function initStats(b,s) {
 
 }
 async function persistUsage(us){
-  console.log(pendingStats)
+//  console.log(pendingStats)
   persisting = true;
   let days = ['sunday', 'monday','tuesday','wednesday','thursday','friday','saturday']
   if(!pendingStats.length){
@@ -1163,6 +1163,7 @@ function handleOnForTracking(b,s,on) {
 
 function handleOffForTracking(b,s,off) {
   initStats(b,s);
+  console.log(stats)
   let current = stats[b][s].current;
   let pending = stats[b][s].pending;
   if(!current.on){
