@@ -1164,6 +1164,8 @@ function handleOnForTracking(b,s,on) {
 function handleOffForTracking(b,s,off) {
   initStats(b,s);
   console.log(stats)
+  console.log(stats.current)
+
   let current = stats[b][s].current;
   let pending = stats[b][s].pending;
   if(!current.on){
