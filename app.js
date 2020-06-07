@@ -49,8 +49,8 @@ var statsRule = new schedule.RecurrenceRule();
 //statsRule.minute = new schedule.Range(0, 59)
 statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
 statsRule.hour = 00;
-statsRule.minute = 40;
-statsRule.second = 00;
+statsRule.minute = 01;
+statsRule.second = 0;
 var j = schedule.scheduleJob(statsRule, function(){
   let usageScheduleDate =  moment();
   usageScheduleDate.subtract(1, "days");
@@ -1055,7 +1055,13 @@ async function persistUsage(us){
     setTimeout(function(){
       persistUsage(us)
     })
-    }/* else{
+    }
+    setTimeout(function(){
+      if(!persisting&&pendingStats.length){
+        persistUsage(us)
+      }
+    },5000)
+    /* else{
       if(us){
         usageSchedule = false;
 
@@ -1163,7 +1169,8 @@ function handleOnForTracking(b,s,on) {
 
 function handleOffForTracking(b,s,off) {
   initStats(b,s);
-  console.log(JSON.stringify(stats))
+ 
+
 
   let current = stats[b][s].current;
   let pending = stats[b][s].pending;
@@ -1173,10 +1180,14 @@ function handleOffForTracking(b,s,off) {
   current.off = off?off:moment().format();
   current.offweek = new moment(current.off).week();
   pendingStats.push(JSON.parse(JSON.stringify(current)));
+  console.log("off stats .........")
+  console.log(JSON.stringify(stats))
+  console.log("off stats .........")
   current.on=null;
   current.off=null;
   current.onweek = null;
   current.offweek = null;
+  
   if(pendingStats.length && !persisting){
     persistUsage(false)
   }
