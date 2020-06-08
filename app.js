@@ -45,20 +45,23 @@ let three =  '2020-03-31T00:00:10+05:30';
 function error(error){
   return {"error":error};
 }
-try{
-  let allonstats = await repo.usageRepository.getAllOn();
-  if(res && res.length){
-    try{
-      clearedAllOn= await repo.usageRepository.clearOn();
-    }catch(er){
-      console.log("error while clearOn")  
-      console.log(er)
+async function clearOnStart(){
+  try{
+    let allonstats = await repo.usageRepository.getAllOn();
+    if(res && res.length){
+      try{
+        clearedAllOn= await repo.usageRepository.clearOn();
+      }catch(er){
+        console.log("error while clearOn")  
+        console.log(er)
+      }
     }
+  }catch(e){
+   console.log("error while getting all on")  
+   console.log(e)
   }
-}catch(e){
- console.log("error while getting all on")  
- console.log(e)
 }
+clearOnStart();
 var statsRule = new schedule.RecurrenceRule();
 //statsRule.minute = new schedule.Range(0, 59)
 statsRule.dayOfWeek = [0, new schedule.Range(1, 6)];
