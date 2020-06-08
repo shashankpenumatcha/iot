@@ -48,7 +48,7 @@ function error(error){
 async function clearOnStart(){
   try{
     let allonstats = await repo.usageRepository.getAllOn();
-    if(res && res.length){
+    if(allonstats && allonstats.length){
       try{
         clearedAllOn= await repo.usageRepository.clearOn();
       }catch(er){
