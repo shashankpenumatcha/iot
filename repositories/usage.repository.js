@@ -71,6 +71,9 @@ class UsageRepository {
     getAllOn() {
       return this.dao.all(`SELECT * FROM usage  where lastOnTime IS NOT NULL`)
     }
+    clearOn() {
+      return this.dao.run(`UPDATE usage SET lastOnTime = NULL`) 
+    }
 
     getByAddress(b,s) {
       return this.dao.all(
