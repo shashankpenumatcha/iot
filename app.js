@@ -676,12 +676,18 @@ socket.on('editSchedule',function(schedule){
                 }else{
                   duration.add(moment.duration(m[d]))
                 }
-                m[d] = `${moment.duration(m[d]).hours()}:${moment.duration(m[d]).minutes()}:${moment.duration(m[d]).seconds()}`
+                m[d] = `${moment.duration(m[d]).hours()} hours, ${moment.duration(m[d]).minutes()} minutes and ${moment.duration(m[d]).seconds()} seconds`
+                if(moment.duration(m[d]).days()){
+                  m[d] = `${moment.duration(m[d]).days()} days, ${moment.duration(m[d]).hours()} hours, ${moment.duration(m[d]).minutes()} minutes and ${moment.duration(m[d]).seconds()} seconds`
+                }
               }
             return d
           })
           if(duration){
-            m.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
+            m.duration = `${duration.hours()} hours, ${duration.minutes()} minutes and ${duration.seconds()} seconds`
+            if(duration.days()){
+              m.duration = `${duration.days()} days, ${duration.hours()} hours, ${duration.minutes()} minutes and ${duration.seconds()} seconds`
+            }
           }
 
 
@@ -1111,12 +1117,19 @@ function mailer(){
               }else{
                 duration.add(moment.duration(s[d]))
               }
-              s[d] = `${moment.duration(s[d]).hours()}:${moment.duration(s[d]).minutes()}:${moment.duration(s[d]).seconds()}`
+              s[d] = `${moment.duration(s[d]).hours()} hours, ${moment.duration(s[d]).minutes()} minutes and ${moment.duration(s[d]).seconds()} seconds`
+              
+              if(moment.duration(s[d]).days()){
+                s[d] = `${moment.duration(s[d]).days()} days, ${moment.duration(s[d]).hours()} hours, ${moment.duration(s[d]).minutes()} minutes and ${moment.duration(s[d]).seconds()} seconds`
+              }
             }
           return d
         })
         if(duration){
-          s.duration = `${duration.hours()}:${duration.minutes()}:${duration.seconds()}`
+          s.duration = `${duration.hours()} hours, ${duration.minutes()} minutes and ${duration.seconds()} seconds`
+          if(duration.days()){
+            s.duration = `${duration.days()} days, ${duration.hours()} hours, ${duration.minutes()} minutes and ${duration.seconds()} seconds`
+          }
         }
         weeks[s.week].payload.switches.push(s);
         return s
