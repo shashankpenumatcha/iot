@@ -21,7 +21,8 @@ var socket = io.connect(`${config.server}?device=${deviceId}`, {reconnection: tr
 var wifiUtil = require('./wifi.js');
 var repo = require("./repo.js");
 var registrationService = require('./services/registration.service');
-
+app.use('/mqtt',express.static(path.join(__dirname,'node_modules/mqtt/dist')))
+app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
@@ -1246,6 +1247,141 @@ function setScheduleById(scheduleId){
 }
 
 
+app.post('/api/password/reset',auth,function(req,res){
+  if(!req.body||!req.body.username||!req.body.password||!req.body.oldPassword){
+    return res.status(400).send(error("Bad Request"))
+  }
+  registrationService.resetPassword(req.body.username,req.body.password,req.body.oldPassword).then(function(reset){
+    if(reset.message){
+      return res.status(200).send(reset)
+    }
+  },function(err){
+    return res.status(500).send(reset)
+
+  })
+
+})
+
+app.post('/api/login',function(req,res){
+  console.log("request to login")
+  if(!req.body||!req.body.username||!req.body.password){
+    console.log("error 1")
+
+    return res.status(400).send({'error':'username and password are required'});
+  }
+  registrationService.login(req.body.username,req.body.password).then(function(user){
+      if(user.error){
+        console.log("error 2")
+
+        return res.status(400).send({"error":"Bad Credentials"})
+      }
+      return res.status(200).send(user);
+    },function(err){
+      console.log("error 3")
+      console.log(err)
+      return res.sendStatus(401)
+    })
+})
+
+app.get('/api/boards',auth,function(req,res){
+ if(!state||!state.boards){
+   return res.status(404).send({error:"boards not found"});
+ }
+ let boards={};
+ Object.keys(state.boards).map(function(m){
+    boards[m] = {};
+    boards[m].switches=[];
+    if(state.boards[m].switches.length){
+      state.boards[m].switches.map(function(n,index){
+          let ob={};
+          ob.label=null;
+          ob.on="/on?b="+m+"&s="+index;
+          ob.off="/off?b="+m+"&s="+index;
+          ob.state = n;
+          boards[m].switches.push(ob);
+          return n;
+      });
+    }
+    return m;
+ });
+ return res.status(200).send(boards);
+})
+
+
+app.get('/api/wifi/scan',auth,function(req,res){    
+
+
+  piWifi.scan().then((networks) => 
+  {
+    console.log(networks)
+    if(networks&&networks.length){
+      console.log('networks length')
+
+      return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
+    }
+  },err=>{
+    res.status(500).send({'error':[]})
+  })
+
+});
+
+
+app.get('/api/wifi/status',auth,function(req,res){
+  
+  wifi.getStatus().then((connection) => {
+      if(connection){
+        return res.status(200).send({"network":connection});
+      }else{
+        return res.status(200).send({"network":[]});
+      }
+  },err=>{
+    return res.status(500).send({"error":err});
+
+  });
+
+})
+
+
+app.post('/api/wifi/join',auth,function(req,res){
+  //check for without passowrd
+  if(!req.body||!req.body.ssid){
+    res.sendStatus(400);
+  }
+  let msg = {
+    name:req.body.ssid,
+    password:req.body.password?req.body.password:null,
+    device:deviceId
+  }
+  if(state.boards){
+    let _boards = Object.keys(state.boards);
+    _boards.map(b=>{
+      console.log(b)
+      console.log(msg)
+      if(client){
+        client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
+      }
+     // client.publish("penumats/"+b+"/wifi",base64data);
+
+      return b
+    })
+  }
+  var conn_info ={
+    wifi_ssid:req.body.ssid,
+    wifi_passcode:req.body.password?req.body.password:null
+  }
+  console.log("cinfo")
+  console.log(conn_info)
+  // TODO: If wifi did not come up correctly, it should fail
+  // currently we ignore ifup failures.
+  wifiUtil._enable_wifi_mode(conn_info, function(err) {
+    if (err) {
+      res.status(500).send('error connecting to wifi')
+    }
+    res.status(200).send("Wifi Enabled");
+    //process.exit(0);
+  });
+
+});
 
 function initDevice(reinit){
 
@@ -1365,140 +1501,6 @@ function initDevice(reinit){
       }
     })
     
-    app.post('/api/password/reset',auth,function(req,res){
-      if(!req.body||!req.body.username||!req.body.password||!req.body.oldPassword){
-        return res.status(400).send(error("Bad Request"))
-      }
-      registrationService.resetPassword(req.body.username,req.body.password,req.body.oldPassword).then(function(reset){
-        if(reset.message){
-          return res.status(200).send(reset)
-        }
-      },function(err){
-        return res.status(500).send(reset)
-  
-      })
-    
-    })
-  
-    app.post('/api/login',function(req,res){
-      console.log("request to login")
-      if(!req.body||!req.body.username||!req.body.password){
-        console.log("error 1")
-
-        return res.status(400).send({'error':'username and password are required'});
-      }
-      registrationService.login(req.body.username,req.body.password).then(function(user){
-          if(user.error){
-            console.log("error 2")
-
-            return res.status(400).send({"error":"Bad Credentials"})
-          }
-          return res.status(200).send(user);
-        },function(err){
-          console.log("error 3")
-          console.log(err)
-          return res.sendStatus(401)
-        })
-    })
-    
-    app.get('/api/boards',auth,function(req,res){
-     if(!state||!state.boards){
-       return res.status(404).send({error:"boards not found"});
-     }
-     let boards={};
-     Object.keys(state.boards).map(function(m){
-        boards[m] = {};
-        boards[m].switches=[];
-        if(state.boards[m].switches.length){
-          state.boards[m].switches.map(function(n,index){
-              let ob={};
-              ob.label=null;
-              ob.on="/on?b="+m+"&s="+index;
-              ob.off="/off?b="+m+"&s="+index;
-              ob.state = n;
-              boards[m].switches.push(ob);
-              return n;
-          });
-        }
-        return m;
-     });
-     return res.status(200).send(boards);
-    })
-  
-  
-    app.get('/api/wifi/scan',auth,function(req,res){    
-
-
-      wifi.scan().then((networks) => 
-      {
-        console.log(networks)
-        if(networks&&networks.length){
-          console.log('networks length')
-    
-          return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
-        }
-      },err=>{
-        res.status(500).send({'error':[]})
-      })
-
-    });
-    
-  
-    app.get('/api/wifi/status',auth,function(req,res){
-      
-      wifi.getStatus().then((connection) => {
-          if(connection){
-            return res.status(200).send({"network":connection});
-          }else{
-            return res.status(200).send({"network":[]});
-          }
-      },err=>{
-        return res.status(500).send({"error":err});
-  
-      });
-    
-    })
-  
-    
-    app.post('/api/wifi/join',auth,function(req,res){
-      //check for without passowrd
-      if(!req.body||!req.body.ssid){
-        res.sendStatus(400);
-      }
-      let msg = {
-        name:req.body.ssid,
-        password:req.body.password?req.body.password:null,
-        device:deviceId
-      }
-      if(state.boards){
-        let _boards = Object.keys(state.boards);
-        _boards.map(b=>{
-          console.log(b)
-          console.log(msg)
-
-          client.publish("penumats/"+b+"/wifi",JSON.stringify(msg));
-         // client.publish("penumats/"+b+"/wifi",base64data);
-    
-          return b
-        })
-      }
-      var conn_info ={
-        wifi_ssid:req.body.ssid,
-        wifi_passcode:req.body.password?req.body.password:null
-      }
-      console.log("cinfo")
-      console.log(conn_info)
-      // TODO: If wifi did not come up correctly, it should fail
-      // currently we ignore ifup failures.
-      wifiUtil._enable_wifi_mode(conn_info, function(err) {
-        if (err) {
-          res.status(500).send('error connecting to wifi')
-        }
-        res.status(200).send("Wifi Enabled");
-        //process.exit(0);
-      });
-    
-    });
   }
 
   
@@ -1508,8 +1510,7 @@ function initDevice(reinit){
   
 }
 
-app.use('/mqtt',express.static(path.join(__dirname,'node_modules/mqtt/dist')))
-app.use(express.static('public'))
+
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
