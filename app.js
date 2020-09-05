@@ -1311,16 +1311,17 @@ app.get('/api/boards',auth,function(req,res){
 app.get('/api/wifi/scan',auth,function(req,res){    
 
 
-  piWifi.scan().then((networks) => 
+  piWifi.scan()((networks,err) => 
   {
+    if(err){
+      res.status(500).send({'error':[]})
+    }
     console.log(networks)
     if(networks&&networks.length){
       console.log('networks length')
 
       return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
     }
-  },err=>{
-    res.status(500).send({'error':[]})
   })
 
 });
