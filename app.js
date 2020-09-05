@@ -1320,7 +1320,7 @@ app.get('/api/wifi/scan',auth,function(req,res){
     if(networks&&networks.length){
       console.log('networks length')
 
-      return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure').map(m=>m.ssid)})
+      return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure')})
     }
   })
 
