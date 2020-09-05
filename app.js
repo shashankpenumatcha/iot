@@ -1311,7 +1311,7 @@ app.get('/api/boards',auth,function(req,res){
 app.get('/api/wifi/scan',auth,function(req,res){    
 
 
-  piWifi.scan()((networks,err) => 
+  piWifi.scan((err,networks) => 
   {
     if(err){
       res.status(500).send({'error':[]})
