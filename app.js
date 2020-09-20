@@ -1326,6 +1326,24 @@ app.get('/api/wifi/scan',auth,function(req,res){
 
 });
 
+app.get('/api/wifi/scan2',auth,function(req,res){    
+
+
+  wifi.scan().then((networks) => 
+  {
+    
+    console.log(networks)
+    if(networks&&networks.length){
+      console.log('networks length')
+
+      return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure')})
+    }
+  },(err)=>{
+    res.status(500).send({'error':[]})
+  })
+
+});
+
 
 app.get('/api/wifi/status',auth,function(req,res){
   
