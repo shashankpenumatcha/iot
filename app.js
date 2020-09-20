@@ -1324,7 +1324,7 @@ app.get('/api/wifi/scan',auth,function(req,res){
       if(networks&&networks.length){
         //console.log('networks length')
         networks = networks.map(m=>{
-          if(status.bssid==m.ssid){
+          if(status.bssid==m.bssid){
             m.connected = true
           }
           return m
