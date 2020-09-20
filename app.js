@@ -1314,7 +1314,7 @@ app.get('/api/wifi/scan',auth,function(req,res){
     if (err) {
       return console.error(err.message);
     }
-    // console.log(status);
+     console.log(status);
     piWifi.scan((err,networks) => 
     {
       if(err){
