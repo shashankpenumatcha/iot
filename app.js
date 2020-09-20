@@ -21,6 +21,7 @@ var socket = io.connect(`${config.server}?device=${deviceId}`, {reconnection: tr
 var wifiUtil = require('./wifi.js');
 var repo = require("./repo.js");
 var registrationService = require('./services/registration.service');
+const { isBuffer } = require('util');
 app.use('/mqtt',express.static(path.join(__dirname,'node_modules/mqtt/dist')))
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -1309,21 +1310,29 @@ app.get('/api/boards',auth,function(req,res){
 
 
 app.get('/api/wifi/scan',auth,function(req,res){    
-
-
-  piWifi.scan((err,networks) => 
-  {
-    if(err){
-      res.status(500).send({'error':[]})
+  piWifi.status('wlan0', function(err, status) {
+    if (err) {
+      return console.error(err.message);
     }
-    console.log(networks)
-    if(networks&&networks.length){
-      console.log('networks length')
-
-      return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure')})
-    }
-  })
-
+    // console.log(status);
+    piWifi.scan((err,networks) => 
+    {
+      if(err){
+        res.status(500).send({'error':[]})
+      }
+        //console.log(networks)
+      if(networks&&networks.length){
+        //console.log('networks length')
+        networks.map(m=>{
+          if(status.bssid==m.ssid){
+            m.connected = true
+          }
+          return m
+        });
+        return res.status(200).send({"networks":networks.filter(f=>f.ssid!='Infrastructure')})
+      }
+    })
+  });
 });
 
 app.get('/api/wifi/scan2',auth,function(req,res){    
