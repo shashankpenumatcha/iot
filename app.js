@@ -139,8 +139,28 @@ function auth(req,res,next){
 
 socket.on('scan',function(socketId){
   console.log("req to get networs")
+  piWifi.status('wlan0', function(err, status) {
+     console.log(status);
+    piWifi.scan((err,networks) => 
+    {
+      if(err){
+        socket.emit('networks',{socketId:socketId,error:'error while scanning netowrks'})
+      }
+        //console.log(networks)
+      if(networks&&networks.length){
+        //console.log('networks length')
+        networks = networks.map(m=>{
+          if(status&&status.bssid==m.bssid){
+            m.connected = true
+          }
+          return m
+        });
+        socket.emit('networks',{socketId:socketId,networks:networks.filter(f=>f.ssid!='Infrastructure')})
+      }
+    })
+  });
  
-  wifi.scan().then((networks) => 
+ /*  wifi.scan().then((networks) => 
   {
     console.log(networks)
     if(networks&&networks.length){
@@ -150,7 +170,7 @@ socket.on('scan',function(socketId){
     }
   },err=>{
     socket.emit('networks',{socketId:socketId,error:'error while scanning netowrks'})
-  });
+  }); */
 })
 
 
@@ -1311,10 +1331,6 @@ app.get('/api/boards',auth,function(req,res){
 
 app.get('/api/wifi/scan',auth,function(req,res){    
   piWifi.status('wlan0', function(err, status) {
-    if (err) {
-      return console.error(err.message);
-    }
-     console.log(status);
     piWifi.scan((err,networks) => 
     {
       if(err){
@@ -1324,7 +1340,7 @@ app.get('/api/wifi/scan',auth,function(req,res){
       if(networks&&networks.length){
         //console.log('networks length')
         networks = networks.map(m=>{
-          if(status.bssid==m.bssid){
+          if(status && status.bssid==m.bssid){
             m.connected = true
           }
           return m

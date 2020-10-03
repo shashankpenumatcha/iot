@@ -1,3 +1,3 @@
 module.exports = {
- server: 'http://134.209.155.230:3001'
+ server: 'http://172.20.10.2:3001'
 }
